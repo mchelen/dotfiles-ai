@@ -24,6 +24,7 @@ written as plain tool-agnostic markdown:
 | [`testing.md`](defaults/testing.md) | Tests come **before** implementation; bug fixes start from a reproducing test |
 | [`architecture.md`](defaults/architecture.md) | Every project keeps an up-to-date `ARCHITECTURE.md` with Mermaid diagrams |
 | [`project-website.md`](defaults/project-website.md) | Most projects get a static site (GitHub Pages) with usage docs and (simulated) screenshots/demos |
+| [`secrets.md`](defaults/secrets.md) | Layered secret/PII protection: pre-commit scan + CI scanner + GitHub secret scanning; leaked = rotate |
 | [`git.md`](defaults/git.md) | No commits/pushes unless asked, no history rewrites, no secrets |
 
 ## Install
@@ -59,9 +60,35 @@ completely silent when there's nothing new, when offline, or when throttled,
 so it doesn't clutter shell startup; it prints only when defaults actually
 changed.
 
-**2. Manual pulls** — `sync.sh` configures `core.hooksPath` so the
-versioned [`hooks/post-merge`](hooks/post-merge) hook re-runs `install.sh`
-after any `git pull` in this repo. Installed files never lag the checkout.
+**2. Manual pulls** — a post-merge hook (managed by the pre-commit
+framework, see below) re-runs `install.sh` after any `git pull` in this
+repo, so installed files never lag the checkout.
+
+## Guarding against leaked secrets
+
+This repo practices what [`defaults/secrets.md`](defaults/secrets.md)
+preaches, in three layers:
+
+1. **Pre-commit** — the standard [pre-commit](https://pre-commit.com)
+   framework ([`.pre-commit-config.yaml`](.pre-commit-config.yaml)) runs
+   the official gitleaks hook plus `detect-private-key` and
+   `detect-aws-credentials` on every commit. PII patterns (SSN, payment
+   card numbers) extend gitleaks' built-in rules via
+   [`.gitleaks.toml`](.gitleaks.toml). Setup per machine (`sync.sh` does
+   this automatically when `pre-commit` is on the PATH):
+
+   ```sh
+   pipx install pre-commit   # or: brew install pre-commit
+   pre-commit install --hook-type pre-commit --hook-type post-merge
+   ```
+
+   False positives get a `gitleaks:allow` comment on the line.
+2. **CI** — [`.github/workflows/secret-scan.yml`](.github/workflows/secret-scan.yml)
+   runs the gitleaks action on every push and PR, catching anything that
+   slipped past (or bypassed) the local hook.
+3. **Platform** — enable *GitHub secret scanning* and *push protection*
+   under Settings → Advanced Security. GitHub then blocks pushes containing
+   recognized provider tokens server-side.
 
 ## Usage by tool
 

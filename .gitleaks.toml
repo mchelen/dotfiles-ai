@@ -1,0 +1,16 @@
+# Extends gitleaks' built-in secret rules with basic PII patterns.
+# Used by both the pre-commit hook and the CI scan.
+# False positives: add a `gitleaks:allow` comment on the offending line.
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "us-social-security-number"
+description = "US Social Security Number"
+regex = '''\b\d{3}-\d{2}-\d{4}\b'''
+
+[[rules]]
+id = "payment-card-number"
+description = "Payment card number (grouped 16-digit)"
+regex = '''\b\d{4}[- ]\d{4}[- ]\d{4}[- ]\d{4}\b'''

@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-# Re-run the installer after any pull so installed blocks never lag the
-# checkout. Enabled via `git config core.hooksPath hooks` (sync.sh sets
-# this automatically). Git runs this from the repo root.
-# sync.sh drives its own install run; skip to avoid doing it twice.
-[ -n "${DOTFILES_AI_SYNC:-}" ] && exit 0
-exec ./install.sh

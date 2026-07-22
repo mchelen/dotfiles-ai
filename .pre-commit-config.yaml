@@ -1,0 +1,26 @@
+# Secret/PII protection via standard hooks. One-time setup per machine:
+#   pre-commit install --hook-type pre-commit --hook-type post-merge
+# (sync.sh does this automatically when pre-commit is installed)
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.3
+    hooks:
+      - id: gitleaks   # secrets + the PII rules in .gitleaks.toml
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: detect-private-key
+      - id: detect-aws-credentials
+        args: [--allow-missing-credentials]
+      - id: check-merge-conflict
+
+  - repo: local
+    hooks:
+      - id: reinstall-defaults
+        name: re-run install.sh after pull
+        entry: bash -c '[ -n "${DOTFILES_AI_SYNC:-}" ] || ./install.sh'
+        language: system
+        stages: [post-merge]
+        always_run: true
+        pass_filenames: false
