@@ -11,8 +11,8 @@ flowchart LR
         I["install.sh"]
     end
     D -->|"concatenated into a<br/>marker-delimited managed block"| I
-    I -->|"insert / replace block"| C["~/.claude/CLAUDE.md<br/>(Claude Code)"]
-    I -->|"insert / replace block"| X["~/.codex/AGENTS.md<br/>(Codex CLI)"]
+    I -->|"insert / replace block<br/>(if tool detected)"| C["~/.claude/CLAUDE.md<br/>(Claude Code)"]
+    I -->|"insert / replace block<br/>(if tool detected)"| X["~/.codex/AGENTS.md, ~/.copilot/…,<br/>~/.gemini/…, ~/.qwen/…,<br/>opencode, goose"]
     I -->|"--print"| P["stdout → paste into<br/>UI-only tools (e.g. Cursor)"]
 ```
 
@@ -27,7 +27,9 @@ flowchart LR
   each target file. Re-runs replace only the managed block (backing up the
   file first), so user content outside the markers is never touched.
   Targets are a plain list in the script — adding a tool means adding a
-  path there.
+  path there. A target is skipped unless its tool's config directory
+  already exists (`--all` overrides), so only tools actually in use get
+  instruction files.
 
 ## Key invariant
 

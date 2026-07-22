@@ -5,8 +5,13 @@
 # Idempotent: content lives between BEGIN/END markers, so re-running
 # replaces the managed block and leaves anything else in the file alone.
 #
+# A target is only written if its tool's config directory already exists
+# (i.e. the tool appears to be installed), so you don't accumulate files
+# for tools you don't use.
+#
 # Usage:
-#   ./install.sh            install/update the managed block in all targets
+#   ./install.sh            install/update the managed block for detected tools
+#   ./install.sh --all      install for every known tool, detected or not
 #   ./install.sh --print    print the assembled block to stdout and exit
 
 set -euo pipefail
@@ -15,11 +20,16 @@ REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 BEGIN_MARK="<!-- BEGIN dotfiles-ai (managed block, edit in the dotfiles-ai repo) -->"
 END_MARK="<!-- END dotfiles-ai -->"
 
-# Tools that read user-level markdown instructions. Add or remove targets
-# to match the tools you actually use.
+# User-level instruction files of tools that read markdown guidance.
+# Add or remove entries to match the tools you use.
 TARGETS=(
-  "$HOME/.claude/CLAUDE.md"   # Claude Code user memory
-  "$HOME/.codex/AGENTS.md"    # OpenAI Codex CLI global guidance
+  "$HOME/.claude/CLAUDE.md"                 # Claude Code (CLI/desktop/IDE)
+  "$HOME/.codex/AGENTS.md"                  # OpenAI Codex CLI
+  "$HOME/.copilot/copilot-instructions.md"  # GitHub Copilot CLI
+  "$HOME/.gemini/GEMINI.md"                 # Google Gemini CLI
+  "$HOME/.qwen/QWEN.md"                     # Qwen Code
+  "$HOME/.config/opencode/AGENTS.md"        # OpenCode
+  "$HOME/.config/goose/.goosehints"         # Goose
 )
 
 assemble() {
@@ -31,15 +41,25 @@ assemble() {
   echo "$END_MARK"
 }
 
-if [[ "${1:-}" == "--print" ]]; then
-  assemble
-  exit 0
-fi
+install_all=0
+case "${1:-}" in
+  --print) assemble; exit 0 ;;
+  --all)   install_all=1 ;;
+  "")      ;;
+  *)       echo "unknown option: $1" >&2; exit 2 ;;
+esac
 
 block="$(assemble)"
 
 for target in "${TARGETS[@]}"; do
-  mkdir -p "$(dirname "$target")"
+  dir="$(dirname "$target")"
+
+  if [[ ! -d "$dir" && "$install_all" -eq 0 ]]; then
+    echo "skipped  $target (no $dir — tool not detected; use --all to force)"
+    continue
+  fi
+
+  mkdir -p "$dir"
   touch "$target"
 
   if grep -qF "$BEGIN_MARK" "$target"; then
