@@ -54,7 +54,11 @@ flowchart LR
 - **`infra/`** — GitHub repository settings as code (Terraform, official
   GitHub provider): description, merge policy, Pages source, vulnerability
   alerts, secret scanning + push protection. An `import` block adopts the
-  existing repo; state stays local and is gitignored.
+  existing repo; state stays local and is gitignored. Applied by
+  **`.github/workflows/repo-settings.yml`** on merges to `main` touching
+  `infra/` (stateless: re-import, reconcile, discard state), using a
+  fine-grained admin PAT in the `REPO_ADMIN_TOKEN` secret; skips with a
+  notice when the secret is absent.
 
 ## Key invariant
 
