@@ -6,6 +6,9 @@ read at the user level.
 
 ```mermaid
 flowchart LR
+    S["sync.sh --auto<br/>(shell startup, daily)"] -->|"git pull main"| D
+    H["hooks/post-merge<br/>(manual git pull)"] -->|"re-run"| I
+    S -->|"re-run"| I
     subgraph repo["dotfiles-ai repo"]
         D["defaults/*.md<br/>one module per topic"]
         I["install.sh"]
@@ -30,6 +33,13 @@ flowchart LR
   path there. A target is skipped unless its tool's config directory
   already exists (`--all` overrides), so only tools actually in use get
   instruction files.
+- **`sync.sh`** — propagation. Pulls the latest `main` (fast-forward only)
+  and re-runs the installer. In `--auto` mode (meant for shell startup) it
+  throttles to one attempt per day via a stamp file in
+  `~/.local/state/dotfiles-ai/`, tracks the last-installed commit so a
+  fresh machine installs on first run, and stays silent when offline or
+  already current. It also sets `core.hooksPath` so the versioned
+  **`hooks/post-merge`** hook re-installs after any manual `git pull`.
 
 ## Key invariant
 

@@ -37,6 +37,29 @@ machine (detection = the tool's config directory exists). Use
 Re-running the script replaces the managed block in place (a `.bak` backup is
 saved), so anything you keep in those files outside the block is untouched.
 
+## Keeping machines in sync
+
+Installed blocks are copies — they only change when `install.sh` runs. Two
+pieces of automation keep them current, so the flow is: edit `defaults/` on
+any machine → merge to `main` → every other machine picks it up on its next
+shell start (or next `git pull`).
+
+**1. Shell startup** — add to `~/.zshrc` / `~/.bashrc`:
+
+```sh
+[ -x "$HOME/dotfiles-ai/sync.sh" ] && "$HOME/dotfiles-ai/sync.sh" --auto
+```
+
+`sync.sh --auto` pulls the latest `main` and re-runs the installer, at most
+once per day (override with `DOTFILES_AI_SYNC_INTERVAL`, in seconds). It's
+completely silent when there's nothing new, when offline, or when throttled,
+so it doesn't clutter shell startup; it prints only when defaults actually
+changed.
+
+**2. Manual pulls** — `sync.sh` configures `core.hooksPath` so the
+versioned [`hooks/post-merge`](hooks/post-merge) hook re-runs `install.sh`
+after any `git pull` in this repo. Installed files never lag the checkout.
+
 ## Usage by tool
 
 There are three delivery mechanisms, depending on what a given tool reads:
