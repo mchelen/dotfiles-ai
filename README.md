@@ -97,14 +97,29 @@ Repository settings live in [`infra/main.tf`](infra/main.tf) (official
 Terraform GitHub provider) instead of the web UI: description, merge
 policy, Pages (`docs/` on `main`), vulnerability alerts, and secret
 scanning with push protection. An `import` block adopts the existing repo,
-so the first apply changes settings without recreating anything:
+so the first apply changes settings without recreating anything.
+
+**Applied automatically in CI**: the
+[`repo-settings` workflow](.github/workflows/repo-settings.yml) runs
+`terraform apply` whenever `infra/` changes on `main`, using the stateless
+import pattern (the import block re-adopts the repo each run, so no
+Terraform backend is needed). One-time setup, because Actions' built-in
+`GITHUB_TOKEN` cannot administer repo settings:
+
+1. [Create a fine-grained PAT](https://github.com/settings/personal-access-tokens/new)
+   scoped to this repo with **Administration: read & write**
+2. Save it as an Actions secret named `REPO_ADMIN_TOKEN`
+   (Settings → Secrets and variables → Actions)
+
+Until the secret exists the workflow skips with a notice. Manual apply
+still works too:
 
 ```sh
 export GITHUB_TOKEN=$(gh auth token)   # needs admin on the repo
 cd infra && terraform init && terraform apply
 ```
 
-To change a setting, edit the `.tf` file and re-apply — don't flip it in
+To change a setting, edit the `.tf` file and merge — don't flip it in
 the UI and let the code drift.
 
 ## Usage by tool
