@@ -4,6 +4,9 @@ Dotfiles, but for AI coding assistants: a set of reusable, personal defaults
 for how an AI assistant should work with you — carried across projects and
 tools instead of re-explained in every session.
 
+**Website:** <https://mchelen.github.io/dotfiles-ai/> (serve `docs/` with
+GitHub Pages: Settings → Pages → deploy from branch `main`, folder `/docs`)
+
 Like classic dotfiles, these encode *individual* preferences (workflow,
 communication style, guardrails), not project conventions. Project-specific
 instructions still belong in each repo's own `CLAUDE.md` / `AGENTS.md`.

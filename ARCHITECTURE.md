@@ -33,6 +33,9 @@ flowchart LR
   path there. A target is skipped unless its tool's config directory
   already exists (`--all` overrides), so only tools actually in use get
   instruction files.
+- **`docs/`** — the project website (static HTML/CSS, no generator),
+  served by GitHub Pages from `main:/docs`. Terminal output shown there
+  is simulated and labeled as such.
 - **`sync.sh`** — propagation. Pulls the latest `main` (fast-forward only)
   and re-runs the installer. In `--auto` mode (meant for shell startup) it
   throttles to one attempt per day via a stamp file in

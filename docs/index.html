@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dotfiles-ai — dotfiles, but for AI coding assistants</title>
+<meta name="description" content="Reusable personal defaults for AI coding assistants, synced across every project and tool.">
+<style>
+  :root {
+    --bg: #fafaf8;
+    --fg: #1c1c1a;
+    --muted: #6b6b66;
+    --accent: #b4552d;
+    --card: #ffffff;
+    --border: #e4e2dc;
+    --term-bg: #1e1e24;
+    --term-fg: #d6d6dc;
+    --term-green: #7ec87e;
+    --term-yellow: #d8b56a;
+    --term-dim: #8a8a94;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16161a;
+      --fg: #e8e8e4;
+      --muted: #9a9a94;
+      --accent: #e0784a;
+      --card: #1f1f24;
+      --border: #32323a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.6;
+  }
+  main { max-width: 860px; margin: 0 auto; padding: 0 1.25rem 4rem; }
+  header { text-align: center; padding: 4rem 1rem 2.5rem; }
+  header h1 { font-size: 2.6rem; margin: 0 0 .5rem; letter-spacing: -.02em; }
+  header h1 .dot { color: var(--accent); }
+  header p.tagline { font-size: 1.25rem; color: var(--muted); margin: 0 auto 1.5rem; max-width: 34em; }
+  .buttons { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: .55rem 1.1rem; border-radius: 8px;
+    text-decoration: none; font-weight: 600; font-size: .95rem;
+    border: 1px solid var(--border); color: var(--fg); background: var(--card);
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  section { margin-top: 3rem; }
+  h2 { font-size: 1.5rem; letter-spacing: -.01em; margin-bottom: .75rem; }
+  h2 .num { color: var(--accent); font-variant-numeric: tabular-nums; margin-right: .4rem; }
+  p { margin: .6rem 0; }
+  .lead { color: var(--muted); }
+  code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: .9em; background: var(--card); border: 1px solid var(--border);
+    border-radius: 4px; padding: .1em .35em;
+  }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; margin-top: 1.25rem; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1rem 1.1rem;
+  }
+  .card h3 { margin: 0 0 .4rem; font-size: 1.02rem; }
+  .card p { margin: 0; font-size: .92rem; color: var(--muted); }
+  /* terminal */
+  .term {
+    background: var(--term-bg); color: var(--term-fg);
+    border-radius: 10px; margin-top: 1.25rem; overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  }
+  .term-bar {
+    display: flex; align-items: center; gap: .4rem;
+    padding: .55rem .8rem; background: rgba(255,255,255,.06);
+    font-size: .78rem; color: var(--term-dim);
+  }
+  .term-bar .dots span {
+    display: inline-block; width: 11px; height: 11px; border-radius: 50%;
+    margin-right: 5px; background: #555;
+  }
+  .term-bar .dots span:nth-child(1){ background:#e0604f; }
+  .term-bar .dots span:nth-child(2){ background:#dfb54f; }
+  .term-bar .dots span:nth-child(3){ background:#61b859; }
+  .term-bar .label { margin-left: auto; font-style: italic; }
+  .term pre {
+    margin: 0; padding: 1rem 1.1rem; overflow-x: auto;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: .84rem; line-height: 1.55;
+  }
+  .term .p { color: var(--term-green); }
+  .term .c { color: var(--term-dim); }
+  .term .y { color: var(--term-yellow); }
+  table {
+    width: 100%; border-collapse: collapse; margin-top: 1.25rem;
+    font-size: .92rem; background: var(--card);
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  }
+  .table-wrap { overflow-x: auto; }
+  th, td { text-align: left; padding: .55rem .8rem; border-bottom: 1px solid var(--border); }
+  th { background: rgba(0,0,0,.03); font-size: .85rem; }
+  @media (prefers-color-scheme: dark) { th { background: rgba(255,255,255,.04); } }
+  tr:last-child td { border-bottom: none; }
+  .ok { color: var(--accent); font-weight: 600; }
+  footer {
+    text-align: center; color: var(--muted); font-size: .85rem;
+    padding: 2rem 1rem 3rem; border-top: 1px solid var(--border); margin-top: 4rem;
+  }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>dotfiles-ai<span class="dot">.</span></h1>
+  <p class="tagline">Dotfiles, but for AI coding assistants — your personal working preferences, carried across every project and every tool.</p>
+  <div class="buttons">
+    <a class="btn primary" href="https://github.com/mchelen/dotfiles-ai">View on GitHub</a>
+    <a class="btn" href="https://github.com/mchelen/dotfiles-ai#usage-by-tool">Tool setup guide</a>
+  </div>
+</header>
+
+<main>
+  <section>
+    <h2>What it is</h2>
+    <p>You have opinions about how an AI assistant should work with you: <em>show me a mockup before you build the feature. Write the test first. Don't commit unless I ask.</em> Today you re-explain those preferences in every session, or duplicate them into every project's instruction file.</p>
+    <p><strong>dotfiles-ai</strong> keeps them in one place instead. Each preference is a small markdown module; an installer assembles the modules into the user-level instruction file of every AI tool on your machine — Claude Code, Codex, Copilot CLI, Gemini CLI, and friends — and a sync script keeps every machine current automatically.</p>
+    <p class="lead">Personal preferences live here, at the user level. Project conventions stay in each repo's own <code>CLAUDE.md</code> / <code>AGENTS.md</code> — this is the layer underneath.</p>
+  </section>
+
+  <section>
+    <h2>The modules</h2>
+    <div class="cards">
+      <div class="card"><h3>feature-workflow</h3><p>New features get a mockup, demo, options, or direction proposal before implementation starts.</p></div>
+      <div class="card"><h3>testing</h3><p>Tests come before code: start from a failing test; bug fixes start from a reproduction.</p></div>
+      <div class="card"><h3>architecture</h3><p>Every project keeps an up-to-date ARCHITECTURE.md with Mermaid diagrams.</p></div>
+      <div class="card"><h3>git</h3><p>Focused commits, PRs opened and merged on green by default, never force-push, never commit secrets.</p></div>
+      <div class="card"><h3>communication</h3><p>Answer first, push back on bad ideas, disclose what was skipped or left broken.</p></div>
+      <div class="card"><h3>code-style</h3><p>Match the codebase, smallest change that works, no drive-by refactors or dependencies.</p></div>
+      <div class="card"><h3>project-website</h3><p>Most projects get a static docs site with usage guides and (simulated) screenshots or demos.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>How it works</h2>
+    <p><span class="num">1.</span><strong>Install once.</strong> <code>install.sh</code> concatenates the modules into a marker-delimited block and inserts it into each detected tool's user-level instruction file. Your own content in those files is never touched, and re-runs replace the block in place.</p>
+    <div class="term">
+      <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~/dotfiles-ai <span class="label">simulated output</span></div>
+      <pre><span class="p">$</span> ./install.sh
+installed /Users/you/.claude/CLAUDE.md
+installed /Users/you/.codex/AGENTS.md
+installed /Users/you/.copilot/copilot-instructions.md
+<span class="y">skipped</span>  /Users/you/.qwen/QWEN.md <span class="c">(no ~/.qwen — tool not detected; use --all to force)</span>
+
+Done. For tools that only take rules through their settings UI
+(e.g. Cursor "User Rules"), paste the output of:  ./install.sh --print</pre>
+    </div>
+
+    <p style="margin-top:2rem"><span class="num">2.</span><strong>Stay in sync automatically.</strong> One line in your shell rc runs <code>sync.sh --auto</code>: at most once a day it pulls the latest <code>main</code> and re-installs — silent unless something actually changed. A versioned <code>post-merge</code> hook covers manual pulls too.</p>
+    <div class="term">
+      <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> new terminal, next morning <span class="label">simulated output</span></div>
+      <pre><span class="c"># ~/.zshrc: [ -x "$HOME/dotfiles-ai/sync.sh" ] && "$HOME/dotfiles-ai/sync.sh" --auto</span>
+dotfiles-ai: updated d78d121 -> cae0439
+updated  /Users/you/.claude/CLAUDE.md <span class="c">(previous version saved to ….bak)</span>
+updated  /Users/you/.codex/AGENTS.md <span class="c">(previous version saved to ….bak)</span>
+<span class="p">$</span> <span class="c">▍</span></pre>
+    </div>
+
+    <p style="margin-top:2rem"><span class="num">3.</span><strong>Evolve by pull request.</strong> Notice a new preference mid-session? Add a module on any machine, merge it, and every other machine picks it up on its next shell start.</p>
+  </section>
+
+  <section>
+    <h2>Supported tools</h2>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Tool</th><th>Surface</th><th>Delivery</th></tr>
+      <tr><td>Claude Code</td><td>CLI · desktop · IDE</td><td class="ok">automatic</td></tr>
+      <tr><td>OpenAI Codex</td><td>CLI</td><td class="ok">automatic</td></tr>
+      <tr><td>GitHub Copilot</td><td>CLI</td><td class="ok">automatic</td></tr>
+      <tr><td>Gemini CLI</td><td>CLI</td><td class="ok">automatic</td></tr>
+      <tr><td>Qwen Code</td><td>CLI</td><td class="ok">automatic</td></tr>
+      <tr><td>OpenCode</td><td>CLI/TUI</td><td class="ok">automatic</td></tr>
+      <tr><td>Goose</td><td>CLI</td><td class="ok">automatic</td></tr>
+      <tr><td>Cursor · Windsurf · Copilot web</td><td>IDE / web</td><td>paste <code>--print</code> output into settings</td></tr>
+      <tr><td>Claude Code web · Codex cloud · Copilot agent</td><td>cloud agents</td><td>commit into the repo's instruction file</td></tr>
+    </table>
+    </div>
+    <p class="lead">Any tool that reads a user-level markdown file can be added with one line in the installer's target list.</p>
+  </section>
+
+  <section>
+    <h2>Get started</h2>
+    <div class="term">
+      <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> setup <span class="label">simulated output</span></div>
+      <pre><span class="p">$</span> git clone https://github.com/mchelen/dotfiles-ai ~/dotfiles-ai
+<span class="p">$</span> ~/dotfiles-ai/install.sh
+<span class="p">$</span> echo '[ -x "$HOME/dotfiles-ai/sync.sh" ] && "$HOME/dotfiles-ai/sync.sh" --auto' >> ~/.zshrc</pre>
+    </div>
+    <p class="lead" style="margin-top:1rem">Then fork it and make the defaults yours — the modules in this repo are one person's preferences, meant to be edited.</p>
+  </section>
+</main>
+
+<footer>
+  <a href="https://github.com/mchelen/dotfiles-ai">mchelen/dotfiles-ai</a> · MIT License · terminal output on this page is simulated for illustration
+</footer>
+</body>
+</html>
