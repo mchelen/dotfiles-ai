@@ -1,0 +1,7 @@
+# Terraform state can embed provider payloads and must never be committed.
+# (.terraform.lock.hcl is NOT ignored on purpose — commit it once generated.)
+*.tfstate
+*.tfstate.*
+.terraform/
+crash.log
+*.tfvars
