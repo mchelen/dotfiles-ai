@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Block commits that look like they contain secrets or sensitive data.
+# Dependency-free (grep-based). Two layers:
+#   1. forbidden filenames (.env, key material, credential stores)
+#   2. high-confidence content patterns in staged added lines
+#
+# False positive? Mark the line with a trailing comment `gitleaks:allow`,
+# or bypass once with: git commit --no-verify
+set -uo pipefail
+
+fail=0
+
+# --- 1. Filenames that should never be committed -----------------------------
+staged=$(git diff --cached --name-only --diff-filter=ACM)
+bad_files=$(printf '%s\n' "$staged" | grep -iE \
+  '(^|/)(\.env(\.[^/]+)?|id_(rsa|ed25519|ecdsa|dsa)[^/]*|[^/]*\.(pem|p12|pfx)|[^/]*\.key|credentials\.json|service[-_]?account[^/]*\.json|\.netrc|\.pgpass)$' \
+  | grep -vE '\.(pub|sample|example|template)$' || true)
+if [[ -n "$bad_files" ]]; then
+  echo "pre-commit: refusing to commit files that usually hold credentials:" >&2
+  printf '  %s\n' $bad_files >&2
+  fail=1
+fi
+
+# --- 2. Content patterns in staged added lines -------------------------------
+# Scan everything except this hook (it contains the patterns themselves).
+added=$(git diff --cached -U0 --diff-filter=ACM -- . ':(exclude)hooks/pre-commit' \
+  | grep -E '^\+' | grep -vE '^\+\+\+' | grep -v 'gitleaks:allow' || true)
+
+check() {  # check <label> <extended-regex>
+  local hits
+  hits=$(printf '%s\n' "$added" | grep -nE -e "$2" | cut -c1-120 || true)
+  if [[ -n "$hits" ]]; then
+    echo "pre-commit: possible $1 in staged changes:" >&2
+    printf '  %s\n' "$hits" >&2
+    fail=1
+  fi
+}
+
+check "private key"        '-----BEGIN [A-Z ]*PRIVATE KEY'
+check "AWS access key"     '\bAKIA[0-9A-Z]{16}\b'
+check "AWS secret key"     'aws_secret_access_key[[:space:]]*[:=]'
+check "GitHub token"       '\b(gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{22,})'
+check "Slack token"        '\bxox[baprs]-[A-Za-z0-9-]{10,}'
+check "Google API key"     '\bAIza[0-9A-Za-z_-]{35}\b'
+check "Stripe live key"    '\b[sr]k_live_[0-9a-zA-Z]{20,}\b'
+check "Anthropic/OpenAI key" '\bsk-(ant|proj|live)-[A-Za-z0-9_-]{16,}\b'
+check "JWT"                '\beyJ[A-Za-z0-9_-]{10,}\.eyJ'
+check "hardcoded credential" '(password|passwd|api[_-]?key|auth[_-]?token|client[_-]?secret)[[:space:]]*[:=][[:space:]]*["'"'"'][^"'"'"']{8,}'
+check "US SSN (PII)"       '\b[0-9]{3}-[0-9]{2}-[0-9]{4}\b'
+check "payment card (PII)" '\b[0-9]{4}[- ][0-9]{4}[- ][0-9]{4}[- ][0-9]{4}\b'
+
+if [[ $fail -ne 0 ]]; then
+  cat >&2 <<'EOF'
+
+Commit blocked. If a match is a false positive, append `gitleaks:allow`
+as a comment on that line, or bypass once with `git commit --no-verify`.
+If it IS a real secret that was ever committed before: rotate it —
+removing it from the tree does not un-leak it.
+EOF
+  exit 1
+fi
+exit 0

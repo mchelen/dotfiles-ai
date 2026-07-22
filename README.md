@@ -24,6 +24,7 @@ written as plain tool-agnostic markdown:
 | [`testing.md`](defaults/testing.md) | Tests come **before** implementation; bug fixes start from a reproducing test |
 | [`architecture.md`](defaults/architecture.md) | Every project keeps an up-to-date `ARCHITECTURE.md` with Mermaid diagrams |
 | [`project-website.md`](defaults/project-website.md) | Most projects get a static site (GitHub Pages) with usage docs and (simulated) screenshots/demos |
+| [`secrets.md`](defaults/secrets.md) | Layered secret/PII protection: pre-commit scan + CI scanner + GitHub secret scanning; leaked = rotate |
 | [`git.md`](defaults/git.md) | No commits/pushes unless asked, no history rewrites, no secrets |
 
 ## Install
@@ -62,6 +63,24 @@ changed.
 **2. Manual pulls** — `sync.sh` configures `core.hooksPath` so the
 versioned [`hooks/post-merge`](hooks/post-merge) hook re-runs `install.sh`
 after any `git pull` in this repo. Installed files never lag the checkout.
+
+## Guarding against leaked secrets
+
+This repo practices what [`defaults/secrets.md`](defaults/secrets.md)
+preaches, in three layers:
+
+1. **Pre-commit** — [`hooks/pre-commit`](hooks/pre-commit) (active via the
+   same `core.hooksPath` setup as the sync hook) blocks staged changes that
+   look like credentials, key material, or PII: known token formats, private
+   key blocks, hardcoded passwords, SSN/card numbers, and files like `.env`
+   or `id_rsa`. Dependency-free grep, so it works on any machine. False
+   positives get a `gitleaks:allow` comment on the line.
+2. **CI** — [`.github/workflows/secret-scan.yml`](.github/workflows/secret-scan.yml)
+   runs the gitleaks action on every push and PR, catching anything that
+   slipped past (or bypassed) the local hook.
+3. **Platform** — enable *GitHub secret scanning* and *push protection*
+   under Settings → Advanced Security. GitHub then blocks pushes containing
+   recognized provider tokens server-side.
 
 ## Usage by tool
 

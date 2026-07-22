@@ -43,6 +43,12 @@ flowchart LR
   fresh machine installs on first run, and stays silent when offline or
   already current. It also sets `core.hooksPath` so the versioned
   **`hooks/post-merge`** hook re-installs after any manual `git pull`.
+- **`hooks/pre-commit`** — dependency-free secret/PII gate on every commit
+  (token formats, private keys, hardcoded credentials, SSN/card patterns,
+  and forbidden filenames like `.env`). Backed up by
+  **`.github/workflows/secret-scan.yml`**, which runs gitleaks in CI on
+  every push/PR, and by GitHub secret scanning + push protection in repo
+  settings.
 
 ## Key invariant
 
