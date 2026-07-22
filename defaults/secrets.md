@@ -1,9 +1,10 @@
 # Secrets and sensitive data
 
 - Every repo gets a pre-commit hook that scans staged changes for
-  credentials, key material, and PII before they can be committed
-  (gitleaks, or a self-contained regex hook where installing tools isn't
-  an option). Set it up as part of the first substantial change.
+  credentials, key material, and PII before they can be committed. Use
+  standard tooling — the pre-commit framework with the official gitleaks
+  hook (extra rules via `.gitleaks.toml` `[extend]`) — not hand-rolled
+  scanners. Set it up as part of the first substantial change.
 - Layer the defenses; don't rely on any single one:
   - **pre-commit** — catches secrets before they enter history
   - **CI** — a secret scanner (e.g. the gitleaks action) on every push/PR

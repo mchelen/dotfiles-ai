@@ -7,7 +7,7 @@ read at the user level.
 ```mermaid
 flowchart LR
     S["sync.sh --auto<br/>(shell startup, daily)"] -->|"git pull main"| D
-    H["hooks/post-merge<br/>(manual git pull)"] -->|"re-run"| I
+    H["post-merge hook<br/>(pre-commit framework)"] -->|"re-run"| I
     S -->|"re-run"| I
     subgraph repo["dotfiles-ai repo"]
         D["defaults/*.md<br/>one module per topic"]
@@ -41,14 +41,16 @@ flowchart LR
   throttles to one attempt per day via a stamp file in
   `~/.local/state/dotfiles-ai/`, tracks the last-installed commit so a
   fresh machine installs on first run, and stays silent when offline or
-  already current. It also sets `core.hooksPath` so the versioned
-  **`hooks/post-merge`** hook re-installs after any manual `git pull`.
-- **`hooks/pre-commit`** — dependency-free secret/PII gate on every commit
-  (token formats, private keys, hardcoded credentials, SSN/card patterns,
-  and forbidden filenames like `.env`). Backed up by
-  **`.github/workflows/secret-scan.yml`**, which runs gitleaks in CI on
-  every push/PR, and by GitHub secret scanning + push protection in repo
-  settings.
+  already current. It also runs `pre-commit install` (when available) so
+  the framework's commit and post-merge hooks are active on the machine.
+- **`.pre-commit-config.yaml`** — secret/PII gate on every commit via the
+  standard pre-commit framework: official gitleaks hook (custom PII rules
+  extend the defaults in **`.gitleaks.toml`**), `detect-private-key`,
+  `detect-aws-credentials`, plus a local post-merge hook that re-runs
+  `install.sh` after pulls (replacing the old `core.hooksPath` approach).
+  Backed up by **`.github/workflows/secret-scan.yml`**, which runs
+  gitleaks in CI on every push/PR, and by GitHub secret scanning + push
+  protection in repo settings.
 
 ## Key invariant
 

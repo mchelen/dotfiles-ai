@@ -2,8 +2,9 @@
 # Keep this machine's installed defaults in sync with the repo.
 #
 # Pulls the latest main (fast-forward only) and re-runs install.sh so every
-# detected tool picks up the current modules. Also points the repo's
-# core.hooksPath at hooks/, so a plain `git pull` re-installs too.
+# detected tool picks up the current modules. Also installs the pre-commit
+# framework's hooks, so commits are secret-scanned and a plain `git pull`
+# re-installs too.
 #
 # Usage:
 #   ./sync.sh          sync now
@@ -34,8 +35,13 @@ fi
 mkdir -p "$STATE_DIR"
 touch "$STAMP"  # stamp the attempt, not the success: one try per interval
 
-# Route manual `git pull`s through the versioned post-merge hook.
-git -C "$REPO_DIR" config core.hooksPath hooks
+# Set up the standard pre-commit framework hooks (secret scanning on
+# commit, re-install after manual pulls). Migrates away from the old
+# core.hooksPath approach if present.
+git -C "$REPO_DIR" config --unset-all core.hooksPath 2>/dev/null || true
+if command -v pre-commit >/dev/null 2>&1; then
+  (cd "$REPO_DIR" && pre-commit install --hook-type pre-commit --hook-type post-merge >/dev/null 2>&1) || true
+fi
 
 before=$(git -C "$REPO_DIR" rev-parse HEAD)
 if ! DOTFILES_AI_SYNC=1 git -C "$REPO_DIR" pull --ff-only --quiet origin main; then
