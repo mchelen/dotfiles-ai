@@ -29,10 +29,9 @@ written as plain tool-agnostic markdown:
 ```
 
 This concatenates the modules and inserts them as a clearly-marked managed
-block in each tool's user-level instruction file:
-
-- `~/.claude/CLAUDE.md` — Claude Code (user memory)
-- `~/.codex/AGENTS.md` — OpenAI Codex CLI
+block in the user-level instruction file of each AI CLI it detects on your
+machine (detection = the tool's config directory exists). Use
+`./install.sh --all` to write every target regardless.
 
 Re-running the script replaces the managed block in place (a `.bak` backup is
 saved), so anything you keep in those files outside the block is untouched.
@@ -54,18 +53,26 @@ There are three delivery mechanisms, depending on what a given tool reads:
 | **Claude Code** | Web (claude.ai/code) | The repo's own `CLAUDE.md` | repo file |
 | **Codex** | CLI | `~/.codex/AGENTS.md` | `install.sh` ✅ |
 | **Codex** | Web/cloud, IDE extension | The repo's `AGENTS.md` | repo file |
+| **GitHub Copilot** | CLI | `~/.copilot/copilot-instructions.md` | `install.sh` ✅ |
 | **GitHub Copilot** | VS Code / JetBrains chat | Repo's `.github/copilot-instructions.md`; VS Code also supports user-scoped `*.instructions.md` files | repo file / settings UI |
 | **GitHub Copilot** | Web (github.com chat) | Personal custom instructions in Copilot settings | settings UI |
 | **GitHub Copilot** | Coding agent | Repo's `AGENTS.md` or `.github/copilot-instructions.md` | repo file |
+| **Gemini CLI** | CLI | `~/.gemini/GEMINI.md` | `install.sh` ✅ |
+| **Qwen Code** | CLI | `~/.qwen/QWEN.md` | `install.sh` ✅ |
+| **OpenCode** | CLI/TUI | `~/.config/opencode/AGENTS.md` | `install.sh` ✅ |
+| **Goose** | CLI | `~/.config/goose/.goosehints` | `install.sh` ✅ |
+| **Aider** | CLI | Any file listed under `read:` in `~/.aider.conf.yml` (e.g. point it at `./install.sh --print > ~/.ai-defaults.md`) | manual |
 | **Cursor** | IDE | User Rules (Cursor Settings → Rules) | settings UI |
-| **Gemini CLI** | CLI | `~/.gemini/GEMINI.md` | add to `TARGETS` |
 | **Windsurf** | IDE | Global rules (settings) | settings UI |
 
 Notes:
 
+- **Detection**: `install.sh` only writes a target when the tool's config
+  directory already exists, so you don't accumulate instruction files for
+  tools you never use. `--all` overrides this.
 - **Adding a file-based tool**: append its path to the `TARGETS` array in
   `install.sh` and re-run — anything that reads a user-level markdown file
-  works the same way (e.g. Gemini CLI above).
+  works the same way.
 - **Repo files**: for cloud agents, either paste the `--print` output into the
   project's `CLAUDE.md`/`AGENTS.md`, or copy just the modules that matter for
   that project. Keep in mind those files are shared with collaborators —
