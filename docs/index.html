@@ -173,6 +173,16 @@ updated  /Users/you/.codex/AGENTS.md <span class="c">(previous version saved to 
   </section>
 
   <section>
+    <h2>Built-in guardrails</h2>
+    <p>The repo practices its own defaults on itself:</p>
+    <div class="cards">
+      <div class="card"><h3>Leak protection, three layers</h3><p>The standard pre-commit framework runs the official gitleaks hook (plus private-key and AWS-credential detectors) on every commit, with PII rules for SSN and card numbers extending gitleaks' defaults. The same scan runs again in GitHub Actions on every push and PR, and GitHub's server-side secret scanning with push protection backstops both.</p></div>
+      <div class="card"><h3>Repo settings as code</h3><p>Description, merge policy, Pages, and security toggles are declared in Terraform (official GitHub provider) — never clicked through the web UI. A CI workflow re-applies the config whenever it changes on main, using a stateless import pattern with no backend to manage.</p></div>
+      <div class="card"><h3>Docs that keep up</h3><p>An ARCHITECTURE.md with Mermaid diagrams, this site, and the README all update in the same pull request as the change that affects them — per the architecture and project-website modules.</p></div>
+    </div>
+  </section>
+
+  <section>
     <h2>Supported tools</h2>
     <div class="table-wrap">
     <table>
@@ -197,7 +207,9 @@ updated  /Users/you/.codex/AGENTS.md <span class="c">(previous version saved to 
       <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> setup <span class="label">simulated output</span></div>
       <pre><span class="p">$</span> git clone https://github.com/mchelen/dotfiles-ai ~/dotfiles-ai
 <span class="p">$</span> ~/dotfiles-ai/install.sh
-<span class="p">$</span> echo '[ -x "$HOME/dotfiles-ai/sync.sh" ] && "$HOME/dotfiles-ai/sync.sh" --auto' >> ~/.zshrc</pre>
+<span class="p">$</span> echo '[ -x "$HOME/dotfiles-ai/sync.sh" ] && "$HOME/dotfiles-ai/sync.sh" --auto' >> ~/.zshrc
+<span class="c"># optional, for the secret-scanning commit hooks:</span>
+<span class="p">$</span> pipx install pre-commit</pre>
     </div>
     <p class="lead" style="margin-top:1rem">Then fork it and make the defaults yours — the modules in this repo are one person's preferences, meant to be edited.</p>
   </section>
