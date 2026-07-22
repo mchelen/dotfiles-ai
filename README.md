@@ -4,8 +4,8 @@ Dotfiles, but for AI coding assistants: a set of reusable, personal defaults
 for how an AI assistant should work with you — carried across projects and
 tools instead of re-explained in every session.
 
-**Website:** <https://mchelen.github.io/dotfiles-ai/> (serve `docs/` with
-GitHub Pages: Settings → Pages → deploy from branch `main`, folder `/docs`)
+**Website:** <https://mchelen.github.io/dotfiles-ai/> (GitHub Pages serving
+`docs/`, configured as code in [`infra/`](infra/))
 
 Like classic dotfiles, these encode *individual* preferences (workflow,
 communication style, guardrails), not project conventions. Project-specific
@@ -25,6 +25,7 @@ written as plain tool-agnostic markdown:
 | [`architecture.md`](defaults/architecture.md) | Every project keeps an up-to-date `ARCHITECTURE.md` with Mermaid diagrams |
 | [`project-website.md`](defaults/project-website.md) | Most projects get a static site (GitHub Pages) with usage docs and (simulated) screenshots/demos |
 | [`secrets.md`](defaults/secrets.md) | Layered secret/PII protection: pre-commit scan + CI scanner + GitHub secret scanning; leaked = rotate |
+| [`repo-config.md`](defaults/repo-config.md) | GitHub repo settings managed as code (Terraform GitHub provider), never clicked through the UI |
 | [`git.md`](defaults/git.md) | No commits/pushes unless asked, no history rewrites, no secrets |
 
 ## Install
@@ -86,9 +87,25 @@ preaches, in three layers:
 2. **CI** — [`.github/workflows/secret-scan.yml`](.github/workflows/secret-scan.yml)
    runs the gitleaks action on every push and PR, catching anything that
    slipped past (or bypassed) the local hook.
-3. **Platform** — enable *GitHub secret scanning* and *push protection*
-   under Settings → Advanced Security. GitHub then blocks pushes containing
+3. **Platform** — *GitHub secret scanning* and *push protection*, declared
+   in the Terraform config below. GitHub then blocks pushes containing
    recognized provider tokens server-side.
+
+## Repo settings as code
+
+Repository settings live in [`infra/main.tf`](infra/main.tf) (official
+Terraform GitHub provider) instead of the web UI: description, merge
+policy, Pages (`docs/` on `main`), vulnerability alerts, and secret
+scanning with push protection. An `import` block adopts the existing repo,
+so the first apply changes settings without recreating anything:
+
+```sh
+export GITHUB_TOKEN=$(gh auth token)   # needs admin on the repo
+cd infra && terraform init && terraform apply
+```
+
+To change a setting, edit the `.tf` file and re-apply — don't flip it in
+the UI and let the code drift.
 
 ## Usage by tool
 

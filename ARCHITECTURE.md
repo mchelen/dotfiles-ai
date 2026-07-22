@@ -51,6 +51,10 @@ flowchart LR
   Backed up by **`.github/workflows/secret-scan.yml`**, which runs
   gitleaks in CI on every push/PR, and by GitHub secret scanning + push
   protection in repo settings.
+- **`infra/`** — GitHub repository settings as code (Terraform, official
+  GitHub provider): description, merge policy, Pages source, vulnerability
+  alerts, secret scanning + push protection. An `import` block adopts the
+  existing repo; state stays local and is gitignored.
 
 ## Key invariant
 

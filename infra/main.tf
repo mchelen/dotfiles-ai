@@ -1,0 +1,68 @@
+# GitHub repo settings as code, via the official GitHub Terraform provider.
+#
+# Apply locally with an admin-scoped token:
+#   export GITHUB_TOKEN=$(gh auth token)   # or a fine-grained PAT with
+#                                          # "Administration: write" on this repo
+#   cd infra && terraform init && terraform apply
+#
+# The import block adopts the existing repo on first apply — no manual
+# `terraform import` step, and nothing is created or destroyed.
+
+terraform {
+  required_version = ">= 1.5"
+
+  required_providers {
+    github = {
+      source  = "integrations/github"
+      version = "~> 6.0"
+    }
+  }
+}
+
+provider "github" {
+  owner = "mchelen" # auth comes from the GITHUB_TOKEN env var
+}
+
+import {
+  to = github_repository.dotfiles_ai
+  id = "dotfiles-ai"
+}
+
+resource "github_repository" "dotfiles_ai" {
+  name         = "dotfiles-ai"
+  description  = "Dotfiles, but for AI coding assistants: reusable personal defaults, synced across projects and tools"
+  homepage_url = "https://mchelen.github.io/dotfiles-ai/"
+  visibility   = "public"
+
+  has_issues      = true
+  has_projects    = false
+  has_wiki        = false
+  has_discussions = false
+
+  allow_squash_merge     = true
+  allow_merge_commit     = false
+  allow_rebase_merge     = false
+  delete_branch_on_merge = true
+
+  vulnerability_alerts = true
+
+  # The static site: serve docs/ from main (replaces the manual
+  # Settings -> Pages step).
+  pages {
+    source {
+      branch = "main"
+      path   = "/docs"
+    }
+  }
+
+  # Platform layer of defaults/secrets.md (replaces the manual
+  # Settings -> Advanced Security step).
+  security_and_analysis {
+    secret_scanning {
+      status = "enabled"
+    }
+    secret_scanning_push_protection {
+      status = "enabled"
+    }
+  }
+}
