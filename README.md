@@ -19,6 +19,7 @@ written as plain tool-agnostic markdown:
 | [`communication.md`](defaults/communication.md) | Answer-first replies, push back on bad ideas, disclose gaps |
 | [`code-style.md`](defaults/code-style.md) | Match the codebase, minimal diffs, no drive-by refactors or dependencies |
 | [`testing.md`](defaults/testing.md) | Tests come **before** implementation; bug fixes start from a reproducing test |
+| [`architecture.md`](defaults/architecture.md) | Every project keeps an up-to-date `ARCHITECTURE.md` with Mermaid diagrams |
 | [`git.md`](defaults/git.md) | No commits/pushes unless asked, no history rewrites, no secrets |
 
 ## Install
