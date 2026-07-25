@@ -291,7 +291,7 @@
 
   <section id="modules">
     <h2>The modules</h2>
-    <p>Ten modules, grouped here by the kind of behavior they govern. Each one is a short markdown file in <code>defaults/</code> — read them, delete the ones you disagree with, add your own.</p>
+    <p>Eleven modules, grouped here by the kind of behavior they govern. Each one is a short markdown file in <code>defaults/</code> — read them, delete the ones you disagree with, add your own.</p>
 
     <h3 class="cat">Collaboration <span>— how the assistant works with you</span></h3>
 
@@ -379,6 +379,15 @@
       <div class="ba">
         <div class="ba-col"><span class="ba-label before">Without</span>The diagram still shows a service that was deleted three months ago, so nobody trusts the doc and it decays further.</div>
         <div class="ba-col"><span class="ba-label after">With</span>The PR that adds the queue also updates the diagram. The doc is accurate because it's never separately "due".</div>
+      </div>
+    </div>
+
+    <div class="module">
+      <h4>specification</h4>
+      <p>Intended behavior gets written down in the repo, in a standard format — currently <a href="https://github.com/github/spec-kit">Spec Kit</a>: a <code>spec.md</code> per feature under <code>specs/</code>, with <code>plan.md</code> and <code>tasks.md</code> derived from it. The spec says <em>what</em> and <em>why</em>; the plan says <em>how</em>. When intended behavior changes the spec is revised in the same change as the code, and code that contradicts the spec gets raised as a question rather than silently resolved in either direction.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Without</span>"What is this supposed to do?" is answered by reading the implementation — so whatever the code does becomes the definition of correct, bugs included.</div>
+        <div class="ba-col"><span class="ba-label after">With</span>"<code>spec.md</code> says expired invites are rejected; the handler renews them. Which is right?" — a contradiction surfaces as a decision instead of a silent drift.</div>
       </div>
     </div>
 
