@@ -76,6 +76,14 @@ flowchart LR
   Backed up by **`.github/workflows/secret-scan.yml`**, which runs
   gitleaks in CI on every push/PR, and by GitHub secret scanning + push
   protection in repo settings.
+- **`specs/`** — intended behavior in Spec Kit format, one directory per
+  capability (`install.sh`, `sync.sh`, `INSTRUCTIONS.md` generation), each a
+  `spec.md` of user stories, functional requirements, and success criteria.
+  Written retroactively from the code, so there are no `plan.md` / `tasks.md`
+  alongside them; from here they are revised in the same change as the
+  behavior they describe. Project-wide principles live in
+  **`.specify/memory/constitution.md`**. This is the `specification` module
+  applied to this repo — see `specs/README.md`.
 - **`infra/`** — GitHub repository settings as code (Terraform, official
   GitHub provider): description, merge policy, Pages source, vulnerability
   alerts, secret scanning + push protection. An `import` block adopts the

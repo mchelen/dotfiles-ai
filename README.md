@@ -278,6 +278,22 @@ cd infra && terraform init && terraform apply
 To change a setting, edit the `.tf` file and merge — don't flip it in
 the UI and let the code drift.
 
+## Specs for this repo
+
+The [`specification`](defaults/specification.md) module asks every project to
+keep intended behavior written down in a standard format, so this repo does
+too. [`specs/`](specs/) holds one [Spec Kit](https://github.com/github/spec-kit)
+`spec.md` per capability — [the installer](specs/001-user-level-install/spec.md),
+[machine sync](specs/002-machine-sync/spec.md), and
+[the generated `INSTRUCTIONS.md`](specs/003-generated-instructions/spec.md) —
+with project-wide principles in
+[`.specify/memory/constitution.md`](.specify/memory/constitution.md).
+
+They were written from the code rather than before it, so there are no
+`plan.md` / `tasks.md` alongside them; [`specs/README.md`](specs/README.md)
+explains that choice. From here they're the contract: behavior changes revise
+the spec in the same pull request.
+
 ## Usage by tool
 
 There are three delivery mechanisms, depending on what a given tool reads:
