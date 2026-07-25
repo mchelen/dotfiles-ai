@@ -4,8 +4,9 @@ Dotfiles, but for AI coding assistants: a set of reusable, personal defaults
 for how an AI assistant should work with you — carried across projects and
 tools instead of re-explained in every session.
 
-**Website:** <https://mchelen.github.io/dotfiles-ai/> (GitHub Pages serving
-`docs/`, configured as code in [`infra/`](infra/))
+**Website:** <https://mchelen.github.io/dotfiles-ai/> — `docs/` published
+by the [`deploy-pages` workflow](.github/workflows/deploy-pages.yml);
+Pages itself configured as code in [`infra/`](infra/)
 
 Like classic dotfiles, these encode *individual* preferences (workflow,
 communication style, guardrails), not project conventions. Project-specific

@@ -46,13 +46,10 @@ resource "github_repository" "dotfiles_ai" {
 
   vulnerability_alerts = true
 
-  # The static site: serve docs/ from main (replaces the manual
-  # Settings -> Pages step).
+  # The static site: published by .github/workflows/deploy-pages.yml
+  # through the Actions deployment path.
   pages {
-    source {
-      branch = "main"
-      path   = "/docs"
-    }
+    build_type = "workflow"
   }
 
   # Platform layer of defaults/secrets.md (replaces the manual
