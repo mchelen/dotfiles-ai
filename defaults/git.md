@@ -15,3 +15,15 @@
   confirmation.
 - Never commit secrets, `.env` files, or credentials — flag it if you see
   them staged.
+
+## Using GitHub tooling efficiently
+
+- Ask for the smallest useful response: set `minimal_output` where the tool
+  supports it, page in small batches, and use server-side filters instead
+  of fetching everything and filtering after.
+- Don't pull a large payload to read one field. When polling something like
+  a workflow or check status, request only that status; if a response comes
+  back huge anyway, save it and query the field out of the file rather than
+  re-fetching.
+- Prefer a scheduled re-check over tight polling loops when waiting on CI
+  or a deployment.
