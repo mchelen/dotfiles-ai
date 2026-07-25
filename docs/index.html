@@ -93,6 +93,91 @@
   .term .p { color: var(--term-green); }
   .term .c { color: var(--term-dim); }
   .term .y { color: var(--term-yellow); }
+  /* tabs (progressive enhancement: without JS every panel just stacks) */
+  .tab-labels { display: flex; flex-wrap: wrap; gap: .35rem; border-bottom: 1px solid var(--border); margin: 1.5rem 0 0; }
+  .tab-labels button {
+    font: inherit; font-size: .92rem; font-weight: 600; cursor: pointer;
+    padding: .5rem .9rem; color: var(--muted); background: none;
+    border: 1px solid transparent; border-bottom: none;
+    border-radius: 8px 8px 0 0; margin-bottom: -1px;
+  }
+  .tab-labels button:hover { color: var(--fg); }
+  .tab-labels button[aria-selected="true"] {
+    color: var(--accent); background: var(--card);
+    border-color: var(--border); border-bottom-color: var(--card);
+  }
+  .tab-panel { padding-top: 1.25rem; }
+  .tab-panel h3 { font-size: 1.05rem; margin: 0 0 .3rem; }
+  .tab-panel h3 .step { color: var(--accent); font-variant-numeric: tabular-nums; margin-right: .4rem; }
+  .tab-panel > p:first-child { margin-top: 0; }
+  .js .tab-panel[hidden] { display: none; }
+  /* mock browser window */
+  .browser {
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+    background: var(--card); margin-top: 1.1rem; box-shadow: 0 6px 18px rgba(0,0,0,.10);
+  }
+  .browser-bar {
+    display: flex; align-items: center; gap: .5rem; padding: .5rem .7rem;
+    background: rgba(0,0,0,.04); border-bottom: 1px solid var(--border);
+    font-size: .78rem; color: var(--muted);
+  }
+  @media (prefers-color-scheme: dark) { .browser-bar { background: rgba(255,255,255,.05); } }
+  .browser-bar .dots span {
+    display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; background: #555;
+  }
+  .browser-bar .dots span:nth-child(1){ background:#e0604f; }
+  .browser-bar .dots span:nth-child(2){ background:#dfb54f; }
+  .browser-bar .dots span:nth-child(3){ background:#61b859; }
+  .browser-bar .url {
+    flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 999px;
+    padding: .15rem .65rem; font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: .74rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .browser-bar .label { font-style: italic; }
+  .browser-body { padding: .9rem 1rem; font-size: .89rem; }
+  .browser-body .field {
+    border: 1px solid var(--border); border-radius: 8px; padding: .6rem .75rem;
+    background: var(--bg); font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: .78rem; color: var(--muted); white-space: pre-wrap; margin-top: .4rem;
+  }
+  .browser-body .field strong { color: var(--fg); font-weight: 600; }
+  /* before / after demo */
+  .demo { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; margin-top: 1.25rem; }
+  .chat {
+    border: 1px solid var(--border); border-radius: 10px; background: var(--card);
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+  .chat-head {
+    padding: .6rem .9rem; font-size: .85rem; font-weight: 700;
+    border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: .5rem;
+  }
+  .chat-head .pill {
+    font-size: .68rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    padding: .12rem .5rem; border-radius: 999px;
+  }
+  .chat-head.before .pill { background: rgba(200,90,60,.16); color: #b4552d; }
+  .chat-head.after  .pill { background: rgba(70,150,80,.16); color: #3f8b4d; }
+  @media (prefers-color-scheme: dark) {
+    .chat-head.before .pill { color: #e0784a; }
+    .chat-head.after  .pill { color: #7ec87e; }
+  }
+  .chat-head .note { font-weight: 400; color: var(--muted); font-size: .8rem; }
+  .msg { padding: .75rem .9rem; font-size: .88rem; line-height: 1.55; border-bottom: 1px solid var(--border); }
+  .msg:last-child { border-bottom: none; }
+  .msg.user { background: rgba(0,0,0,.025); }
+  @media (prefers-color-scheme: dark) { .msg.user { background: rgba(255,255,255,.035); } }
+  .msg .who {
+    display: block; font-size: .68rem; text-transform: uppercase; letter-spacing: .07em;
+    color: var(--muted); margin-bottom: .3rem;
+  }
+  .msg ul { margin: .4rem 0 0; padding-left: 1.1rem; }
+  .msg li { margin: .15rem 0; }
+  .msg .ascii {
+    font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .76rem;
+    line-height: 1.35; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: .5rem .6rem; margin: .5rem 0 0; overflow-x: auto;
+    white-space: pre;
+  }
   table {
     width: 100%; border-collapse: collapse; margin-top: 1.25rem;
     font-size: .92rem; background: var(--card);
@@ -116,8 +201,9 @@
   <h1>dotfiles-ai<span class="dot">.</span></h1>
   <p class="tagline">Dotfiles, but for AI coding assistants — your personal working preferences, carried across every project and every tool.</p>
   <div class="buttons">
-    <a class="btn primary" href="https://github.com/mchelen/dotfiles-ai">View on GitHub</a>
-    <a class="btn" href="https://github.com/mchelen/dotfiles-ai#usage-by-tool">Tool setup guide</a>
+    <a class="btn primary" href="#install">Install</a>
+    <a class="btn" href="#demo">See it in action</a>
+    <a class="btn" href="https://github.com/mchelen/dotfiles-ai">View on GitHub</a>
   </div>
 </header>
 
@@ -201,19 +287,185 @@ updated  /Users/you/.codex/AGENTS.md <span class="c">(previous version saved to 
     <p class="lead">Any tool that reads a user-level markdown file can be added with one line in the installer's target list.</p>
   </section>
 
-  <section>
-    <h2>Get started</h2>
-    <div class="term">
-      <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> setup <span class="label">simulated output</span></div>
-      <pre><span class="p">$</span> git clone https://github.com/mchelen/dotfiles-ai ~/dotfiles-ai
-<span class="p">$</span> ~/dotfiles-ai/install.sh
-<span class="p">$</span> echo '[ -x "$HOME/dotfiles-ai/sync.sh" ] && "$HOME/dotfiles-ai/sync.sh" --auto' >> ~/.zshrc
-<span class="c"># optional, for the secret-scanning commit hooks:</span>
-<span class="p">$</span> pipx install pre-commit</pre>
+  <section id="demo">
+    <h2>Before and after</h2>
+    <p>Same repo, same request, same model — the only difference is whether the defaults are installed. This is what the <code>feature-workflow</code>, <code>testing</code>, and <code>git</code> modules change in practice:</p>
+    <div class="demo">
+      <div class="chat">
+        <div class="chat-head before"><span class="pill">before</span> <span class="note">no defaults installed</span></div>
+        <div class="msg user"><span class="who">You</span>Add a dark mode toggle to the settings page.</div>
+        <div class="msg"><span class="who">Assistant</span>I'll implement that now.
+          <div class="ascii">✓ Edited src/settings/SettingsPage.tsx
+✓ Edited src/theme/ThemeProvider.tsx
+✓ Added src/theme/useDarkMode.ts
+✓ Edited src/index.css
+✓ Committed "Add dark mode toggle"</div>
+          Done — dark mode is wired up with a toggle in Settings, persisted to localStorage. I also refactored <code>ThemeProvider</code> to use context while I was in there.</div>
+        <div class="msg user"><span class="who">You</span>Wait — we already have a theme system in <code>useAppearance()</code>. And I wanted the toggle in the header, not settings.</div>
+        <div class="msg"><span class="who">Assistant</span>Sorry about that — let me revert and redo it.</div>
+      </div>
+
+      <div class="chat">
+        <div class="chat-head after"><span class="pill">after</span> <span class="note">defaults installed</span></div>
+        <div class="msg user"><span class="who">You</span>Add a dark mode toggle to the settings page.</div>
+        <div class="msg"><span class="who">Assistant</span>Before I build this, here's the direction — you already have <code>useAppearance()</code>, so I'd extend it rather than add a second theme system.
+          <div class="ascii">+-- Settings ---------------+
+|  Appearance               |
+|    Theme   ( ) Light      |
+|            (o) Dark       |
+|            ( ) System     |
++---------------------------+</div>
+          <ul>
+            <li><strong>A.</strong> Three-way radio as sketched — matches the OS-preference behavior you already handle</li>
+            <li><strong>B.</strong> Simple on/off switch — smaller, but loses "follow system"</li>
+          </ul>
+          I'd go with A. Want the toggle in Settings, or in the header where the other quick actions live?</div>
+        <div class="msg user"><span class="who">You</span>A, and put it in the header.</div>
+        <div class="msg"><span class="who">Assistant</span>Starting from a failing test, then implementing:
+          <div class="ascii">FAIL  useAppearance > persists explicit dark
+PASS  useAppearance > persists explicit dark</div>
+          Header toggle is in and the suite is green. I left the change scoped to <code>useAppearance()</code> — no refactor of the provider. Nothing committed yet; say the word and I'll open a PR.</div>
+      </div>
     </div>
-    <p class="lead" style="margin-top:1rem">Then fork it and make the defaults yours — the modules in this repo are one person's preferences, meant to be edited.</p>
+    <p class="lead" style="margin-top:1rem">Simulated conversation, but the behaviors are exactly what the installed modules ask for: propose before building, test first, no unrequested refactors, no commits without asking.</p>
+  </section>
+
+  <section id="install">
+    <h2>Install</h2>
+    <p>Steps differ by where the assistant runs. Pick your setup:</p>
+
+    <div class="tab-labels" role="tablist">
+      <button role="tab" id="tab-local" aria-controls="panel-local" aria-selected="true">Local CLIs &amp; IDEs</button>
+      <button role="tab" id="tab-web" aria-controls="panel-web" aria-selected="false">Claude Code on the web</button>
+      <button role="tab" id="tab-codex" aria-controls="panel-codex" aria-selected="false">OpenAI Codex</button>
+      <button role="tab" id="tab-ui" aria-controls="panel-ui" aria-selected="false">Cursor · Windsurf · Copilot web</button>
+    </div>
+
+    <div class="tab-panel" id="panel-local" role="tabpanel" aria-labelledby="tab-local">
+      <p>Covers Claude Code (CLI, desktop app, IDE extensions), Codex CLI, Copilot CLI, Gemini CLI, Qwen Code, OpenCode, and Goose — anything that reads a user-level instruction file. The installer writes to every tool it detects, so one run covers all of them.</p>
+      <h3><span class="step">1.</span>Clone and install</h3>
+      <div class="term">
+        <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~ <span class="label">simulated output</span></div>
+        <pre><span class="p">$</span> git clone https://github.com/mchelen/dotfiles-ai ~/dotfiles-ai
+<span class="p">$</span> ~/dotfiles-ai/install.sh
+installed /Users/you/.claude/CLAUDE.md
+installed /Users/you/.codex/AGENTS.md
+installed /Users/you/.copilot/copilot-instructions.md
+<span class="y">skipped</span>  /Users/you/.qwen/QWEN.md <span class="c">(no ~/.qwen — tool not detected; use --all to force)</span></pre>
+      </div>
+      <h3 style="margin-top:1.5rem"><span class="step">2.</span>Keep it current</h3>
+      <p>One line in your shell rc re-syncs at most once a day, silently unless something changed:</p>
+      <div class="term">
+        <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~/.zshrc <span class="label">simulated output</span></div>
+        <pre><span class="p">$</span> echo '[ -x "$HOME/dotfiles-ai/sync.sh" ] && "$HOME/dotfiles-ai/sync.sh" --auto' >> ~/.zshrc
+<span class="c"># optional — enables the secret-scanning commit hooks:</span>
+<span class="p">$</span> pipx install pre-commit</pre>
+      </div>
+      <h3 style="margin-top:1.5rem"><span class="step">3.</span>Verify</h3>
+      <p>Start a new session and ask for a feature. If the assistant proposes options before writing code, it's live.</p>
+    </div>
+
+    <div class="tab-panel" id="panel-web" role="tabpanel" aria-labelledby="tab-web" hidden>
+      <p><strong>Why this differs:</strong> a cloud session runs in a fresh container that clones your repo — it never sees <code>~/.claude/CLAUDE.md</code> on your laptop. The defaults have to travel <em>inside the repo</em>, so you commit them to the project's own <code>CLAUDE.md</code>.</p>
+      <h3><span class="step">1.</span>Append the block to the project's CLAUDE.md</h3>
+      <div class="term">
+        <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~/code/your-project <span class="label">simulated output</span></div>
+        <pre><span class="p">$</span> ~/dotfiles-ai/install.sh --print >> CLAUDE.md
+<span class="p">$</span> git add CLAUDE.md &amp;&amp; git commit -m "Add AI assistant defaults"
+<span class="p">$</span> git push</pre>
+      </div>
+      <p class="lead" style="margin-top:.75rem">The block is marker-delimited, so re-running the command later replaces it cleanly instead of duplicating it. Remember this file is shared with collaborators — drop any module you wouldn't impose on the team.</p>
+      <h3 style="margin-top:1.5rem"><span class="step">2.</span>Start a session</h3>
+      <p>Open <code>claude.ai/code</code>, pick the repo, and the defaults load with the checkout — no per-session setup:</p>
+      <div class="browser">
+        <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">claude.ai/code</span><span class="label">simulated</span></div>
+        <div class="browser-body">
+          <div style="font-size:.8rem;color:var(--muted);margin-bottom:.5rem">your-project · main</div>
+          <div><strong>You:</strong> add a bulk export button to the reports page</div>
+          <div class="field" style="margin-top:.6rem"><strong>Claude</strong>
+Before I build this, two approaches — client-side CSV from the
+loaded rows, or a server endpoint that streams the full result
+set. I'd recommend the endpoint since reports can exceed the
+page size. Mockup of the button placement below…</div>
+          <div style="font-size:.78rem;color:var(--muted);margin-top:.5rem">↑ proposing first, because CLAUDE.md carries the feature-workflow module</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="panel-codex" role="tabpanel" aria-labelledby="tab-codex" hidden>
+      <p>Codex reads <code>AGENTS.md</code>. The CLI reads a user-level one; the cloud/IDE variants only see the repo — so the two need different steps.</p>
+      <h3><span class="step">1.</span>Codex CLI — automatic</h3>
+      <p>Already covered by <code>install.sh</code>, which writes <code>~/.codex/AGENTS.md</code> whenever it detects <code>~/.codex</code>:</p>
+      <div class="term">
+        <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~ <span class="label">simulated output</span></div>
+        <pre><span class="p">$</span> ~/dotfiles-ai/install.sh
+installed /Users/you/.codex/AGENTS.md
+<span class="c">…</span></pre>
+      </div>
+      <h3 style="margin-top:1.5rem"><span class="step">2.</span>Codex cloud &amp; IDE extension — commit to the repo</h3>
+      <p>Same reasoning as Claude Code on the web: the container only has your repository.</p>
+      <div class="term">
+        <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~/code/your-project <span class="label">simulated output</span></div>
+        <pre><span class="p">$</span> ~/dotfiles-ai/install.sh --print >> AGENTS.md
+<span class="p">$</span> git add AGENTS.md &amp;&amp; git commit -m "Add AI assistant defaults" &amp;&amp; git push</pre>
+      </div>
+      <div class="browser">
+        <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">chatgpt.com/codex</span><span class="label">simulated</span></div>
+        <div class="browser-body">
+          <div style="font-size:.8rem;color:var(--muted);margin-bottom:.5rem">Task · your-project</div>
+          <div><strong>Task:</strong> fix the flaky checkout test</div>
+          <div class="field" style="margin-top:.6rem"><strong>Codex</strong>
+Reproducing first: added a failing test that pins the race
+(3 runs, 2 failures). Fix keeps the change inside the retry
+helper — no refactor of the test harness. Not committing
+until you've looked.</div>
+          <div style="font-size:.78rem;color:var(--muted);margin-top:.5rem">↑ reproduce-then-fix and no-auto-commit come from AGENTS.md in the repo</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="panel-ui" role="tabpanel" aria-labelledby="tab-ui" hidden>
+      <p>These tools take user-level rules through a settings field rather than a file on disk, so the defaults get pasted in once. Re-paste after you change a module.</p>
+      <h3><span class="step">1.</span>Copy the assembled block</h3>
+      <div class="term">
+        <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~ <span class="label">simulated output</span></div>
+        <pre><span class="p">$</span> ~/dotfiles-ai/install.sh --print | pbcopy   <span class="c"># Linux: | xclip -sel clip</span></pre>
+      </div>
+      <h3 style="margin-top:1.5rem"><span class="step">2.</span>Paste into the tool's rules field</h3>
+      <p>Cursor: <em>Settings → Rules → User Rules</em>. Windsurf: <em>Settings → Global rules</em>. Copilot on github.com: <em>Copilot settings → Personal custom instructions</em>.</p>
+      <div class="browser">
+        <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">Cursor · Settings → Rules</span><span class="label">simulated</span></div>
+        <div class="browser-body">
+          <div style="font-weight:600">User Rules</div>
+          <div style="font-size:.8rem;color:var(--muted)">Applied to every project on this machine.</div>
+          <div class="field"><strong># Feature development workflow</strong>
+When I ask for a new feature or a significant change:
+- Do <strong>not</strong> jump straight into implementation.
+- First give me something concrete to react to…
+<span style="color:var(--muted)">▍</span></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="lead" style="margin-top:1.75rem">Then fork it and make the defaults yours — the modules in this repo are one person's preferences, meant to be edited.</p>
   </section>
 </main>
+
+<script>
+  document.documentElement.classList.add('js');
+  const tablist = document.querySelector('.tab-labels');
+  if (tablist) {
+    tablist.addEventListener('click', e => {
+      const tab = e.target.closest('button[role=tab]');
+      if (!tab) return;
+      for (const t of tablist.querySelectorAll('button[role=tab]')) {
+        const selected = t === tab;
+        t.setAttribute('aria-selected', String(selected));
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !selected;
+      }
+    });
+  }
+</script>
 
 <footer>
   <a href="https://github.com/mchelen/dotfiles-ai">mchelen/dotfiles-ai</a> · MIT License · terminal output on this page is simulated for illustration

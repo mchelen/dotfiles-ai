@@ -5,6 +5,11 @@
 - Show the project in action. Where real screenshots or live demos aren't
   practical, simulate them — rendered terminal sessions, mocked UI states,
   example output — and label simulated content as such.
+- Include a before/after demo showing what the project actually changes:
+  the same scenario with and without it, side by side.
+- Give install steps for every environment where they differ (local CLI,
+  cloud/web, IDE, settings-UI-only tools), not just the common case —
+  and say *why* a variant differs, so the reader can generalize.
 - Keep the site in the repo (e.g. a `docs/` folder) so it versions with
   the code, and update it alongside user-facing changes.
 - Publish via the GitHub Actions Pages path by default: Pages source set
