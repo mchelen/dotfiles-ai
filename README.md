@@ -46,6 +46,7 @@ four categories below describe the kind of behavior each module governs:
 | Module | Preference |
 |---|---|
 | [`architecture.md`](defaults/architecture.md) | Every project keeps an up-to-date `ARCHITECTURE.md` with Mermaid diagrams |
+| [`specification.md`](defaults/specification.md) | Intended behavior lives in a checked-in spec (Spec Kit), revised in the same change as the code |
 | [`project-website.md`](defaults/project-website.md) | Most projects get a static site (GitHub Pages) with usage docs and (simulated) screenshots/demos |
 
 The site has [a full explanation of every module with before/after
