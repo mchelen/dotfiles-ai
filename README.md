@@ -83,8 +83,56 @@ cloud) and settings-UI tools, copy [`INSTRUCTIONS.md`](INSTRUCTIONS.md) out of
 your fork on github.com and paste it where the tool reads instructions. No
 clone, nothing installed; see the next section.
 
+**Claude Code on the web, every session** — configure the environment once
+instead of every project; see below.
+
 The [website has the click-by-click guide](https://mchelen.github.io/dotfiles-ai/#install)
 for each environment, with screenshots.
+
+## Claude Code on the web: one setup script, every session
+
+A cloud session runs in a fresh VM, so nothing from your machine is there —
+but the session's *environment* can carry a **setup script**: Bash that runs
+as root **before Claude Code launches**, whose writes to disk persist. Point
+it at your fork and it does what you'd do on a laptop, leaving the block in
+the container's `~/.claude/CLAUDE.md`. Every repo you open in that
+environment, nothing committed to any project, no effect on collaborators.
+
+At `claude.ai/code`, click the cloud icon showing the current environment's
+name, hover the environment, click the settings icon, and put this in the
+**Setup script** field:
+
+```sh
+#!/bin/bash
+# dotfiles-ai: user-level defaults for every session in this environment
+git clone --depth 1 https://github.com/YOUR-USERNAME/dotfiles-ai /opt/dotfiles-ai || true
+mkdir -p "$HOME/.claude"
+/opt/dotfiles-ai/install.sh || true
+```
+
+The `mkdir` matters — `install.sh` only writes a tool's file when that tool's
+config directory exists, and a fresh container has none. The `|| true` guards
+matter too: a setup script that exits non-zero fails the whole session.
+Confirm it worked by starting a *new* session (resumes don't re-run it) and
+asking Claude to `cat ~/.claude/CLAUDE.md`.
+
+Notes:
+
+- **Cached.** The script runs on the first session in an environment; later
+  sessions start from a filesystem snapshot. It re-runs when you edit the
+  script, change the allowed hosts, or after roughly seven days — so change a
+  character in the script to pull in module edits immediately.
+- **Keep the repo public.** A private fork would need a token in the clone
+  URL, and environment variables are not a secrets store. `github.com` is on
+  the default *Trusted* network allowlist, so a public clone needs no extra
+  configuration.
+- **Teams.** Owners/admins on Team and Enterprise plans can put the same
+  script in an organization-shared environment (admin settings → *Cloud
+  environments*).
+- **Always-fresh alternative.** A `SessionStart` hook in a repo's
+  `.claude/settings.json` runs every session including resumes, cloud and
+  local — no cache to bust — but it's committed, so it's per-project and your
+  collaborators run it too.
 
 ## `INSTRUCTIONS.md` (generated)
 
@@ -104,12 +152,13 @@ no-terminal path only works if this file is always current.
 
 ## Keeping copies in sync
 
-Three copies of the defaults can drift apart, each refreshed differently:
+The copies of the defaults can drift apart, each refreshed differently:
 
 | Direction | How | Effort |
 |---|---|---|
 | Your fork ← upstream | GitHub's **Sync fork** button | one click, no terminal |
 | Your machines ← your fork | `sync.sh` | automatic, daily |
+| Cloud sessions ← your fork | Setup script re-runs when the environment cache rebuilds | edit the script to force it |
 | Project repos ← your fork | Re-copy `INSTRUCTIONS.md`, replace the block | manual |
 
 ### Your fork ← upstream
@@ -143,6 +192,14 @@ changed.
 **2. Manual pulls** — a post-merge hook (managed by the pre-commit
 framework, see below) re-runs `install.sh` after any `git pull` in this
 repo, so installed files never lag the checkout.
+
+### Cloud sessions ← your fork
+
+The setup script clones your fork on each run, so it picks up whatever `main`
+holds at that moment — but the run itself is snapshot-cached rather than
+repeated per session. Edits reach new cloud sessions when the cache rebuilds
+(script change, allowed-hosts change, or ~7 days), and immediately if you
+change a character in the script. Resuming a session never re-runs it.
 
 ### Project repos ← your fork
 
