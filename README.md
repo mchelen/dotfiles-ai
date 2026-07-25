@@ -24,6 +24,7 @@ four categories below describe the kind of behavior each module governs:
 |---|---|
 | [`communication.md`](defaults/communication.md) | Answer-first replies, push back on bad ideas, disclose gaps |
 | [`feature-workflow.md`](defaults/feature-workflow.md) | New features get a mockup, demo, options, or direction proposal **before** implementation starts |
+| [`tool-fallbacks.md`](defaults/tool-fallbacks.md) | When an interactive tool looks stuck, fall back to plain text instead of retrying it |
 
 **Craft** — how code gets written
 

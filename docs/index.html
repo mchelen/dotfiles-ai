@@ -249,7 +249,7 @@
 
   <section id="modules">
     <h2>The modules</h2>
-    <p>Nine modules, grouped here by the kind of behavior they govern. Each one is a short markdown file in <code>defaults/</code> — read them, delete the ones you disagree with, add your own.</p>
+    <p>Ten modules, grouped here by the kind of behavior they govern. Each one is a short markdown file in <code>defaults/</code> — read them, delete the ones you disagree with, add your own.</p>
 
     <h3 class="cat">Collaboration <span>— how the assistant works with you</span></h3>
 
@@ -268,6 +268,15 @@
       <div class="ba">
         <div class="ba-col"><span class="ba-label before">Without</span>400 lines land in the wrong architecture, and you review a finished thing you'd have designed differently.</div>
         <div class="ba-col"><span class="ba-label after">With</span>"Two approaches — client-side CSV, or a streaming endpoint. I'd pick the endpoint because reports exceed the page size. Sketch below. Which?"</div>
+      </div>
+    </div>
+
+    <div class="module">
+      <h4>tool-fallbacks</h4>
+      <p>Tooling fails sometimes. When an interactive prompt looks stuck — the same card reappearing, or you saying you answered something that never arrived — the assistant drops to plain text rather than retrying the thing that just broke. A reported refusal is treated as possibly-lost input, not a decision, because retrying through a broken mechanism is exactly what turns one lost answer into a loop. Written after <a href="https://github.com/anthropics/claude-code/issues/81223">this bug</a>: a dismissed question card silently discards typed text.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Without</span>The card is re-issued after every failure. You answer the same question four times and nothing moves forward.</div>
+        <div class="ba-col"><span class="ba-label after">With</span>"That came back as a decline, but you said you answered — the card is probably eating input. Switching to plain text: &lt;question&gt;"</div>
       </div>
     </div>
 
