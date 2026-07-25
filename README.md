@@ -15,37 +15,37 @@ instructions still belong in each repo's own `CLAUDE.md` / `AGENTS.md`.
 ## What's here
 
 Each file in [`defaults/`](defaults/) is one self-contained preference module,
-written as plain tool-agnostic markdown, grouped into four categories by the
-kind of behavior it governs:
+written as plain tool-agnostic markdown. Files are flat in `defaults/`; the
+four categories below describe the kind of behavior each module governs:
 
 **Collaboration** — how the assistant works with you
 
 | Module | Preference |
 |---|---|
-| [`communication.md`](defaults/collaboration/communication.md) | Answer-first replies, push back on bad ideas, disclose gaps |
-| [`feature-workflow.md`](defaults/collaboration/feature-workflow.md) | New features get a mockup, demo, options, or direction proposal **before** implementation starts |
+| [`communication.md`](defaults/communication.md) | Answer-first replies, push back on bad ideas, disclose gaps |
+| [`feature-workflow.md`](defaults/feature-workflow.md) | New features get a mockup, demo, options, or direction proposal **before** implementation starts |
 
 **Craft** — how code gets written
 
 | Module | Preference |
 |---|---|
-| [`code-style.md`](defaults/craft/code-style.md) | Match the codebase, minimal diffs, no drive-by refactors or dependencies |
-| [`testing.md`](defaults/craft/testing.md) | Tests come **before** implementation; bug fixes start from a reproducing test |
+| [`code-style.md`](defaults/code-style.md) | Match the codebase, minimal diffs, no drive-by refactors or dependencies |
+| [`testing.md`](defaults/testing.md) | Tests come **before** implementation; bug fixes start from a reproducing test |
 
 **Delivery** — how work ships
 
 | Module | Preference |
 |---|---|
-| [`git.md`](defaults/delivery/git.md) | No commits/pushes unless asked, PRs opened and merged on green, no history rewrites |
-| [`secrets.md`](defaults/delivery/secrets.md) | Layered secret/PII protection: pre-commit scan + CI scanner + GitHub secret scanning; leaked = rotate |
-| [`repo-config.md`](defaults/delivery/repo-config.md) | GitHub repo settings managed as code (Terraform GitHub provider), never clicked through the UI |
+| [`git.md`](defaults/git.md) | No commits/pushes unless asked, PRs opened and merged on green, no history rewrites |
+| [`secrets.md`](defaults/secrets.md) | Layered secret/PII protection: pre-commit scan + CI scanner + GitHub secret scanning; leaked = rotate |
+| [`repo-config.md`](defaults/repo-config.md) | GitHub repo settings managed as code (Terraform GitHub provider), never clicked through the UI |
 
 **Documentation** — what gets written down
 
 | Module | Preference |
 |---|---|
-| [`architecture.md`](defaults/documentation/architecture.md) | Every project keeps an up-to-date `ARCHITECTURE.md` with Mermaid diagrams |
-| [`project-website.md`](defaults/documentation/project-website.md) | Most projects get a static site (GitHub Pages) with usage docs and (simulated) screenshots/demos |
+| [`architecture.md`](defaults/architecture.md) | Every project keeps an up-to-date `ARCHITECTURE.md` with Mermaid diagrams |
+| [`project-website.md`](defaults/project-website.md) | Most projects get a static site (GitHub Pages) with usage docs and (simulated) screenshots/demos |
 
 The site has [a full explanation of every module with before/after
 examples](https://mchelen.github.io/dotfiles-ai/#modules).
@@ -89,7 +89,7 @@ repo, so installed files never lag the checkout.
 
 ## Guarding against leaked secrets
 
-This repo practices what [`defaults/delivery/secrets.md`](defaults/delivery/secrets.md)
+This repo practices what [`defaults/secrets.md`](defaults/secrets.md)
 preaches, in three layers:
 
 1. **Pre-commit** — the standard [pre-commit](https://pre-commit.com)
@@ -117,7 +117,8 @@ preaches, in three layers:
 
 Repository settings live in [`infra/main.tf`](infra/main.tf) (official
 Terraform GitHub provider) instead of the web UI: description, merge
-policy, Pages (`docs/` on `main`), vulnerability alerts, and secret
+policy, Pages (published by the `deploy-pages` workflow), vulnerability
+alerts, and secret
 scanning with push protection. An `import` block adopts the existing repo,
 so the first apply changes settings without recreating anything.
 
@@ -191,10 +192,9 @@ Notes:
 
 ## Adding your own defaults
 
-1. Drop a new `.md` file into the category folder it belongs to —
-   `defaults/collaboration/`, `craft/`, `delivery/`, or `documentation/` —
-   one topic per file, phrased as direct instructions to the assistant.
-   (A new category is just a new folder; the installer picks it up.)
+1. Drop a new `.md` file in `defaults/` — one topic per file, phrased as
+   direct instructions to the assistant. If it belongs to one of the four
+   categories above, add it to that table in this README.
 2. Re-run `./install.sh`.
 
 Keep modules short and unconditional enough to apply everywhere; anything

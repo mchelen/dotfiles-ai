@@ -32,19 +32,19 @@ TARGETS=(
   "$HOME/.config/goose/.goosehints"         # Goose
 )
 
-# Modules live in defaults/<category>/<module>.md; the glob expands in
-# category order, so the assembled block stays grouped by category.
+# Modules are flat files in defaults/; categories are a documentation
+# concept (see the README), not a directory layout.
 assemble() {
   local found=0
   echo "$BEGIN_MARK"
-  for f in "$REPO_DIR"/defaults/*/*.md; do
+  for f in "$REPO_DIR"/defaults/*.md; do
     [[ -f "$f" ]] || continue
     found=1
     cat "$f"
     echo
   done
   echo "$END_MARK"
-  [[ $found -eq 1 ]] || { echo "no modules found in $REPO_DIR/defaults/*/" >&2; return 1; }
+  [[ $found -eq 1 ]] || { echo "no modules found in $REPO_DIR/defaults/" >&2; return 1; }
 }
 
 install_all=0
