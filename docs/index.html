@@ -93,6 +93,38 @@
   .term .p { color: var(--term-green); }
   .term .c { color: var(--term-dim); }
   .term .y { color: var(--term-yellow); }
+  /* module catalog */
+  h3.cat {
+    font-size: 1.15rem; margin: 2.25rem 0 1rem; padding-bottom: .4rem;
+    border-bottom: 2px solid var(--accent); letter-spacing: -.01em;
+  }
+  h3.cat span { font-weight: 400; color: var(--muted); font-size: .92rem; letter-spacing: 0; }
+  .module {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1rem 1.1rem; margin-bottom: 1rem;
+  }
+  .module h4 {
+    margin: 0 0 .4rem; font-size: 1rem; font-family: ui-monospace, Menlo, Consolas, monospace;
+    color: var(--accent);
+  }
+  .module > p { margin: 0 0 .85rem; font-size: .93rem; }
+  .ba { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .75rem; }
+  .ba-col {
+    border: 1px solid var(--border); border-radius: 8px; padding: .6rem .7rem;
+    background: var(--bg); font-size: .86rem; line-height: 1.5;
+  }
+  .ba-label {
+    display: block; font-size: .66rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .07em; margin-bottom: .35rem;
+  }
+  .ba-label.before { color: #b4552d; }
+  .ba-label.after { color: #3f8b4d; }
+  @media (prefers-color-scheme: dark) {
+    .ba-label.before { color: #e0784a; }
+    .ba-label.after { color: #7ec87e; }
+  }
+  .ba-note { color: var(--muted); font-size: .8rem; font-style: italic; }
+  .mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .8rem; }
   /* tabs (progressive enhancement: without JS every panel just stacks) */
   .tab-labels { display: flex; flex-wrap: wrap; gap: .35rem; border-bottom: 1px solid var(--border); margin: 1.5rem 0 0; }
   .tab-labels button {
@@ -215,18 +247,97 @@
     <p class="lead">Personal preferences live here, at the user level. Project conventions stay in each repo's own <code>CLAUDE.md</code> / <code>AGENTS.md</code> — this is the layer underneath.</p>
   </section>
 
-  <section>
+  <section id="modules">
     <h2>The modules</h2>
-    <div class="cards">
-      <div class="card"><h3>feature-workflow</h3><p>New features get a mockup, demo, options, or direction proposal before implementation starts.</p></div>
-      <div class="card"><h3>testing</h3><p>Tests come before code: start from a failing test; bug fixes start from a reproduction.</p></div>
-      <div class="card"><h3>architecture</h3><p>Every project keeps an up-to-date ARCHITECTURE.md with Mermaid diagrams.</p></div>
-      <div class="card"><h3>git</h3><p>Focused commits, PRs opened and merged on green by default, never force-push, never commit secrets.</p></div>
-      <div class="card"><h3>communication</h3><p>Answer first, push back on bad ideas, disclose what was skipped or left broken.</p></div>
-      <div class="card"><h3>code-style</h3><p>Match the codebase, smallest change that works, no drive-by refactors or dependencies.</p></div>
-      <div class="card"><h3>project-website</h3><p>Most projects get a static docs site with usage guides and (simulated) screenshots or demos.</p></div>
-      <div class="card"><h3>secrets</h3><p>Layered leak protection: pre-commit secret/PII scan, CI scanner, and GitHub push protection.</p></div>
-      <div class="card"><h3>repo-config</h3><p>GitHub repo settings managed as code with Terraform — no clicking through the web UI.</p></div>
+    <p>Nine modules, grouped by the kind of behavior they govern. Each one is a short markdown file in <code>defaults/&lt;category&gt;/</code> — read them, delete the ones you disagree with, add your own.</p>
+
+    <h3 class="cat">Collaboration <span>— how the assistant works with you</span></h3>
+
+    <div class="module">
+      <h4>communication</h4>
+      <p>Lead with the answer, not the preamble. Say so when a request looks like a bad idea, before doing it. Disclose what was skipped, what's still failing, and what was left half-done — never present partial work as finished.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Without</span>"I've completed the refactor and everything is working!"<br><span class="ba-note">(two tests were failing; you find out tomorrow)</span></div>
+        <div class="ba-col"><span class="ba-label after">With</span>"Refactor is in. One caveat: <code>checkout.spec.ts</code> has two failures I didn't introduce and didn't fix — want me to take them next?"</div>
+      </div>
+    </div>
+
+    <div class="module">
+      <h4>feature-workflow</h4>
+      <p>The flagship. For anything bigger than an obvious fix, the assistant owes you something to react to first — a mockup, a throwaway demo, two or three options with trade-offs, or a short written direction. Implementation waits for your nod. Small, unambiguous changes skip the ceremony.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Without</span>400 lines land in the wrong architecture, and you review a finished thing you'd have designed differently.</div>
+        <div class="ba-col"><span class="ba-label after">With</span>"Two approaches — client-side CSV, or a streaming endpoint. I'd pick the endpoint because reports exceed the page size. Sketch below. Which?"</div>
+      </div>
+    </div>
+
+    <h3 class="cat">Craft <span>— how code gets written</span></h3>
+
+    <div class="module">
+      <h4>code-style</h4>
+      <p>The surrounding code wins over any general convention. Smallest change that solves the problem; no opportunistic refactors riding along in an unrelated diff. Comments explain non-obvious constraints, not what the line already says. New dependencies need a reason stated out loud.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Without</span>Adds <code>date-fns</code> for one format call, reformats the whole file, and the real change is buried in a 300-line diff.</div>
+        <div class="ba-col"><span class="ba-label after">With</span>A six-line helper matching the file's existing style. Diff is six lines. No new dependency.</div>
+      </div>
+    </div>
+
+    <div class="module">
+      <h4>testing</h4>
+      <p>Start from a failing test that captures the expected behavior, then write the code that makes it pass — and show both runs, so you can see the test actually exercises the change. Bug fixes begin with a reproduction. Tests target behavior, not internals.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Without</span>"Fixed — should work now." No test proves it did, and nothing stops the bug returning next month.</div>
+        <div class="ba-col"><span class="ba-label after">With</span><span class="mono">FAIL  parses timezone-less dates</span><br><span class="mono">PASS  parses timezone-less dates</span><br><span class="ba-note">the bug now has a permanent guard</span></div>
+      </div>
+    </div>
+
+    <h3 class="cat">Delivery <span>— how work ships</span></h3>
+
+    <div class="module">
+      <h4>git</h4>
+      <p>Nothing is committed or pushed unless you asked. Commits stay small and focused rather than bundling unrelated work. Once a branch is done it goes to a pull request automatically, gets watched, and merges itself when checks are green and reviews are in — but never over a failing check. History is never rewritten without asking.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Without</span>One commit titled "updates" touching 14 files, pushed straight to <code>main</code>, impossible to revert cleanly.</div>
+        <div class="ba-col"><span class="ba-label after">With</span>Branch → focused commits → PR opened → CI watched → squash-merged on green. You read a diff, not a mystery.</div>
+      </div>
+    </div>
+
+    <div class="module">
+      <h4>secrets</h4>
+      <p>Three independent layers, because any one of them can be bypassed: the pre-commit framework running gitleaks locally, the same scan again in CI, and GitHub's server-side push protection. Checks are never quietly disabled — a false positive gets an inline allow-marker instead. Anything that reaches history is treated as compromised and rotated, not just deleted.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Without</span><code>.env</code> slips into a commit and is discovered a week later — by which point the key has been public in the history the whole time.</div>
+        <div class="ba-col"><span class="ba-label after">With</span><span class="mono">Detect hardcoded secrets……Failed</span><br><span class="ba-note">commit blocked before the key ever exists in history</span></div>
+      </div>
+    </div>
+
+    <div class="module">
+      <h4>repo-config</h4>
+      <p>Repository settings — merge policy, Pages, security toggles, branch protection — live in Terraform under <code>infra/</code> and get applied from CI, rather than being clicked through the web UI where they drift silently and nobody can review the change.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Without</span>"Go to Settings → Advanced Security and turn on push protection." Undocumented, unreviewable, and gone if the repo is recreated.</div>
+        <div class="ba-col"><span class="ba-label after">With</span>A three-line change in <code>infra/main.tf</code>, reviewed in a PR, applied by CI on merge.</div>
+      </div>
+    </div>
+
+    <h3 class="cat">Documentation <span>— what gets written down</span></h3>
+
+    <div class="module">
+      <h4>architecture</h4>
+      <p>Every project keeps an <code>ARCHITECTURE.md</code> at the root: major components, how they fit together, key data flows, with Mermaid diagrams. It's updated in the same change that rewires a component — never as a later cleanup pass. Deliberately high level, so small edits don't invalidate it.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Without</span>The diagram still shows a service that was deleted three months ago, so nobody trusts the doc and it decays further.</div>
+        <div class="ba-col"><span class="ba-label after">With</span>The PR that adds the queue also updates the diagram. The doc is accurate because it's never separately "due".</div>
+      </div>
+    </div>
+
+    <div class="module">
+      <h4>project-website</h4>
+      <p>Most projects get a static site explaining what it is, why it exists, and how to use it — including install steps for every environment where they differ, and a before/after demo of what the project actually changes. Where real screenshots aren't practical, simulate them and label them as simulated. <em>This page is that module applied to itself.</em></p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Without</span>A README that assumes you already know what the project does, and install steps that only cover the author's own setup.</div>
+        <div class="ba-col"><span class="ba-label after">With</span>The page you're reading: what/why, per-environment install tabs, and a side-by-side demo.</div>
+      </div>
     </div>
   </section>
 
