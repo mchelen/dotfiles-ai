@@ -10,7 +10,7 @@ flowchart LR
     H["post-merge hook<br/>(pre-commit framework)"] -->|"re-run"| I
     S -->|"re-run"| I
     subgraph repo["dotfiles-ai repo"]
-        D["defaults/&lt;category&gt;/*.md<br/>one module per topic"]
+        D["defaults/*.md<br/>one module per topic"]
         I["install.sh"]
     end
     D -->|"concatenated into a<br/>marker-delimited managed block"| I
@@ -21,15 +21,13 @@ flowchart LR
 
 ## Components
 
-- **`defaults/<category>/`** — the content, grouped into four categories by
-  the kind of behavior each module governs: `collaboration/` (how the
-  assistant works with you), `craft/` (how code gets written), `delivery/`
-  (how work ships), and `documentation/` (what gets written down). Each
-  file is one self-contained, tool-agnostic preference module written as
-  direct instructions to an assistant. Modules are independent; the
-  installer includes all of them, in category-then-filename order, so the
-  assembled block stays grouped. Adding a category means adding a folder —
-  no installer change.
+- **`defaults/`** — the content: flat `.md` files, one self-contained,
+  tool-agnostic preference module each, written as direct instructions to
+  an assistant. Modules are independent; the installer includes all of them
+  in filename order. Modules are also grouped into four documentation
+  categories — collaboration, craft, delivery, documentation — but that
+  grouping lives in the README and the website only, deliberately not in
+  the directory layout, so adding a module stays a one-file drop.
 - **`install.sh`** — the delivery mechanism. It concatenates the modules
   between `BEGIN`/`END` HTML-comment markers and inserts that block into
   each target file. Re-runs replace only the managed block (backing up the
