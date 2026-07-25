@@ -26,6 +26,7 @@ flowchart LR
     I -->|"--print, in CI on<br/>defaults/** change"| N
     I -->|"insert / replace block<br/>(if tool detected)"| C["~/.claude/CLAUDE.md<br/>(Claude Code)"]
     I -->|"insert / replace block<br/>(if tool detected)"| X["~/.codex/AGENTS.md, ~/.copilot/…,<br/>~/.gemini/…, ~/.qwen/…,<br/>opencode, goose"]
+    I -->|"run by a cloud environment's<br/>setup script, before launch"| E["~/.claude/CLAUDE.md inside every<br/>Claude Code web session"]
     N -->|"'Copy raw file' → web editor<br/>(manual refresh)"| R["a project's CLAUDE.md<br/>/ AGENTS.md (cloud agents)"]
     N -->|"copy → paste"| P["UI-only tools<br/>(e.g. Cursor User Rules)"]
 ```
@@ -93,7 +94,14 @@ is refreshed by a different mechanism:
 |---|---|---|
 | The fork itself | GitHub *Sync fork* | manual, one click |
 | User-level files on a machine | `sync.sh` → `install.sh` | automatic (daily / post-merge) |
+| `~/.claude/CLAUDE.md` in a cloud session | environment setup script → `install.sh` | on environment cache rebuild |
 | A project repo's `CLAUDE.md` / `AGENTS.md` | re-copy `INSTRUCTIONS.md`, replace the block | manual |
+
+The cloud-session copy reuses `install.sh` unchanged: a Claude Code on the web
+environment can run a setup script as root before the session launches, and
+its writes to disk persist, so the same script that provisions a laptop
+provisions a container. Because that result is snapshot-cached per
+environment, it lags `defaults/` until the cache rebuilds.
 
 The last one is deliberately manual: those files are shared with a project's
 collaborators, so no scheduled bot rewrites them.

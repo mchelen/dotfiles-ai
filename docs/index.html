@@ -443,7 +443,8 @@ updated  /Users/you/.codex/AGENTS.md <span class="c">(previous version saved to 
       <tr><td>OpenCode</td><td>CLI/TUI</td><td class="ok">automatic</td></tr>
       <tr><td>Goose</td><td>CLI</td><td class="ok">automatic</td></tr>
       <tr><td>Cursor · Windsurf · Copilot web</td><td>IDE / web</td><td>paste <code>INSTRUCTIONS.md</code> into settings</td></tr>
-      <tr><td>Claude Code web · Codex cloud · Copilot agent</td><td>cloud agents</td><td>copy <code>INSTRUCTIONS.md</code> into the repo's instruction file</td></tr>
+      <tr><td>Claude Code on the web</td><td>cloud agent</td><td>environment setup script (every repo) <em>or</em> <code>INSTRUCTIONS.md</code> in the repo</td></tr>
+      <tr><td>Codex cloud · Copilot agent</td><td>cloud agents</td><td>copy <code>INSTRUCTIONS.md</code> into the repo's instruction file</td></tr>
     </table>
     </div>
     <p class="lead">Any tool that reads a user-level markdown file can be added with one line in the installer's target list.</p>
@@ -542,7 +543,8 @@ PASS  useAppearance > persists explicit dark</div>
 
     <div class="tab-labels" role="tablist">
       <button role="tab" id="tab-local" aria-controls="panel-local" aria-selected="true">Local CLIs &amp; IDEs</button>
-      <button role="tab" id="tab-web" aria-controls="panel-web" aria-selected="false">Claude Code on the web</button>
+      <button role="tab" id="tab-env" aria-controls="panel-env" aria-selected="false">Claude web · every session</button>
+      <button role="tab" id="tab-web" aria-controls="panel-web" aria-selected="false">Claude web · one project</button>
       <button role="tab" id="tab-codex" aria-controls="panel-codex" aria-selected="false">OpenAI Codex</button>
       <button role="tab" id="tab-ui" aria-controls="panel-ui" aria-selected="false">Cursor · Windsurf · Copilot web</button>
     </div>
@@ -592,7 +594,78 @@ installed /Users/you/.copilot/copilot-instructions.md
       <p>Edit files in <code>~/dotfiles-ai/defaults/</code>, then <code>git push</code> to your fork and re-run <code>install.sh</code>. Every other machine picks the change up on its next shell start.</p>
     </div>
 
+    <div class="tab-panel" id="panel-env" role="tabpanel" aria-labelledby="tab-env" hidden>
+      <p><strong>Configure once, and every future cloud session has the defaults — in every repo you open.</strong> Nothing is committed to any project, so teammates are unaffected. This is the closest thing to the local install if you work mostly on the web.</p>
+      <p>A cloud session runs in a fresh VM. Its <em>environment</em> can carry a <strong>setup script</strong>: a Bash script that runs as root <em>before Claude Code launches</em>, and whatever it writes to disk stays. So the script clones your fork and runs <code>install.sh</code> — exactly what you'd do on a laptop — leaving the block in the container's <code>~/.claude/CLAUDE.md</code>. (Claude Code's docs list your <em>laptop's</em> <code>~/.claude/CLAUDE.md</code> as not available in a cloud session, because it lives on your machine rather than in the repo. The setup script recreates it inside the container instead.)</p>
+      <p>Pick the <em>one project</em> tab instead when the defaults should apply to a specific repo for everyone who works on it, including collaborators and other cloud agents.</p>
+
+      <h3><span class="step">4.</span>Open the environment selector</h3>
+      <p>At <code>claude.ai/code</code>, click the cloud icon showing the current environment's name.</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">5.</span>Open that environment's settings</h3>
+      <p>Hover the environment in the list and click the settings icon that appears on its right. (Setting up a new one instead? Choose <em>Add environment</em> — the dialog has the same fields.)</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">6.</span>Paste this into the <em>Setup script</em> field</h3>
+      <p>Substitute your account for <span class="youfork">your-username</span>. The <code>mkdir</code> line matters: <code>install.sh</code> only writes a tool's file when that tool's config directory exists, and in a fresh container it doesn't yet.</p>
+      <div class="term">
+        <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> environment → Setup script <span class="label">paste, don't run</span></div>
+        <pre>#!/bin/bash
+<span class="c"># dotfiles-ai: user-level defaults for every session in this environment</span>
+git clone --depth 1 https://github.com/<span class="y">your-username</span>/dotfiles-ai /opt/dotfiles-ai || true
+mkdir -p "$HOME/.claude"
+/opt/dotfiles-ai/install.sh || true</pre>
+      </div>
+      <p class="lead" style="margin-top:.75rem">The <code>|| true</code> guards are deliberate: a setup script that exits non-zero fails the whole session, and a transient network blip shouldn't cost you a session.</p>
+      <div class="browser">
+        <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">claude.ai/code</span><span class="label">simulated</span></div>
+        <div class="browser-body">
+          <div style="font-weight:600">Environment settings</div>
+          <div class="gh-row" style="margin-top:.6rem">
+            <span class="gh-note">Name</span><span class="gh-input">default</span>
+            <span class="gh-note">Network access</span><span class="gh-input">Trusted ▾</span>
+          </div>
+          <div class="gh-note" style="margin-top:.7rem">Setup script</div>
+          <div class="field gh-hl">#!/bin/bash
+git clone --depth 1 https://github.com/<strong>your-username</strong>/dotfiles-ai /opt/dotfiles-ai || true
+mkdir -p "$HOME/.claude"
+/opt/dotfiles-ai/install.sh || true</div>
+          <div class="gh-row" style="margin-top:.8rem"><span class="gh-btn green">Save</span><span class="gh-btn">Cancel</span></div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:1.5rem"><span class="step">7.</span>Save the dialog</h3>
+      <p>Saving a changed setup script invalidates the environment's cached filesystem, so the script runs again on your next new session.</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">8.</span>Start a <em>new</em> session and confirm</h3>
+      <p>Resuming an existing session never re-runs the setup script, so start a fresh one. Ask Claude to print the file:</p>
+      <div class="browser">
+        <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">claude.ai/code</span><span class="label">simulated</span></div>
+        <div class="browser-body">
+          <div style="font-size:.8rem;color:var(--muted);margin-bottom:.5rem">any-repo · main</div>
+          <div><strong>You:</strong> cat ~/.claude/CLAUDE.md</div>
+          <div class="field" style="margin-top:.6rem">&lt;!-- BEGIN dotfiles-ai (managed block, edit in the dotfiles-ai repo) --&gt;
+<strong># Architecture documentation</strong>
+- Every project keeps an `ARCHITECTURE.md` at the repo root…</div>
+          <div class="gh-note" style="margin-top:.5rem">↑ if the block is there, every session in this environment now starts with it</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:1.5rem"><span class="step">9.</span>To pick up module edits, bump the script</h3>
+      <p>The setup script's result is <strong>snapshot-cached</strong> — it runs on the first session in an environment, then later sessions start from that saved filesystem. It re-runs only when you change the script, change the allowed hosts, or after roughly seven days. Editing a comment in the script is enough to force a rebuild after you change <code>defaults/</code>.</p>
+
+      <div class="callout">
+        <p><strong>Worth knowing:</strong></p>
+        <ul>
+          <li><strong>Keep the dotfiles repo public.</strong> A private fork would need a token in the clone URL, and environment variables are not a secrets store. These are preferences, not secrets.</li>
+          <li><strong>Network access must not be <em>None</em>.</strong> <code>github.com</code> is on the default <em>Trusted</em> allowlist, so the clone works with no extra configuration.</li>
+          <li><strong>Teams:</strong> owners and admins on Team and Enterprise plans can put the same script in an organization-shared environment (admin settings → <em>Cloud environments</em>), so everyone's sessions start with an agreed baseline.</li>
+          <li><strong>Always-fresh alternative:</strong> a <code>SessionStart</code> hook in a repo's <code>.claude/settings.json</code> runs on every session including resumes, cloud and local — no cache to bust — but it's committed to that repo, so it's per-project and your collaborators run it too.</li>
+        </ul>
+      </div>
+    </div>
+
     <div class="tab-panel" id="panel-web" role="tabpanel" aria-labelledby="tab-web" hidden>
+      <p>Use this when the defaults should belong to <em>one repo</em> — applying to collaborators and to any cloud agent that opens it. To set yourself up once for <em>every</em> repo instead, see the <em>every session</em> tab.</p>
       <p><strong>Why this differs:</strong> a cloud session runs in a fresh container that clones your repo — it never sees <code>~/.claude/CLAUDE.md</code> on your laptop. The defaults have to travel <em>inside the repo</em>, so they go into the project's own <code>CLAUDE.md</code>.</p>
       <p><strong>No terminal, no clone, nothing installed.</strong> Every step below happens in the browser. That works because your fork carries a generated file at its root, <code>INSTRUCTIONS.md</code> — every module in <code>defaults/</code>, already assembled into one marker-delimited block, ready to copy. A GitHub Actions workflow regenerates it on every change to <code>defaults/</code> on <code>main</code>, so it is current even when you edit modules from the web editor.</p>
 
@@ -746,12 +819,13 @@ When I ask for a new feature or a significant change:
 
   <section id="sync">
     <h2>Keeping it all in sync</h2>
-    <p>Once you've forked and installed, there are three copies of the defaults that can drift apart, and each is refreshed differently:</p>
+    <p>Once you've forked and installed, the copies of the defaults that can drift apart are each refreshed differently:</p>
     <div class="table-wrap">
     <table>
       <tr><th>Direction</th><th>How</th><th>Effort</th></tr>
       <tr><td>Your fork ← upstream</td><td>GitHub's <em>Sync fork</em> button</td><td class="ok">one click</td></tr>
       <tr><td>Your machines ← your fork</td><td><code>sync.sh --auto</code> from your shell rc</td><td class="ok">automatic, daily</td></tr>
+      <tr><td>Cloud sessions ← your fork</td><td>Setup script re-runs when the environment cache rebuilds</td><td>edit the script to force it</td></tr>
       <tr><td>Project repos ← your fork</td><td>Re-copy <code>INSTRUCTIONS.md</code>, replace the block</td><td>manual, when you want it</td></tr>
     </table>
     </div>
@@ -791,6 +865,10 @@ updated  /Users/you/.claude/CLAUDE.md <span class="c">(previous version saved to
 updated  /Users/you/.codex/AGENTS.md <span class="c">(previous version saved to ….bak)</span>
 <span class="p">$</span> <span class="c">▍</span></pre>
     </div>
+
+    <h3 class="cat">Cloud sessions ← your fork <span>— the environment setup script</span></h3>
+    <p>The setup script clones your fork, so each run picks up whatever <code>main</code> holds at that moment — but the run itself is snapshot-cached, not repeated per session. New sessions start from the saved filesystem until the cache rebuilds, which happens when you change the script, change the environment's allowed hosts, or after roughly seven days.</p>
+    <p>So: edits to <code>defaults/</code> reach your cloud sessions within a week on their own, or immediately if you open the environment settings and change one character in the script. Resuming an existing session never re-runs it.</p>
 
     <h3 class="cat">Project repos ← your fork <span>— manual refresh of a committed block</span></h3>
     <p>A block committed into some project's <code>CLAUDE.md</code> or <code>AGENTS.md</code> is a snapshot in <em>that</em> repo's history. Nothing updates it on its own — and deliberately so: those files are shared with collaborators, and a bot rewriting them under a team is a worse default than doing it when you mean to. There's no upstream-sync bot for this today. To refresh one:</p>
