@@ -1,0 +1,47 @@
+name: generate-instructions
+
+# Regenerates the root INSTRUCTIONS.md — the assembled block of every
+# defaults/ module — whenever the modules change on main, and commits the
+# result back.
+#
+# This runs in CI rather than as a local pre-commit hook on purpose: it is
+# what makes the no-terminal install path work. A module edited through the
+# GitHub web editor still produces an up-to-date INSTRUCTIONS.md, so someone
+# with no local clone can always copy the current block out of their fork.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'defaults/**'
+      - 'install.sh'
+      - '.github/workflows/generate-instructions.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: generate-instructions
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Regenerate INSTRUCTIONS.md
+        run: ./install.sh --print > INSTRUCTIONS.md
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- INSTRUCTIONS.md; then
+            echo "::notice::INSTRUCTIONS.md is already current — nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add INSTRUCTIONS.md
+          git commit -m "Regenerate INSTRUCTIONS.md from defaults/"
+          git push

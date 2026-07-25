@@ -51,7 +51,7 @@
   .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
   section { margin-top: 3rem; }
   h2 { font-size: 1.5rem; letter-spacing: -.01em; margin-bottom: .75rem; }
-  h2 .num { color: var(--accent); font-variant-numeric: tabular-nums; margin-right: .4rem; }
+  .num { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; margin-right: .4rem; }
   p { margin: .6rem 0; }
   .lead { color: var(--muted); }
   code {
@@ -141,6 +141,8 @@
   .tab-panel { padding-top: 1.25rem; }
   .tab-panel h3 { font-size: 1.05rem; margin: 0 0 .3rem; }
   .tab-panel h3 .step { color: var(--accent); font-variant-numeric: tabular-nums; margin-right: .4rem; }
+  h3.steph { font-size: 1.05rem; margin: 1.5rem 0 .3rem; }
+  h3.steph .step { color: var(--accent); font-variant-numeric: tabular-nums; margin-right: .4rem; }
   .tab-panel > p:first-child { margin-top: 0; }
   .js .tab-panel[hidden] { display: none; }
   /* mock browser window */
@@ -173,6 +175,45 @@
     font-size: .78rem; color: var(--muted); white-space: pre-wrap; margin-top: .4rem;
   }
   .browser-body .field strong { color: var(--fg); font-weight: 600; }
+  /* simulated GitHub chrome inside the mock browser */
+  .gh-row { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+  .gh-row + .gh-row { margin-top: .55rem; }
+  .gh-btn {
+    display: inline-block; padding: .28rem .7rem; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--bg);
+    font-size: .78rem; font-weight: 600; white-space: nowrap;
+  }
+  .gh-btn.green { background: #2c7a41; border-color: #2c7a41; color: #fff; }
+  .gh-btn.icon { font-family: ui-monospace, Menlo, Consolas, monospace; padding: .28rem .45rem; }
+  .gh-hl { box-shadow: 0 0 0 2px var(--accent); border-radius: 6px; }
+  .gh-note { font-size: .78rem; color: var(--muted); }
+  .gh-input {
+    border: 1px solid var(--border); border-radius: 6px; padding: .28rem .55rem;
+    background: var(--bg); font-size: .78rem; min-width: 11rem;
+  }
+  .gh-path {
+    font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .8rem; font-weight: 600;
+  }
+  .gh-toolbar {
+    display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
+    border: 1px solid var(--border); border-bottom: none;
+    border-radius: 8px 8px 0 0; padding: .4rem .6rem; background: var(--bg);
+  }
+  .gh-file {
+    border: 1px solid var(--border); border-radius: 0 0 8px 8px; padding: .55rem .6rem;
+    font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .74rem;
+    color: var(--muted); white-space: pre-wrap;
+  }
+  /* callout */
+  .callout {
+    border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: 8px; background: var(--card); padding: .85rem 1rem; margin-top: 1rem;
+  }
+  .callout p:first-child { margin-top: 0; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout ul { margin: .5rem 0 0; padding-left: 1.15rem; }
+  .callout li { margin: .3rem 0; }
+  .youfork { color: var(--accent); font-weight: 700; }
   /* before / after demo */
   .demo { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; margin-top: 1.25rem; }
   .chat {
@@ -234,6 +275,7 @@
   <p class="tagline">Dotfiles, but for AI coding assistants — your personal working preferences, carried across every project and every tool.</p>
   <div class="buttons">
     <a class="btn primary" href="#install">Install</a>
+    <a class="btn" href="https://github.com/mchelen/dotfiles-ai/fork">Fork it</a>
     <a class="btn" href="#demo">See it in action</a>
     <a class="btn" href="https://github.com/mchelen/dotfiles-ai">View on GitHub</a>
   </div>
@@ -352,7 +394,7 @@
 
   <section>
     <h2>How it works</h2>
-    <p><span class="num">1.</span><strong>Install once.</strong> <code>install.sh</code> concatenates the modules into a marker-delimited block and inserts it into each detected tool's user-level instruction file. Your own content in those files is never touched, and re-runs replace the block in place.</p>
+    <p><span class="num">1.</span><strong>Fork, then install once.</strong> You start by forking, because the modules are meant to be edited and every copy should follow a repo you control. Then <code>install.sh</code> concatenates the modules into a marker-delimited block and inserts it into each detected tool's user-level instruction file. Your own content in those files is never touched, and re-runs replace the block in place.</p>
     <div class="term">
       <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~/dotfiles-ai <span class="label">simulated output</span></div>
       <pre><span class="p">$</span> ./install.sh
@@ -400,8 +442,8 @@ updated  /Users/you/.codex/AGENTS.md <span class="c">(previous version saved to 
       <tr><td>Qwen Code</td><td>CLI</td><td class="ok">automatic</td></tr>
       <tr><td>OpenCode</td><td>CLI/TUI</td><td class="ok">automatic</td></tr>
       <tr><td>Goose</td><td>CLI</td><td class="ok">automatic</td></tr>
-      <tr><td>Cursor · Windsurf · Copilot web</td><td>IDE / web</td><td>paste <code>--print</code> output into settings</td></tr>
-      <tr><td>Claude Code web · Codex cloud · Copilot agent</td><td>cloud agents</td><td>commit into the repo's instruction file</td></tr>
+      <tr><td>Cursor · Windsurf · Copilot web</td><td>IDE / web</td><td>paste <code>INSTRUCTIONS.md</code> into settings</td></tr>
+      <tr><td>Claude Code web · Codex cloud · Copilot agent</td><td>cloud agents</td><td>copy <code>INSTRUCTIONS.md</code> into the repo's instruction file</td></tr>
     </table>
     </div>
     <p class="lead">Any tool that reads a user-level markdown file can be added with one line in the installer's target list.</p>
@@ -452,7 +494,51 @@ PASS  useAppearance > persists explicit dark</div>
 
   <section id="install">
     <h2>Install</h2>
-    <p>Steps differ by where the assistant runs. Pick your setup:</p>
+    <p>Every path starts the same way — <strong>fork the repo</strong> (steps 1–3). After that the steps differ by where your assistant runs; pick the tab that matches and continue at step 4.</p>
+
+    <h3 class="cat">Step 0 · Fork it <span>— everyone, whichever path you take</span></h3>
+    <div class="callout">
+      <p><strong>Why a fork, and not this repo?</strong></p>
+      <ul>
+        <li><strong>These are one person's preferences, and you're expected to edit them.</strong> Every module here is an opinion — "propose before you build", "test first", "never commit unless asked". Some will fit you, some won't. Deleting a module you disagree with and adding three of your own is the normal way to use this project, and that means writing to a repo you own.</li>
+        <li><strong>Your machines should sync from a repo you control.</strong> Both <code>sync.sh</code> and the copy-paste flow below pull from whatever repo you point them at. Point them upstream and someone else's edits land on your machines unannounced; point them at your fork and you decide what arrives, and when, by clicking <em>Sync fork</em>.</li>
+      </ul>
+    </div>
+
+    <h3 class="steph"><span class="step">1.</span>Open the fork page</h3>
+    <p>Use this prepopulated link — it opens GitHub's fork form with this repo already filled in: <a href="https://github.com/mchelen/dotfiles-ai/fork"><strong>github.com/mchelen/dotfiles-ai/fork</strong></a>. (The equivalent by hand: on the repo page, click <em>Fork</em> in the top-right button row.)</p>
+
+    <h3 class="steph"><span class="step">2.</span>Click the green <em>Create fork</em> button</h3>
+    <p>Leave <em>Owner</em> as your own account and <em>Repository name</em> as <code>dotfiles-ai</code>. Leave <em>Copy the <code>main</code> branch only</em> checked.</p>
+    <div class="browser">
+      <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">github.com/mchelen/dotfiles-ai/fork</span><span class="label">simulated</span></div>
+      <div class="browser-body">
+        <div style="font-weight:600">Create a new fork</div>
+        <div class="gh-note">A fork is a copy of a repository. Forking a repository allows you to freely experiment with changes without affecting the original project.</div>
+        <div class="gh-row" style="margin-top:.75rem">
+          <span class="gh-note">Owner *</span><span class="gh-input">your-username ▾</span>
+          <span class="gh-note">Repository name *</span><span class="gh-input">dotfiles-ai</span>
+        </div>
+        <div class="gh-row"><span class="gh-note">☑ Copy the <code>main</code> branch only</span></div>
+        <div class="gh-row" style="margin-top:.85rem"><span class="gh-btn green gh-hl">Create fork</span></div>
+      </div>
+    </div>
+
+    <h3 class="steph"><span class="step">3.</span>Wait for the redirect to your copy</h3>
+    <p>GitHub lands you on <code>github.com/<span class="youfork">your-username</span>/dotfiles-ai</code>, marked <em>forked from mchelen/dotfiles-ai</em>. Everywhere below, <span class="youfork">your-username</span> means your GitHub account — this is now <em>your</em> repo, and you can edit any file in it, from the browser or from a clone.</p>
+    <div class="browser">
+      <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">github.com/your-username/dotfiles-ai</span><span class="label">simulated</span></div>
+      <div class="browser-body">
+        <div class="gh-path">your-username / <strong>dotfiles-ai</strong></div>
+        <div class="gh-note">forked from mchelen/dotfiles-ai</div>
+        <div class="gh-row" style="margin-top:.7rem">
+          <span class="gh-btn">&lt;&gt; Code</span><span class="gh-btn">Issues</span><span class="gh-btn">Pull requests</span><span class="gh-btn">Actions</span><span class="gh-btn">Settings</span>
+        </div>
+        <div class="gh-row"><span class="gh-note">INSTRUCTIONS.md · README.md · defaults/ · docs/ · install.sh · sync.sh</span></div>
+      </div>
+    </div>
+
+    <p style="margin-top:1.75rem">Now pick your path. Each tab continues the numbering at step 4.</p>
 
     <div class="tab-labels" role="tablist">
       <button role="tab" id="tab-local" aria-controls="panel-local" aria-selected="true">Local CLIs &amp; IDEs</button>
@@ -462,41 +548,116 @@ PASS  useAppearance > persists explicit dark</div>
     </div>
 
     <div class="tab-panel" id="panel-local" role="tabpanel" aria-labelledby="tab-local">
-      <p>Covers Claude Code (CLI, desktop app, IDE extensions), Codex CLI, Copilot CLI, Gemini CLI, Qwen Code, OpenCode, and Goose — anything that reads a user-level instruction file. The installer writes to every tool it detects, so one run covers all of them.</p>
-      <h3><span class="step">1.</span>Clone and install</h3>
+      <p>Covers Claude Code (CLI, desktop app, IDE extensions), Codex CLI, Copilot CLI, Gemini CLI, Qwen Code, OpenCode, and Goose — anything that reads a user-level instruction file. The installer writes to every tool it detects, so one run covers all of them. Needs a terminal.</p>
+
+      <h3><span class="step">4.</span>Clone <em>your fork</em> to <code>~/dotfiles-ai</code></h3>
+      <p>Substitute your own account for <span class="youfork">your-username</span>. Clone your fork, <strong>not</strong> <code>mchelen/dotfiles-ai</code> — <code>sync.sh</code> pulls from whatever this clone's <code>origin</code> is, so cloning upstream means you can't push your own edits and every machine follows someone else's repo.</p>
       <div class="term">
         <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~ <span class="label">simulated output</span></div>
-        <pre><span class="p">$</span> git clone https://github.com/mchelen/dotfiles-ai ~/dotfiles-ai
-<span class="p">$</span> ~/dotfiles-ai/install.sh
+        <pre><span class="p">$</span> git clone https://github.com/<span class="y">your-username</span>/dotfiles-ai ~/dotfiles-ai
+Cloning into '/Users/you/dotfiles-ai'...
+remote: Enumerating objects: 214, done.
+Receiving objects: 100% (214/214), 82.11 KiB | 6.84 MiB/s, done.</pre>
+      </div>
+
+      <h3 style="margin-top:1.5rem"><span class="step">5.</span>Run the installer</h3>
+      <p>It writes the managed block into the user-level instruction file of every tool it finds on this machine.</p>
+      <div class="term">
+        <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~ <span class="label">simulated output</span></div>
+        <pre><span class="p">$</span> ~/dotfiles-ai/install.sh
 installed /Users/you/.claude/CLAUDE.md
 installed /Users/you/.codex/AGENTS.md
 installed /Users/you/.copilot/copilot-instructions.md
 <span class="y">skipped</span>  /Users/you/.qwen/QWEN.md <span class="c">(no ~/.qwen — tool not detected; use --all to force)</span></pre>
       </div>
-      <h3 style="margin-top:1.5rem"><span class="step">2.</span>Keep it current</h3>
-      <p>One line in your shell rc re-syncs at most once a day, silently unless something changed:</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">6.</span>Add the sync line to your shell rc</h3>
+      <p>One line, so this machine re-pulls your fork and re-installs at most once a day — silent unless something actually changed. Use <code>~/.bashrc</code> instead if you're on bash.</p>
       <div class="term">
-        <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~/.zshrc <span class="label">simulated output</span></div>
-        <pre><span class="p">$</span> echo '[ -x "$HOME/dotfiles-ai/sync.sh" ] && "$HOME/dotfiles-ai/sync.sh" --auto' >> ~/.zshrc
-<span class="c"># optional — enables the secret-scanning commit hooks:</span>
-<span class="p">$</span> pipx install pre-commit</pre>
+        <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~ <span class="label">simulated output</span></div>
+        <pre><span class="p">$</span> echo '[ -x "$HOME/dotfiles-ai/sync.sh" ] && "$HOME/dotfiles-ai/sync.sh" --auto' >> ~/.zshrc</pre>
       </div>
-      <h3 style="margin-top:1.5rem"><span class="step">3.</span>Verify</h3>
-      <p>Start a new session and ask for a feature. If the assistant proposes options before writing code, it's live.</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">7.</span>Install <code>pre-commit</code> <span class="gh-note">(optional)</span></h3>
+      <p>Enables this repo's secret-scanning commit hooks and the post-merge re-install. <code>sync.sh</code> wires the hooks up itself once the binary exists.</p>
+      <div class="term">
+        <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~ <span class="label">simulated output</span></div>
+        <pre><span class="p">$</span> pipx install pre-commit   <span class="c"># or: brew install pre-commit</span></pre>
+      </div>
+
+      <h3 style="margin-top:1.5rem"><span class="step">8.</span>Verify</h3>
+      <p>Start a new session in any of those tools and ask for a feature. If the assistant proposes options before writing code, it's live.</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">9.</span>Make them yours</h3>
+      <p>Edit files in <code>~/dotfiles-ai/defaults/</code>, then <code>git push</code> to your fork and re-run <code>install.sh</code>. Every other machine picks the change up on its next shell start.</p>
     </div>
 
     <div class="tab-panel" id="panel-web" role="tabpanel" aria-labelledby="tab-web" hidden>
-      <p><strong>Why this differs:</strong> a cloud session runs in a fresh container that clones your repo — it never sees <code>~/.claude/CLAUDE.md</code> on your laptop. The defaults have to travel <em>inside the repo</em>, so you commit them to the project's own <code>CLAUDE.md</code>.</p>
-      <h3><span class="step">1.</span>Append the block to the project's CLAUDE.md</h3>
-      <div class="term">
-        <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~/code/your-project <span class="label">simulated output</span></div>
-        <pre><span class="p">$</span> ~/dotfiles-ai/install.sh --print >> CLAUDE.md
-<span class="p">$</span> git add CLAUDE.md &amp;&amp; git commit -m "Add AI assistant defaults"
-<span class="p">$</span> git push</pre>
+      <p><strong>Why this differs:</strong> a cloud session runs in a fresh container that clones your repo — it never sees <code>~/.claude/CLAUDE.md</code> on your laptop. The defaults have to travel <em>inside the repo</em>, so they go into the project's own <code>CLAUDE.md</code>.</p>
+      <p><strong>No terminal, no clone, nothing installed.</strong> Every step below happens in the browser. That works because your fork carries a generated file at its root, <code>INSTRUCTIONS.md</code> — every module in <code>defaults/</code>, already assembled into one marker-delimited block, ready to copy. A GitHub Actions workflow regenerates it on every change to <code>defaults/</code> on <code>main</code>, so it is current even when you edit modules from the web editor.</p>
+
+      <h3><span class="step">4.</span>Open <code>INSTRUCTIONS.md</code> in your fork</h3>
+      <p>Go to <code>github.com/<span class="youfork">your-username</span>/dotfiles-ai</code> and click <strong>INSTRUCTIONS.md</strong> in the file list. Direct link, with your account substituted in: <code>github.com/<span class="youfork">your-username</span>/dotfiles-ai/blob/main/INSTRUCTIONS.md</code></p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">5.</span>Click <em>Copy raw file</em></h3>
+      <p>It's the two-overlapping-squares icon in the toolbar above the file content, to the right — next to the download arrow and the pencil. One click puts the whole block on your clipboard.</p>
+      <div class="browser">
+        <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">github.com/your-username/dotfiles-ai/blob/main/INSTRUCTIONS.md</span><span class="label">simulated</span></div>
+        <div class="browser-body">
+          <div class="gh-toolbar">
+            <span class="gh-path">INSTRUCTIONS.md</span>
+            <span class="gh-note" style="margin-left:auto">Code · Blame · 190 lines</span>
+            <span class="gh-btn icon gh-hl" title="Copy raw file">⧉</span>
+            <span class="gh-btn icon" title="Download raw file">⭳</span>
+            <span class="gh-btn icon" title="Edit this file">✎</span>
+          </div>
+          <div class="gh-file">&lt;!-- BEGIN dotfiles-ai (managed block, edit in the dotfiles-ai repo) --&gt;
+# Architecture documentation
+
+- Every project keeps an `ARCHITECTURE.md` at the repo root: a high-level
+  description of the code — major components, how they fit together…</div>
+          <div class="gh-note" style="margin-top:.5rem">↑ generated from <code>defaults/</code> by the <code>generate-instructions</code> workflow</div>
+        </div>
       </div>
-      <p class="lead" style="margin-top:.75rem">The block is marker-delimited, so re-running the command later replaces it cleanly instead of duplicating it. Remember this file is shared with collaborators — drop any module you wouldn't impose on the team.</p>
-      <h3 style="margin-top:1.5rem"><span class="step">2.</span>Start a session</h3>
-      <p>Open <code>claude.ai/code</code>, pick the repo, and the defaults load with the checkout — no per-session setup:</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">6.</span>Open your project's repo on github.com</h3>
+      <p>The repo you'll actually run the cloud session against — not your dotfiles-ai fork.</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">7.</span>Open (or create) that repo's <code>CLAUDE.md</code></h3>
+      <p>If it already exists, click it in the file list. If it doesn't: <em>Add file ▾ → Create new file</em>, then type <code>CLAUDE.md</code> as the filename — that drops you straight into the editor, so skip step 8.</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">8.</span>Click the pencil icon (<em>Edit this file</em>)</h3>
+      <p>Same toolbar position as in step 5, on your project's file this time.</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">9.</span>Paste at the end of the file</h3>
+      <p>Click into the editor, press <kbd>⌘↓</kbd> / <kbd>Ctrl-End</kbd> to reach the bottom, add a blank line, then paste with <kbd>⌘V</kbd> / <kbd>Ctrl-V</kbd>. Keep the <code>BEGIN</code>/<code>END</code> comment lines — they're what lets you replace the block later without touching the rest of the file.</p>
+      <div class="browser">
+        <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">github.com/your-username/your-project/edit/main/CLAUDE.md</span><span class="label">simulated</span></div>
+        <div class="browser-body">
+          <div class="gh-toolbar">
+            <span class="gh-path">CLAUDE.md</span>
+            <span class="gh-note">Edit · Preview</span>
+            <span class="gh-btn green gh-hl" style="margin-left:auto">Commit changes…</span>
+          </div>
+          <div class="gh-file"># your-project
+
+Run `make dev` for a local server. Migrations live in `db/`.
+
+&lt;!-- BEGIN dotfiles-ai (managed block, edit in the dotfiles-ai repo) --&gt;
+# Architecture documentation
+…
+&lt;!-- END dotfiles-ai --&gt;<span style="color:var(--accent)">▍</span></div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:1.5rem"><span class="step">10.</span>Delete any module your teammates shouldn't get</h3>
+      <p>This file is committed to a shared repo, so it applies to everyone who works on it. Personal-taste modules are fine to trim right here in the editor — the block still replaces cleanly later.</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">11.</span>Click <em>Commit changes…</em>, then <em>Commit changes</em></h3>
+      <p>Green button, top right of the editor. In the dialog, leave <em>Commit directly to the <code>main</code> branch</em> selected — or pick <em>Create a new branch and start a pull request</em> if the repo requires review — then confirm with the green <em>Commit changes</em> button.</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">12.</span>Start a session at <code>claude.ai/code</code></h3>
+      <p>Pick that repo. The defaults arrive with the checkout — no per-session setup, no local install:</p>
       <div class="browser">
         <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">claude.ai/code</span><span class="label">simulated</span></div>
         <div class="browser-body">
@@ -510,25 +671,34 @@ page size. Mockup of the button placement below…</div>
           <div style="font-size:.78rem;color:var(--muted);margin-top:.5rem">↑ proposing first, because CLAUDE.md carries the feature-workflow module</div>
         </div>
       </div>
+
+      <div class="callout">
+        <p><strong>Editing the defaults themselves, also without a terminal:</strong> in your fork, open any file under <code>defaults/</code>, click the pencil, edit, and commit to <code>main</code>. The <code>generate-instructions</code> workflow reassembles <code>INSTRUCTIONS.md</code> within a minute of that commit. To push the change into a project, repeat steps 4–11 and replace the old block.</p>
+      </div>
     </div>
 
     <div class="tab-panel" id="panel-codex" role="tabpanel" aria-labelledby="tab-codex" hidden>
-      <p>Codex reads <code>AGENTS.md</code>. The CLI reads a user-level one; the cloud/IDE variants only see the repo — so the two need different steps.</p>
-      <h3><span class="step">1.</span>Codex CLI — automatic</h3>
-      <p>Already covered by <code>install.sh</code>, which writes <code>~/.codex/AGENTS.md</code> whenever it detects <code>~/.codex</code>:</p>
+      <p>Codex reads <code>AGENTS.md</code>. The CLI reads a user-level one; the cloud and IDE variants only ever see the repo — so the two need different steps. Do either or both.</p>
+
+      <h3><span class="step">4a.</span>Codex CLI — run the installer from your clone</h3>
+      <p>Nothing Codex-specific to do: <code>install.sh</code> writes <code>~/.codex/AGENTS.md</code> whenever <code>~/.codex</code> exists. Follow steps 4–6 of the <em>Local CLIs &amp; IDEs</em> tab, which covers this and every other CLI in one run.</p>
       <div class="term">
         <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~ <span class="label">simulated output</span></div>
         <pre><span class="p">$</span> ~/dotfiles-ai/install.sh
 installed /Users/you/.codex/AGENTS.md
 <span class="c">…</span></pre>
       </div>
-      <h3 style="margin-top:1.5rem"><span class="step">2.</span>Codex cloud &amp; IDE extension — commit to the repo</h3>
-      <p>Same reasoning as Claude Code on the web: the container only has your repository.</p>
-      <div class="term">
-        <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~/code/your-project <span class="label">simulated output</span></div>
-        <pre><span class="p">$</span> ~/dotfiles-ai/install.sh --print >> AGENTS.md
-<span class="p">$</span> git add AGENTS.md &amp;&amp; git commit -m "Add AI assistant defaults" &amp;&amp; git push</pre>
-      </div>
+
+      <h3 style="margin-top:1.5rem"><span class="step">4b.</span>Codex cloud &amp; IDE — open <code>INSTRUCTIONS.md</code> in your fork</h3>
+      <p>Same reasoning as Claude Code on the web: the container only has your repository, so the block has to be committed into it. And the same no-terminal route works — <code>github.com/<span class="youfork">your-username</span>/dotfiles-ai/blob/main/INSTRUCTIONS.md</code>.</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">5.</span>Click <em>Copy raw file</em></h3>
+      <p>The two-overlapping-squares icon in the file toolbar, right-hand side.</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">6.</span>Paste it into the project's <code>AGENTS.md</code> and commit</h3>
+      <p>Identical to steps 6–11 of the <em>Claude Code on the web</em> tab, with <code>AGENTS.md</code> as the filename instead of <code>CLAUDE.md</code>: open the file (or <em>Add file ▾ → Create new file</em>), click the pencil, paste at the end, trim anything team-inappropriate, then <em>Commit changes… → Commit changes</em>.</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">7.</span>Start a task at <code>chatgpt.com/codex</code></h3>
       <div class="browser">
         <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">chatgpt.com/codex</span><span class="label">simulated</span></div>
         <div class="browser-body">
@@ -545,14 +715,18 @@ until you've looked.</div>
     </div>
 
     <div class="tab-panel" id="panel-ui" role="tabpanel" aria-labelledby="tab-ui" hidden>
-      <p>These tools take user-level rules through a settings field rather than a file on disk, so the defaults get pasted in once. Re-paste after you change a module.</p>
-      <h3><span class="step">1.</span>Copy the assembled block</h3>
-      <div class="term">
-        <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~ <span class="label">simulated output</span></div>
-        <pre><span class="p">$</span> ~/dotfiles-ai/install.sh --print | pbcopy   <span class="c"># Linux: | xclip -sel clip</span></pre>
-      </div>
-      <h3 style="margin-top:1.5rem"><span class="step">2.</span>Paste into the tool's rules field</h3>
-      <p>Cursor: <em>Settings → Rules → User Rules</em>. Windsurf: <em>Settings → Global rules</em>. Copilot on github.com: <em>Copilot settings → Personal custom instructions</em>.</p>
+      <p>These tools take user-level rules through a settings field rather than a file on disk, so the defaults get pasted in once. No terminal needed here either. Re-paste after you change a module.</p>
+
+      <h3><span class="step">4.</span>Open <code>INSTRUCTIONS.md</code> in your fork</h3>
+      <p><code>github.com/<span class="youfork">your-username</span>/dotfiles-ai/blob/main/INSTRUCTIONS.md</code></p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">5.</span>Click <em>Copy raw file</em></h3>
+      <p>The two-overlapping-squares icon in the file toolbar, right-hand side. (From a local clone instead: <code>~/dotfiles-ai/install.sh --print | pbcopy</code>, or <code>| xclip -sel clip</code> on Linux.)</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">6.</span>Open your tool's rules field</h3>
+      <p>Cursor: <em>Settings → Rules → User Rules</em>. Windsurf: <em>Settings → Global rules</em>. Copilot on github.com: <em>your avatar → Your Copilot → Personal instructions</em>.</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">7.</span>Paste the block and save</h3>
       <div class="browser">
         <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">Cursor · Settings → Rules</span><span class="label">simulated</span></div>
         <div class="browser-body">
@@ -567,7 +741,65 @@ When I ask for a new feature or a significant change:
       </div>
     </div>
 
-    <p class="lead" style="margin-top:1.75rem">Then fork it and make the defaults yours — the modules in this repo are one person's preferences, meant to be edited.</p>
+    <p class="lead" style="margin-top:1.75rem">However you installed them, the modules are now yours to edit — that's the point of the fork in step 0. Keeping the copies current is covered next.</p>
+  </section>
+
+  <section id="sync">
+    <h2>Keeping it all in sync</h2>
+    <p>Once you've forked and installed, there are three copies of the defaults that can drift apart, and each is refreshed differently:</p>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Direction</th><th>How</th><th>Effort</th></tr>
+      <tr><td>Your fork ← upstream</td><td>GitHub's <em>Sync fork</em> button</td><td class="ok">one click</td></tr>
+      <tr><td>Your machines ← your fork</td><td><code>sync.sh --auto</code> from your shell rc</td><td class="ok">automatic, daily</td></tr>
+      <tr><td>Project repos ← your fork</td><td>Re-copy <code>INSTRUCTIONS.md</code>, replace the block</td><td>manual, when you want it</td></tr>
+    </table>
+    </div>
+
+    <h3 class="cat">Your fork ← upstream <span>— pulling in changes from mchelen/dotfiles-ai</span></h3>
+    <p>When this repo gains a module you want, GitHub can fast-forward your fork for you — no terminal, no remotes to configure.</p>
+    <p><span class="num">1.</span>Open <code>github.com/<span class="youfork">your-username</span>/dotfiles-ai</code> on the <em>Code</em> tab.</p>
+    <p><span class="num">2.</span>Click <strong>Sync fork</strong> in the banner above the file list — it appears whenever upstream is ahead.</p>
+    <p><span class="num">3.</span>Click <strong>Update branch</strong> in the dropdown.</p>
+    <div class="browser">
+      <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">github.com/your-username/dotfiles-ai</span><span class="label">simulated</span></div>
+      <div class="browser-body">
+        <div class="gh-row">
+          <span class="gh-path">main ▾</span>
+          <span class="gh-note">This branch is 3 commits behind mchelen/dotfiles-ai:main.</span>
+          <span class="gh-btn gh-hl" style="margin-left:auto">Sync fork ▾</span>
+          <span class="gh-btn">Contribute ▾</span>
+        </div>
+        <div class="gh-row" style="margin-top:.6rem">
+          <span class="gh-note">Update branch — this branch is out-of-date with the base branch</span>
+          <span class="gh-btn green">Update branch</span>
+        </div>
+      </div>
+    </div>
+    <p class="lead" style="margin-top:.75rem">If you've edited the same files, GitHub offers <em>Discard commits</em> instead — don't take it. Open a merge from upstream in a clone, or cherry-pick the module you wanted by hand.</p>
+    <p>Because <code>INSTRUCTIONS.md</code> is generated by CI from whatever <code>defaults/</code> holds after a sync, it follows along automatically — your fork's copy stays consistent with your fork's modules.</p>
+
+    <h3 class="cat">Your machines ← your fork <span>— sync.sh</span></h3>
+    <p>Installed blocks are copies; they only change when <code>install.sh</code> runs. Two things run it for you:</p>
+    <p><span class="num">1.</span><strong>Shell startup.</strong> The line added in the local install path runs <code>sync.sh --auto</code>: at most once a day it fast-forwards your fork's <code>main</code> and re-installs. It is silent when there's nothing new, when you're offline, or when throttled.</p>
+    <p><span class="num">2.</span><strong>Manual pulls.</strong> A <code>post-merge</code> hook (pre-commit framework) re-runs <code>install.sh</code> after any <code>git pull</code> in the clone, so the installed files never lag the checkout.</p>
+    <div class="term">
+      <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> new terminal, next morning <span class="label">simulated output</span></div>
+      <pre><span class="c"># ~/.zshrc: [ -x "$HOME/dotfiles-ai/sync.sh" ] && "$HOME/dotfiles-ai/sync.sh" --auto</span>
+dotfiles-ai: updated d78d121 -> cae0439
+updated  /Users/you/.claude/CLAUDE.md <span class="c">(previous version saved to ….bak)</span>
+updated  /Users/you/.codex/AGENTS.md <span class="c">(previous version saved to ….bak)</span>
+<span class="p">$</span> <span class="c">▍</span></pre>
+    </div>
+
+    <h3 class="cat">Project repos ← your fork <span>— manual refresh of a committed block</span></h3>
+    <p>A block committed into some project's <code>CLAUDE.md</code> or <code>AGENTS.md</code> is a snapshot in <em>that</em> repo's history. Nothing updates it on its own — and deliberately so: those files are shared with collaborators, and a bot rewriting them under a team is a worse default than doing it when you mean to. There's no upstream-sync bot for this today. To refresh one:</p>
+    <p><span class="num">1.</span>Open <code>INSTRUCTIONS.md</code> in your fork and click <em>Copy raw file</em>.</p>
+    <p><span class="num">2.</span>Open the project's <code>CLAUDE.md</code> (or <code>AGENTS.md</code>) and click the pencil icon.</p>
+    <p><span class="num">3.</span>Select from the <code>&lt;!-- BEGIN dotfiles-ai … --&gt;</code> line through the <code>&lt;!-- END dotfiles-ai --&gt;</code> line, inclusive, and delete it.</p>
+    <p><span class="num">4.</span>Paste the fresh block in its place.</p>
+    <p><span class="num">5.</span>Click <em>Commit changes… → Commit changes</em>.</p>
+    <p class="lead">The markers are what make this safe: everything outside them — the project's own instructions — is untouched. Same procedure from a clone if you prefer: <code>~/dotfiles-ai/install.sh --print</code>, then swap the block.</p>
   </section>
 </main>
 
