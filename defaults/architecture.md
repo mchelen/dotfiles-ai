@@ -1,5 +1,8 @@
 # Architecture documentation
 
+**Every project keeps an `ARCHITECTURE.md`, updated in the same change that
+rewires a component.**
+
 - Every project keeps an `ARCHITECTURE.md` at the repo root: a high-level
   description of the code — major components, how they fit together, and key
   data flows — including Mermaid diagrams for structure and flows.

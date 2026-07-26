@@ -1,6 +1,8 @@
 # Offloading mechanical work
 
-Mechanical work belongs in a command, not in your context. When a shell
+**Mechanical work belongs in a command, not in your context.**
+
+When a shell
 command, script, or CI job produces the same answer, run it instead of loading
 the material and working it out yourself — it's cheaper, it's reproducible, and
 it leaves context for the parts that actually need thought.

@@ -104,6 +104,9 @@ confirm the result is identical to the committed file.
 
 - **FR-001**: The repository MUST contain, at its root, a generated file holding
   exactly the assembled block that the installer would print.
+- **FR-001a**: The repository MUST also contain a generated condensed file, one
+  line per module, for destinations that cap instruction length. Both files are
+  regenerated and committed by the same automation, on the same trigger.
 - **FR-002**: That file MUST be usable by copy and paste with no editing: no
   preamble, no trailing commentary, both markers present.
 - **FR-003**: The file MUST be regenerated whenever the modules or the assembly
@@ -130,7 +133,7 @@ confirm the result is identical to the committed file.
 
 - **SC-001**: A browser-only user can obtain the current block in two clicks —
   open the file, copy raw — with no clone and nothing installed.
-- **SC-002**: For every commit on the default branch, the committed file matches
+- **SC-002**: For every commit on the default branch, both committed files match
   a fresh assembly of the modules at that commit.
 - **SC-003**: A module edited entirely in the browser is reflected in the
   generated file without any human action.

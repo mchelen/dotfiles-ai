@@ -93,6 +93,11 @@ clone, nothing installed; see the next section.
 **Claude Code on the web, every session** — configure the environment once
 instead of every project; see below.
 
+**Web chat (Claude, ChatGPT, Gemini)** — paste
+[`INSTRUCTIONS-brief.md`](INSTRUCTIONS-brief.md) into each provider's
+persistent instructions field. The full block is far too large for those
+fields; the condensed one fits all of them.
+
 The [website has the click-by-click guide](https://mchelen.github.io/dotfiles-ai/#install)
 for each environment, with screenshots.
 
@@ -150,10 +155,18 @@ in your fork, click **Copy raw file**, and paste it into a project's
 `AGENTS.md` through the GitHub web editor, or into a settings field like
 Cursor's *User Rules*.
 
-It is generated — never edit it by hand. The
+[`INSTRUCTIONS-brief.md`](INSTRUCTIONS-brief.md) is the condensed companion:
+one line per module, taken from each module's bold thesis sentence. It exists
+because web chat instruction fields are size-capped — Claude project
+instructions around 8,000 characters, ChatGPT custom instructions 5,000 on
+paid plans and 1,500 on Free/Go — while the full block is ~15,000. The brief
+is ~1,430, so it fits all three, with roughly one module of headroom before
+the smallest cap is missed.
+
+Both are generated — never edit them by hand. The
 [`generate-instructions` workflow](.github/workflows/generate-instructions.yml)
-runs `install.sh --print > INSTRUCTIONS.md` and commits the result whenever
-`defaults/**` changes on `main`. CI rather than a local pre-commit hook is the
+runs `install.sh --print` and `install.sh --brief` and commits the results
+whenever `defaults/**` changes on `main`. CI rather than a local pre-commit hook is the
 point: a module edited in the browser has no local hook to run, and the
 no-terminal path only works if this file is always current.
 
@@ -353,7 +366,9 @@ Notes:
 ## Adding your own defaults
 
 1. Drop a new `.md` file in `defaults/` — one topic per file, phrased as
-   direct instructions to the assistant. If it belongs to one of the four
+   direct instructions to the assistant. Open it with a **bold thesis
+   sentence** under the heading; that single line is what feeds
+   `INSTRUCTIONS-brief.md`, and generation fails loudly if it's missing. If it belongs to one of the four
    categories above, add it to that table in this README. (Adding or editing
    a module from the GitHub web editor works just as well.)
 2. Re-run `./install.sh` on each machine — or let `sync.sh` do it. Once the

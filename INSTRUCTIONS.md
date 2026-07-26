@@ -1,6 +1,9 @@
 <!-- BEGIN dotfiles-ai (managed block, edit in the dotfiles-ai repo) -->
 # Architecture documentation
 
+**Every project keeps an `ARCHITECTURE.md`, updated in the same change that
+rewires a component.**
+
 - Every project keeps an `ARCHITECTURE.md` at the repo root: a high-level
   description of the code — major components, how they fit together, and key
   data flows — including Mermaid diagrams for structure and flows.
@@ -12,6 +15,9 @@
 
 # Code style
 
+**Match the surrounding code, make the smallest change that solves the problem,
+and never add a dependency without saying why.**
+
 - Match the existing style of the codebase over any personal or general default.
 - Prefer the smallest change that solves the problem; avoid opportunistic
   refactors unless I ask.
@@ -21,6 +27,9 @@
   If a dependency is genuinely warranted, say so and why before adding it.
 
 # Communication
+
+**Lead with the answer, say so before doing something you think is a bad idea,
+and disclose whatever you skipped or left failing.**
 
 - Lead with the answer or outcome, then supporting detail.
 - If something I asked for seems like a bad idea, say so before doing it —
@@ -32,7 +41,9 @@
 
 # Offloading mechanical work
 
-Mechanical work belongs in a command, not in your context. When a shell
+**Mechanical work belongs in a command, not in your context.**
+
+When a shell
 command, script, or CI job produces the same answer, run it instead of loading
 the material and working it out yourself — it's cheaper, it's reproducible, and
 it leaves context for the parts that actually need thought.
@@ -66,6 +77,9 @@ Don't offload when it costs correctness:
 
 # Feature development workflow
 
+**For anything bigger than an obvious fix, put something concrete in front of me
+and wait for a yes before implementing.**
+
 When I ask for a new feature or a significant change (as opposed to a bug fix,
 small tweak, or something I've already specified in detail):
 
@@ -84,6 +98,9 @@ Skip this ceremony when:
 - I've already approved a direction and this is a follow-up within it
 
 # Git
+
+**Nothing is committed or pushed unless I ask; finished work goes to a pull
+request that merges only on green.**
 
 - Never commit or push unless I ask (or I've clearly set up a workflow where
   it's expected).
@@ -115,6 +132,9 @@ Skip this ceremony when:
 
 # Project website
 
+**Most projects get a static site — what it is, why it exists, how to use it —
+with demos simulated and labeled when real ones aren't practical.**
+
 - Most projects should have a static website (GitHub Pages or similar)
   covering: what the project is, why it exists, and how to use it.
 - Show the project in action. Where real screenshots or live demos aren't
@@ -139,6 +159,9 @@ Skip this ceremony when:
 
 # Repo configuration as code
 
+**Repository settings live in Terraform in the repo and are applied by CI, never
+clicked through the web UI.**
+
 - GitHub repository settings are managed declaratively, not clicked through
   the web UI. Use the official Terraform GitHub provider
   (`integrations/github`) with an `import` block to adopt the existing
@@ -162,6 +185,9 @@ Skip this ceremony when:
 
 # Secrets and sensitive data
 
+**Secrets are stopped by three independent layers, and a failing check is never
+quietly disabled.**
+
 - Every repo gets a pre-commit hook that scans staged changes for
   credentials, key material, and PII before they can be committed. Use
   standard tooling — the pre-commit framework with the official gitleaks
@@ -182,8 +208,10 @@ Skip this ceremony when:
 
 # Specification
 
-For anything beyond a small change, keep a written specification in the repo,
-in a standard format, and keep it true. The current format is
+**For anything beyond a small change, keep a written specification in the repo,
+in a standard format, and keep it true.**
+
+The current format is
 [Spec Kit](https://github.com/github/spec-kit).
 
 - **Where it lives:** one directory per feature under `specs/`, holding
@@ -216,6 +244,9 @@ throwaway spikes — the same threshold as the feature workflow.
 
 # Testing
 
+**Start from a failing test that captures the expected behavior, then write the
+code that makes it pass — and show me both runs.**
+
 - Write tests **before** implementation by default: start from a failing test
   that captures the expected behavior, then write the code to make it pass.
 - Show me the failing test run before the fix and the passing run after —
@@ -233,6 +264,9 @@ Skip test-first when:
 - I've explicitly said to skip tests
 
 # Tool fallbacks
+
+**When an interactive tool looks stuck, switch to plain text rather than retrying
+the thing that just broke.**
 
 - If an interactive tool looks stuck — the same prompt keeps reappearing, a
   response never arrives, or I say I answered something you never received —

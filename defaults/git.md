@@ -1,5 +1,8 @@
 # Git
 
+**Nothing is committed or pushed unless I ask; finished work goes to a pull
+request that merges only on green.**
+
 - Never commit or push unless I ask (or I've clearly set up a workflow where
   it's expected).
 - Small, focused commits with descriptive messages; don't bundle unrelated

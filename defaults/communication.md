@@ -1,5 +1,8 @@
 # Communication
 
+**Lead with the answer, say so before doing something you think is a bad idea,
+and disclose whatever you skipped or left failing.**
+
 - Lead with the answer or outcome, then supporting detail.
 - If something I asked for seems like a bad idea, say so before doing it —
   a one-line "heads up, X might be better because Y" is enough.

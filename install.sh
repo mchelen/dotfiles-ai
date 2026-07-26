@@ -13,6 +13,7 @@
 #   ./install.sh            install/update the managed block for detected tools
 #   ./install.sh --all      install for every known tool, detected or not
 #   ./install.sh --print    print the assembled block to stdout and exit
+#   ./install.sh --brief    print the condensed one-line-per-module block and exit
 
 set -euo pipefail
 
@@ -47,9 +48,43 @@ assemble() {
   [[ $found -eq 1 ]] || { echo "no modules found in $REPO_DIR/defaults/" >&2; return 1; }
 }
 
+# Condensed form: the H1 and the bold thesis sentence from each module, one
+# line each, with no BEGIN/END markers: those exist so the full block can be
+# replaced in place inside a file, and a settings textarea has nothing to match
+# against, so they would be ~100 characters of pure cost against a hard cap.
+# Exists because the persistent-instruction fields in web chat
+# products cap out well below the size of the full block (see the website's
+# "Web chat" install path). Every module must carry a thesis sentence — a
+# paragraph wrapped in ** ** directly under its heading — and assembly fails
+# loudly rather than silently dropping a module that lacks one.
+brief() {
+  local found=0
+  echo "My working defaults (dotfiles-ai). Follow these unless I say otherwise."
+  echo
+  for f in "$REPO_DIR"/defaults/*.md; do
+    [[ -f "$f" ]] || continue
+    found=1
+    local line
+    line="$(awk '
+      /^\*\*/ && !done {
+        buf = $0
+        while (buf !~ /\*\*[[:space:]]*$/) { if ((getline nxt) <= 0) break; buf = buf " " nxt }
+        sub(/^\*\*/, "", buf); sub(/\*\*[[:space:]]*$/, "", buf)
+        print buf; done = 1
+      }' "$f")"
+    if [[ -z "$line" ]]; then
+      echo "no thesis sentence (a **bold** paragraph under the heading) in $f" >&2
+      return 1
+    fi
+    echo "- $line"
+  done
+  [[ $found -eq 1 ]] || { echo "no modules found in $REPO_DIR/defaults/" >&2; return 1; }
+}
+
 install_all=0
 case "${1:-}" in
   --print) assemble; exit 0 ;;
+  --brief) brief; exit 0 ;;
   --all)   install_all=1 ;;
   "")      ;;
   *)       echo "unknown option: $1" >&2; exit 2 ;;
@@ -89,4 +124,6 @@ cat <<'EOF'
 
 Done. For tools that only take rules through their settings UI
 (e.g. Cursor "User Rules"), paste the output of:  ./install.sh --print
+For web chat instruction fields, which are size-capped, use the condensed
+form instead:                                     ./install.sh --brief
 EOF

@@ -1,5 +1,8 @@
 # Secrets and sensitive data
 
+**Secrets are stopped by three independent layers, and a failing check is never
+quietly disabled.**
+
 - Every repo gets a pre-commit hook that scans staged changes for
   credentials, key material, and PII before they can be committed. Use
   standard tooling — the pre-commit framework with the official gitleaks
