@@ -5,6 +5,9 @@
   [ADR-0002](0002-adopt-storytelling-commit-convention.md) — specifically the
   reasoning in each that rejected skills as single-vendor.
 - **Date:** 2026-07-26
+- **Amended 2026-07-26:** third-party skills are **referenced, never
+  vendored**. This closes the copy-vs-pin question the record itself left
+  open, before any implementation existed to be superseded.
 
 ## Context
 
@@ -85,12 +88,13 @@ the authored preference modules.
    - *Authored here*: modules that are procedures rather than facts become
      skills, by the documented criterion above.
    - *Curated from elsewhere*: third-party skills the owner has evaluated and
-     chosen to keep.
+     chosen to keep, held as **pinned references** — never copied into this
+     repository.
 
 3. **Curation metadata is the deliverable.** For anything sourced elsewhere:
-   where it came from, its license, the version pinned, why it was kept, and
-   what was changed. A directory of 2,810 skills already exists; a list of
-   fifteen with reasons attached does not.
+   where it came from, the version pinned, why it was kept, and what to watch
+   for upstream. A directory of 2,810 skills already exists; a list of fifteen
+   with reasons attached does not.
 
 4. **Bootstrap where a standard exists, degrade where it doesn't.** A Claude
    plugin marketplace manifest gives a one-command install for Claude Code.
@@ -107,12 +111,16 @@ the authored preference modules.
 - **Status quo: everything resident.** Simple, and the only option before the
   standard existed. Pays context permanently for material used occasionally,
   and cannot represent curated third-party work at all.
-- **Copy third-party skills into the repo** — offline, pinned, auditable, but
-  carries licensing and attribution obligations and goes stale silently.
-- **Reference them by pinned URL** — no licensing question and no staleness,
-  but breaks the offline guarantee and the fork-owns-everything property.
-  *Unresolved; the first implementation should pick per skill rather than
-  globally.*
+- **Copy third-party skills into the repo (vendoring).** Offline, pinned,
+  auditable — and *rejected*. It makes this repository a redistributor of other
+  people's work, with the licensing and attribution obligations that carries,
+  and copies go stale silently while looking current. The maintenance is real
+  and permanent; the benefit is an offline guarantee this project has never
+  needed.
+- **Reference them by pinned version.** *Adopted.* No redistribution, no
+  licence tracking, and upstream fixes are upstream's. The costs are accepted
+  knowingly: installation needs network access, and a reference can rot if
+  upstream moves or deletes it.
 - **Plugin marketplace as the only mechanism.** Rejected: it is the one genuinely
   Claude-specific layer, and making it the sole path reintroduces exactly the
   lock-in this record is correcting for.
@@ -129,8 +137,12 @@ the authored preference modules.
   This turns a looming constraint into slack.
 - As skills they can be *longer and better* than a resident module can afford
   to be, since their body costs nothing until invoked.
-- New obligations: a second install target, license tracking for anything
-  vendored, and a real risk of sprawl. The value is the shortness of the list.
+- New obligations: a second install target and a real risk of sprawl. The value
+  is the shortness of the list.
+- **A referenced skill cannot be locally patched.** If a third-party skill is
+  almost right, the answer is to author one here rather than fork-and-edit
+  theirs. That keeps provenance unambiguous: every skill in this repository is
+  either wholly ours or wholly someone else's, never a quiet hybrid.
 - `install.sh` gains a concern it does not have today. The marker-block
   invariant does not apply to skills — they are whole files in their own
   directories — so this is a genuinely different write path, not an extension
@@ -139,6 +151,9 @@ the authored preference modules.
 ## Revisit when
 
 - The Agent Skills specification changes shape, or its governance moves.
+- Referenced skills start disappearing or changing under us often enough
+  that pinning by reference stops being reliable, or an offline install
+  becomes a requirement — either would reopen the vendoring question.
 - Non-Claude tools' skill locations diverge enough that one install step cannot
   serve them, making the "degrade gracefully" promise hollow.
 - The curated list grows past the point where each entry's inclusion can still
