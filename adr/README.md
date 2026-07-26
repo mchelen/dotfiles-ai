@@ -21,6 +21,10 @@ exists.*
 - A record is never rewritten to match what happened later. When a decision
   changes, add a new record and mark the old one superseded, so the reasoning
   at the time survives.
+- Resolving a question a record **explicitly left open** is different: that is
+  an amendment in place, dated and visible at the top of the record, not a new
+  entry. The test is whether anything has been built on the record yet — once
+  something has, changing it is a decision changing, and needs its own record.
 - Every record ends with **Revisit when** — the observable conditions that
   should reopen it. A decision with no stated expiry conditions is a decision
   nobody will ever revisit on purpose.
