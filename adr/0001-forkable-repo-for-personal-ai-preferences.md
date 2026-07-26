@@ -1,6 +1,8 @@
 # 1. Distribute personal AI preferences as a forkable dotfiles repo
 
 - **Status:** Accepted, provisional — see [Revisit when](#revisit-when)
+- **Superseded in part by** [ADR-0003](0003-curate-skills-on-the-agent-skills-standard.md):
+  the rejection of skills as single-vendor was wrong. The rest stands.
 - **Date:** 2026-07-26
 
 ## Context

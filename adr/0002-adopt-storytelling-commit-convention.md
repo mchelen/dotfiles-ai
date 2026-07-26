@@ -1,6 +1,9 @@
 # 2. Adopt the storytelling commit convention, scoped to two existing rules
 
 - **Status:** Accepted
+- **Superseded in part by** [ADR-0003](0003-curate-skills-on-the-agent-skills-standard.md):
+  the "Not adopted: the packaging" reasoning was wrong. The convention's
+  adoption and both tension resolutions stand.
 - **Date:** 2026-07-26
 
 ## Context
