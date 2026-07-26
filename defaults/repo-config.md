@@ -1,5 +1,8 @@
 # Repo configuration as code
 
+**Repository settings live in Terraform in the repo and are applied by CI, never
+clicked through the web UI.**
+
 - GitHub repository settings are managed declaratively, not clicked through
   the web UI. Use the official Terraform GitHub provider
   (`integrations/github`) with an `import` block to adopt the existing

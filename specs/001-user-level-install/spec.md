@@ -125,6 +125,13 @@ written to standard output and no target file is created or modified.
   regardless of detection.
 - **FR-005**: The system MUST offer a mode that prints the assembled block to
   standard output and modifies nothing.
+- **FR-005a**: The system MUST offer a second print mode producing a condensed
+  form — one line per module, drawn from that module's thesis sentence — for
+  destinations that cap instruction length. It MUST fail, naming the file,
+  when a module has no thesis sentence, rather than silently omitting it.
+  The condensed form carries no `BEGIN`/`END` markers: its destinations are
+  replaced wholesale, so markers would spend a meaningful share of a hard
+  character budget on nothing.
 - **FR-006**: On re-run, the system MUST replace the existing managed block in
   place rather than appending a second one.
 - **FR-007**: The system MUST preserve all file content outside the markers,
@@ -141,7 +148,10 @@ written to standard output and no target file is created or modified.
 ### Key Entities
 
 - **Module**: one markdown file in `defaults/`, self-contained and
-  tool-agnostic, written as direct instructions to an assistant.
+  tool-agnostic, written as direct instructions to an assistant. Each opens
+  with a **thesis sentence** — one bold paragraph under the heading — that
+  states the preference in a single line and is the source for the condensed
+  form.
 - **Managed block**: the assembled modules plus their delimiting markers; the
   unit that is inserted, replaced, and removed as a whole.
 - **Target**: the absolute path of one tool's user-level instruction file,
@@ -160,6 +170,11 @@ written to standard output and no target file is created or modified.
 - **SC-004**: No file is created for a tool that is not installed on the machine.
 - **SC-005**: Adding a module changes no file other than the new module and the
   generated copies of the block.
+- **SC-006**: The condensed form fits the smallest instruction field this
+  project documents. It is currently 1,430 characters against a 1,500
+  character floor, so roughly one further module exhausts the margin — at
+  which point the floor is missed and the guide must say so rather than
+  quietly overflow.
 
 ## Assumptions
 

@@ -1,5 +1,8 @@
 # Project website
 
+**Most projects get a static site — what it is, why it exists, how to use it —
+with demos simulated and labeled when real ones aren't practical.**
+
 - Most projects should have a static website (GitHub Pages or similar)
   covering: what the project is, why it exists, and how to use it.
 - Show the project in action. Where real screenshots or live demos aren't

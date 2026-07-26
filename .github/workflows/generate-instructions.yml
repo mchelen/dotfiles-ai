@@ -1,8 +1,9 @@
 name: generate-instructions
 
-# Regenerates the root INSTRUCTIONS.md — the assembled block of every
-# defaults/ module — whenever the modules change on main, and commits the
-# result back.
+# Regenerates the two generated artifacts whenever the modules change on main,
+# and commits the result back:
+#   INSTRUCTIONS.md        the full assembled block
+#   INSTRUCTIONS-brief.md  one line per module, for size-capped chat fields
 #
 # This runs in CI rather than as a local pre-commit hook on purpose: it is
 # what makes the no-terminal install path work. A module edited through the
@@ -31,17 +32,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Regenerate INSTRUCTIONS.md
-        run: ./install.sh --print > INSTRUCTIONS.md
+      - name: Regenerate generated artifacts
+        run: |
+          ./install.sh --print > INSTRUCTIONS.md
+          ./install.sh --brief > INSTRUCTIONS-brief.md
 
       - name: Commit if changed
         run: |
-          if git diff --quiet -- INSTRUCTIONS.md; then
-            echo "::notice::INSTRUCTIONS.md is already current — nothing to commit."
+          if git diff --quiet -- INSTRUCTIONS.md INSTRUCTIONS-brief.md; then
+            echo "::notice::Generated instructions are already current — nothing to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add INSTRUCTIONS.md
-          git commit -m "Regenerate INSTRUCTIONS.md from defaults/"
+          git add INSTRUCTIONS.md INSTRUCTIONS-brief.md
+          git commit -m "Regenerate instruction artifacts from defaults/"
           git push

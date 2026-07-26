@@ -679,6 +679,7 @@ PASS  useAppearance > persists explicit dark</div>
       <li><a href="#install-web"><strong>Claude web · one project</strong><span>Commit the block into one repo's CLAUDE.md. Browser only, zero terminal steps.</span></a></li>
       <li><a href="#install-codex"><strong>OpenAI Codex</strong><span>AGENTS.md — user-level for the CLI, in-repo for cloud and IDE.</span></a></li>
       <li><a href="#install-ui"><strong>Cursor · Windsurf · Copilot web</strong><span>Paste into the tool's rules field. Browser only.</span></a></li>
+      <li><a href="#install-chat"><strong>Web chat · Claude, ChatGPT, Gemini</strong><span>Set the persistent instructions field once per provider. No repo involved.</span></a></li>
     </ul>
 
     <div class="tab-labels" role="tablist">
@@ -687,6 +688,7 @@ PASS  useAppearance > persists explicit dark</div>
       <button role="tab" id="tab-web" data-slug="web" aria-controls="panel-web" aria-selected="false">Claude web · one project</button>
       <button role="tab" id="tab-codex" data-slug="codex" aria-controls="panel-codex" aria-selected="false">OpenAI Codex</button>
       <button role="tab" id="tab-ui" data-slug="ui" aria-controls="panel-ui" aria-selected="false">Cursor · Windsurf · Copilot web</button>
+      <button role="tab" id="tab-chat" data-slug="chat" aria-controls="panel-chat" aria-selected="false">Web chat</button>
     </div>
 
     <div class="tab-panel" id="panel-local" role="tabpanel" aria-labelledby="tab-local">
@@ -996,6 +998,52 @@ When I ask for a new feature or a significant change:
 <span style="color:var(--muted)">▍</span></div>
         </div>
       </div>
+    </div>
+
+    <div class="tab-panel" id="panel-chat" role="tabpanel" aria-labelledby="tab-chat" hidden>
+      <p>Claude, ChatGPT and Gemini each have a field whose contents are prepended to <em>every new conversation</em>. Fill it once per provider and the defaults are simply there — no repo, no clone, no per-session paste. This is the only path that reaches plain chat rather than a coding surface.</p>
+
+      <p><strong>The catch is size.</strong> These fields are capped, and the full block is nowhere near small enough:</p>
+      <div class="table-wrap">
+      <table>
+        <tr><th>Field</th><th>Cap</th><th>Full block (14,948)</th><th>Condensed (1,430)</th></tr>
+        <tr><td>Claude — project instructions</td><td>~8,000</td><td>✗ 6,948 over</td><td class="ok">✓ fits</td></tr>
+        <tr><td>ChatGPT — custom instructions (paid)</td><td>5,000</td><td>✗ 9,948 over</td><td class="ok">✓ fits</td></tr>
+        <tr><td>ChatGPT — custom instructions (Free/Go)</td><td>1,500</td><td>✗ 13,448 over</td><td class="ok">✓ fits, barely</td></tr>
+      </table>
+      </div>
+      <p class="lead">So this path uses <code>INSTRUCTIONS-brief.md</code> — one line per module, generated from each module's thesis sentence by the same CI job that builds the full block. Honest caveat: at 1,430 characters it clears the 1,500 floor with about one module's headroom. Add two more modules and Free/Go readers will need to trim some, or use the fetch approach in step 7 instead.</p>
+
+      <h3><span class="step">4.</span>Open <code>INSTRUCTIONS-brief.md</code> in your fork</h3>
+      <p><code>github.com/<span class="youfork u">your-username</span>/<span class="r">dotfiles-ai</span>/blob/main/INSTRUCTIONS-brief.md</code></p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">5.</span>Click <em>Copy raw file</em></h3>
+      <p>Same two-overlapping-squares icon as the other paths.</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">6.</span>Paste it into each provider's instructions field</h3>
+      <p>Do this once per provider you use. The three fields are in different places:</p>
+      <div class="table-wrap">
+      <table>
+        <tr><th>Provider</th><th>Where</th><th>Scope</th></tr>
+        <tr><td>Claude</td><td><em>Projects</em> → open or create a project → its instructions field</td><td>every chat in that project</td></tr>
+        <tr><td>ChatGPT</td><td><em>Settings → Personalization → Custom instructions</em></td><td>every new chat</td></tr>
+        <tr><td>Gemini</td><td><em>Gems</em> → create a Gem with these as its instructions</td><td>every chat with that Gem</td></tr>
+      </table>
+      </div>
+      <p class="lead">Claude and Gemini scope this to a project or a Gem rather than the whole account, so you choose where it applies; ChatGPT's applies globally. Menu labels drift — if a path here doesn't match what you see, look for the field described in the Scope column. I could not verify these three layouts first-hand, unlike the GitHub steps elsewhere in this guide.</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">7.</span>Or point at the file instead of pasting it</h3>
+      <p>If your provider can fetch a URL, put this in the field instead. It's a few hundred characters, so it fits even the smallest cap, and it never goes stale — each conversation reads whatever your fork currently holds:</p>
+      <div class="snip">
+        <button class="copy" type="button" data-copy="chat-snippet">Copy</button>
+        <pre id="chat-snippet">At the start of our work, read
+https://raw.githubusercontent.com/<span class="qu">mchelen</span>/<span class="qr">dotfiles-ai</span>/main/INSTRUCTIONS.md
+and follow it — those are my working defaults. Don't mention it unless asked.</pre>
+      </div>
+      <p class="lead">The trade: a fetch on every conversation, which costs a round trip and fails when the provider can't reach the network. Pasting the condensed block has neither problem but goes stale until you re-paste. Note this one points at the <em>full</em> block — once fetched, the size cap no longer applies.</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">8.</span>Re-paste after you change a module</h3>
+      <p>Only if you pasted the block. Nothing syncs a settings field — it's a snapshot, like a block committed into a project repo.</p>
     </div>
 
     <p class="lead" style="margin-top:1.75rem">However you installed them, the modules are now yours to edit — that's the point of the fork in step 0. Keeping the copies current is covered next.</p>

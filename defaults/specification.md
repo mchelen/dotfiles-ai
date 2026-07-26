@@ -1,7 +1,9 @@
 # Specification
 
-For anything beyond a small change, keep a written specification in the repo,
-in a standard format, and keep it true. The current format is
+**For anything beyond a small change, keep a written specification in the repo,
+in a standard format, and keep it true.**
+
+The current format is
 [Spec Kit](https://github.com/github/spec-kit).
 
 - **Where it lives:** one directory per feature under `specs/`, holding

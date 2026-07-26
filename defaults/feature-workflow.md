@@ -1,5 +1,8 @@
 # Feature development workflow
 
+**For anything bigger than an obvious fix, put something concrete in front of me
+and wait for a yes before implementing.**
+
 When I ask for a new feature or a significant change (as opposed to a bug fix,
 small tweak, or something I've already specified in detail):
 

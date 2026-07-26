@@ -1,5 +1,8 @@
 # Code style
 
+**Match the surrounding code, make the smallest change that solves the problem,
+and never add a dependency without saying why.**
+
 - Match the existing style of the codebase over any personal or general default.
 - Prefer the smallest change that solves the problem; avoid opportunistic
   refactors unless I ask.
