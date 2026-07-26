@@ -12,6 +12,11 @@ Like classic dotfiles, these encode *individual* preferences (workflow,
 communication style, guardrails), not project conventions. Project-specific
 instructions still belong in each repo's own `CLAUDE.md` / `AGENTS.md`.
 
+**Why this exists, and why it's built this way** — including the alternatives
+considered (per-tool config, chezmoi, `rulesync`, `AGENTS.md`, auto memory) and
+what would make this approach obsolete — is recorded in
+[`adr/0001`](adr/0001-forkable-repo-for-personal-ai-preferences.md).
+
 ## What's here
 
 Each file in [`defaults/`](defaults/) is one self-contained preference module,
