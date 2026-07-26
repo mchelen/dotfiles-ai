@@ -291,7 +291,7 @@
 
   <section id="modules">
     <h2>The modules</h2>
-    <p>Eleven modules, grouped here by the kind of behavior they govern. Each one is a short markdown file in <code>defaults/</code> — read them, delete the ones you disagree with, add your own.</p>
+    <p>Twelve modules, grouped here by the kind of behavior they govern. Each one is a short markdown file in <code>defaults/</code> — read them, delete the ones you disagree with, add your own.</p>
 
     <h3 class="cat">Collaboration <span>— how the assistant works with you</span></h3>
 
@@ -319,6 +319,15 @@
       <div class="ba">
         <div class="ba-col"><span class="ba-label before">Without</span>The card is re-issued after every failure. You answer the same question four times and nothing moves forward.</div>
         <div class="ba-col"><span class="ba-label after">With</span>"That came back as a decline, but you said you answered — the card is probably eating input. Switching to plain text: &lt;question&gt;"</div>
+      </div>
+    </div>
+
+    <div class="module">
+      <h4>compute-offload</h4>
+      <p>Mechanical work goes to a command, not into the context window: query with <code>grep</code>, <code>jq</code>, and <code>diff</code> instead of reading a large file to find a small part of it; make verification scripts print a verdict rather than a transcript; put a check that must hold every time into CI. With guardrails, because the cheap path isn't always the right one — judgment doesn't offload, a fragile parser written to avoid a short read is a bad trade, and a filtered or partial check is always disclosed as one.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Without</span>A 345 KB API response is pulled into context to learn which three CI jobs ran. The answer arrives, and the room for the actual task doesn't.</div>
+        <div class="ba-col"><span class="ba-label after">With</span><span class="mono">jq -r '.runs[] | "\(.name) \(.conclusion)"'</span><br><span class="ba-note">eight lines, same answer, re-runnable next time</span></div>
       </div>
     </div>
 
