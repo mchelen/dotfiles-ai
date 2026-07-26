@@ -147,8 +147,8 @@ Notes:
 `defaults/` assembled into the same marker-delimited block `install.sh`
 writes. It exists so the defaults can be used with no terminal at all: open it
 in your fork, click **Copy raw file**, and paste it into a project's
-`CLAUDE.md` / `AGENTS.md` through the GitHub web editor, or into a settings
-field like Cursor's *User Rules*.
+`AGENTS.md` through the GitHub web editor, or into a settings field like
+Cursor's *User Rules*.
 
 It is generated — never edit it by hand. The
 [`generate-instructions` workflow](.github/workflows/generate-instructions.yml)
@@ -210,13 +210,14 @@ change a character in the script. Resuming a session never re-runs it.
 
 ### Project repos ← your fork
 
-A block committed into a project's `CLAUDE.md` / `AGENTS.md` is a snapshot in
+A block committed into a project's `AGENTS.md` / `CLAUDE.md` is a snapshot in
 *that* repo's history; nothing updates it automatically, and there's no
 upstream-sync bot for it today. Those files are shared with collaborators, so
 refreshing one is a deliberate act:
 
 1. Open `INSTRUCTIONS.md` in your fork, click **Copy raw file**.
-2. Open the project's `CLAUDE.md` / `AGENTS.md`, click the pencil icon.
+2. Open the project's `AGENTS.md` (the `CLAUDE.md` import needs no changes),
+   click the pencil icon.
 3. Select from the `<!-- BEGIN dotfiles-ai … -->` line through the
    `<!-- END dotfiles-ai -->` line, inclusive, and delete it.
 4. Paste the fresh block in its place.
@@ -308,14 +309,16 @@ There are three delivery mechanisms, depending on what a given tool reads:
    project on the machine.
 2. **Settings UI** — paste `INSTRUCTIONS.md` (or the output of
    `./install.sh --print`) into the tool's rules/instructions setting.
-3. **Repo file** — commit the block (or a subset of modules) into a file in
-   the project itself; needed for cloud/web agents that only see the repo.
+3. **Repo file** — commit the block (or a subset of modules) into the
+   project's `AGENTS.md`; needed for cloud/web agents that only see the repo.
    Copy it from `INSTRUCTIONS.md` in your fork — no local clone required.
+   Claude Code reads `CLAUDE.md` rather than `AGENTS.md`, so add a one-line
+   `CLAUDE.md` containing `@AGENTS.md` to point it at the same block.
 
 | Tool | Surface | Where the defaults go | Mechanism |
 |---|---|---|---|
 | **Claude Code** | CLI, desktop app, IDE extensions | `~/.claude/CLAUDE.md` (user memory) | `install.sh` ✅ |
-| **Claude Code** | Web (claude.ai/code) | The repo's own `CLAUDE.md` | repo file |
+| **Claude Code** | Web (claude.ai/code) | The repo's `AGENTS.md`, plus a `CLAUDE.md` containing `@AGENTS.md` — Claude Code reads `CLAUDE.md`, not `AGENTS.md` | repo file |
 | **Codex** | CLI | `~/.codex/AGENTS.md` | `install.sh` ✅ |
 | **Codex** | Web/cloud, IDE extension | The repo's `AGENTS.md` | repo file |
 | **GitHub Copilot** | CLI | `~/.copilot/copilot-instructions.md` | `install.sh` ✅ |
@@ -339,7 +342,8 @@ Notes:
   `install.sh` and re-run — anything that reads a user-level markdown file
   works the same way.
 - **Repo files**: for cloud agents, paste `INSTRUCTIONS.md` (or the `--print`
-  output) into the project's `CLAUDE.md`/`AGENTS.md`, or copy just the modules
+  output) into the project's `AGENTS.md` (plus a `CLAUDE.md` importing it with
+  `@AGENTS.md`, which is what Claude Code reads), or copy just the modules
   that matter for that project. Keep in mind those files are shared with collaborators —
   personal preferences you don't want to impose on others belong at the user
   level.

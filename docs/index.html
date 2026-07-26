@@ -837,7 +837,7 @@ mkdir -p "$HOME/.claude"
 
     <div class="tab-panel" id="panel-web" role="tabpanel" aria-labelledby="tab-web" hidden>
       <p>Use this when the defaults should belong to <em>one repo</em> — applying to collaborators and to any cloud agent that opens it. To set yourself up once for <em>every</em> repo instead, see the <em>every session</em> tab.</p>
-      <p><strong>Why this differs:</strong> a cloud session runs in a fresh container that clones your repo — it never sees <code>~/.claude/CLAUDE.md</code> on your laptop. The defaults have to travel <em>inside the repo</em>, so they go into the project's own <code>CLAUDE.md</code>.</p>
+      <p><strong>Why this differs:</strong> a cloud session runs in a fresh container that clones your repo — it never sees <code>~/.claude/CLAUDE.md</code> on your laptop. The defaults have to travel <em>inside the repo</em>, so they go into the project's own <code>AGENTS.md</code>.</p>
       <p><strong>No terminal, no clone, nothing installed.</strong> Every step below happens in the browser. That works because your fork carries a generated file at its root, <code>INSTRUCTIONS.md</code> — every module in <code>defaults/</code>, already assembled into one marker-delimited block, ready to copy. A GitHub Actions workflow regenerates it on every change to <code>defaults/</code> on <code>main</code>, so it is current even when you edit modules from the web editor.</p>
 
       <h3><span class="step">4.</span>Open <code>INSTRUCTIONS.md</code> in your fork</h3>
@@ -867,8 +867,12 @@ mkdir -p "$HOME/.claude"
       <h3 style="margin-top:1.5rem"><span class="step">6.</span>Open your project's repo on github.com</h3>
       <p>The repo you'll actually run the cloud session against — not your dotfiles-ai fork.</p>
 
-      <h3 style="margin-top:1.5rem"><span class="step">7.</span>Open (or create) that repo's <code>CLAUDE.md</code></h3>
-      <p>If it already exists, click it in the file list. If it doesn't: <em>Add file ▾ → Create new file</em>, then type <code>CLAUDE.md</code> as the filename — that drops you straight into the editor, so skip step 8.</p>
+      <h3 style="margin-top:1.5rem"><span class="step">7.</span>Open (or create) that repo's <code>AGENTS.md</code></h3>
+      <p>If it already exists, click it in the file list. If it doesn't: <em>Add file ▾ → Create new file</em>, then type <code>AGENTS.md</code> as the filename — that drops you straight into the editor, so skip step 8.</p>
+      <div class="callout">
+        <p><strong>Why <code>AGENTS.md</code> and not <code>CLAUDE.md</code>?</strong> <a href="https://agents.md">AGENTS.md</a> is the cross-tool convention — a community specification stewarded by the Agentic AI Foundation under the Linux Foundation since December 2025, read by roughly fifteen agents including Codex, Cursor, Copilot, Gemini CLI, Windsurf, Aider, Zed and Amazon Q. One file, most tools.</p>
+        <p><strong>Claude Code is the exception, and it needs one extra step.</strong> Its documentation is explicit that it reads <code>CLAUDE.md</code> and <em>not</em> <code>AGENTS.md</code>. The documented fix is a one-line <code>CLAUDE.md</code> that imports the other file, so both read the same block with nothing duplicated — that's step 12 below.</p>
+      </div>
 
       <h3 style="margin-top:1.5rem"><span class="step">8.</span>Click the pencil icon (<em>Edit this file</em>)</h3>
       <p>Same toolbar position as in step 5, on your project's file this time.</p>
@@ -876,10 +880,10 @@ mkdir -p "$HOME/.claude"
       <h3 style="margin-top:1.5rem"><span class="step">9.</span>Paste at the end of the file</h3>
       <p>Click into the editor, press <kbd>⌘↓</kbd> / <kbd>Ctrl-End</kbd> to reach the bottom, add a blank line, then paste with <kbd>⌘V</kbd> / <kbd>Ctrl-V</kbd>. Keep the <code>BEGIN</code>/<code>END</code> comment lines — they're what lets you replace the block later without touching the rest of the file.</p>
       <div class="browser">
-        <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">github.com/<span class="u">your-username</span>/your-project/edit/main/CLAUDE.md</span><span class="label">simulated</span></div>
+        <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">github.com/<span class="u">your-username</span>/your-project/edit/main/AGENTS.md</span><span class="label">simulated</span></div>
         <div class="browser-body">
           <div class="gh-toolbar">
-            <span class="gh-path">CLAUDE.md</span>
+            <span class="gh-path">AGENTS.md</span>
             <span class="gh-note">Edit · Preview</span>
             <span class="gh-btn green gh-hl" style="margin-left:auto">Commit changes…</span>
           </div>
@@ -900,7 +904,16 @@ Run `make dev` for a local server. Migrations live in `db/`.
       <h3 style="margin-top:1.5rem"><span class="step">11.</span>Click <em>Commit changes…</em>, then <em>Commit changes</em></h3>
       <p>Green button, top right of the editor. In the dialog, leave <em>Commit directly to the <code>main</code> branch</em> selected — or pick <em>Create a new branch and start a pull request</em> if the repo requires review — then confirm with the green <em>Commit changes</em> button.</p>
 
-      <h3 style="margin-top:1.5rem"><span class="step">12.</span>Start a session at <code>claude.ai/code</code></h3>
+      <h3 style="margin-top:1.5rem"><span class="step">12.</span>Add a <code>CLAUDE.md</code> that imports it</h3>
+      <p>This is the step that makes Claude Code see the block, since it doesn't read <code>AGENTS.md</code>. Repeat steps 7–11 for a file named <code>CLAUDE.md</code>, but instead of pasting the block, its entire contents are one line:</p>
+      <div class="term">
+        <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> CLAUDE.md <span class="label">paste, don't run</span></div>
+        <pre>@AGENTS.md</pre>
+      </div>
+      <p>Claude Code expands that import at session start, so both files stay in sync with no duplication — and future refreshes only ever touch <code>AGENTS.md</code>. Anything you want Claude Code to do <em>and not the other agents</em> can go below the import line.</p>
+      <p class="lead">From a clone you could symlink instead — <code>ln -s AGENTS.md CLAUDE.md</code> — but the import is the better default here: it works on Windows without Developer Mode, and it leaves room for Claude-specific additions.</p>
+
+      <h3 style="margin-top:1.5rem"><span class="step">13.</span>Start a session at <code>claude.ai/code</code></h3>
       <p>Pick that repo. The defaults arrive with the checkout — no per-session setup, no local install:</p>
       <div class="browser">
         <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">claude.ai/code</span><span class="label">simulated</span></div>
@@ -917,7 +930,7 @@ page size. Mockup of the button placement below…</div>
       </div>
 
       <div class="callout">
-        <p><strong>Editing the defaults themselves, also without a terminal:</strong> in your fork, open any file under <code>defaults/</code>, click the pencil, edit, and commit to <code>main</code>. The <code>generate-instructions</code> workflow reassembles <code>INSTRUCTIONS.md</code> within a minute of that commit. To push the change into a project, repeat steps 4–11 and replace the old block.</p>
+        <p><strong>Editing the defaults themselves, also without a terminal:</strong> in your fork, open any file under <code>defaults/</code>, click the pencil, edit, and commit to <code>main</code>. The <code>generate-instructions</code> workflow reassembles <code>INSTRUCTIONS.md</code> within a minute of that commit. To push the change into a project, repeat steps 4–11 and replace the old block (the <code>CLAUDE.md</code> import from step 12 needs no touching — it points at the file you just refreshed).</p>
       </div>
     </div>
 
@@ -940,7 +953,7 @@ installed /Users/you/.codex/AGENTS.md
       <p>The two-overlapping-squares icon in the file toolbar, right-hand side.</p>
 
       <h3 style="margin-top:1.5rem"><span class="step">6.</span>Paste it into the project's <code>AGENTS.md</code> and commit</h3>
-      <p>Identical to steps 6–11 of the <em>Claude Code on the web</em> tab, with <code>AGENTS.md</code> as the filename instead of <code>CLAUDE.md</code>: open the file (or <em>Add file ▾ → Create new file</em>), click the pencil, paste at the end, trim anything team-inappropriate, then <em>Commit changes… → Commit changes</em>.</p>
+      <p>Identical to steps 6–11 of the <em>Claude web · one project</em> tab, which already targets <code>AGENTS.md</code>: open the file (or <em>Add file ▾ → Create new file</em>), click the pencil, paste at the end, trim anything team-inappropriate, then <em>Commit changes… → Commit changes</em>.</p>
 
       <h3 style="margin-top:1.5rem"><span class="step">7.</span>Start a task at <code>chatgpt.com/codex</code></h3>
       <div class="browser">
@@ -1042,9 +1055,9 @@ updated  /Users/you/.codex/AGENTS.md <span class="c">(previous version saved to 
     <p>So: edits to <code>defaults/</code> reach your cloud sessions within a week on their own, or immediately if you open the environment settings and change one character in the script. Resuming an existing session never re-runs it.</p>
 
     <h3 class="cat">Project repos ← your fork <span>— manual refresh of a committed block</span></h3>
-    <p>A block committed into some project's <code>CLAUDE.md</code> or <code>AGENTS.md</code> is a snapshot in <em>that</em> repo's history. Nothing updates it on its own — and deliberately so: those files are shared with collaborators, and a bot rewriting them under a team is a worse default than doing it when you mean to. There's no upstream-sync bot for this today. To refresh one:</p>
+    <p>A block committed into some project's <code>AGENTS.md</code> or <code>CLAUDE.md</code> is a snapshot in <em>that</em> repo's history. Nothing updates it on its own — and deliberately so: those files are shared with collaborators, and a bot rewriting them under a team is a worse default than doing it when you mean to. There's no upstream-sync bot for this today. To refresh one:</p>
     <p><span class="num">1.</span>Open <code>INSTRUCTIONS.md</code> in your fork and click <em>Copy raw file</em>.</p>
-    <p><span class="num">2.</span>Open the project's <code>CLAUDE.md</code> (or <code>AGENTS.md</code>) and click the pencil icon.</p>
+    <p><span class="num">2.</span>Open the project's <code>AGENTS.md</code> (or <code>CLAUDE.md</code>) and click the pencil icon.</p>
     <p><span class="num">3.</span>Select from the <code>&lt;!-- BEGIN dotfiles-ai … --&gt;</code> line through the <code>&lt;!-- END dotfiles-ai --&gt;</code> line, inclusive, and delete it.</p>
     <p><span class="num">4.</span>Paste the fresh block in its place.</p>
     <p><span class="num">5.</span>Click <em>Commit changes… → Commit changes</em>.</p>
