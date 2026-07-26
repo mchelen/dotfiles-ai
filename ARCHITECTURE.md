@@ -76,6 +76,11 @@ flowchart LR
   Backed up by **`.github/workflows/secret-scan.yml`**, which runs
   gitleaks in CI on every push/PR, and by GitHub secret scanning + push
   protection in repo settings.
+- **`adr/`** — architecture decision records: why the project is shaped this
+  way, which alternatives were weighed (native per-tool config, a generic
+  dotfiles manager, `rulesync`, `AGENTS.md`, Claude Code auto memory, a
+  vendor plugin), and the conditions that should reopen each decision. Start
+  at [`adr/0001`](adr/0001-forkable-repo-for-personal-ai-preferences.md).
 - **`specs/`** — intended behavior in Spec Kit format, one directory per
   capability (`install.sh`, `sync.sh`, `INSTRUCTIONS.md` generation), each a
   `spec.md` of user stories, functional requirements, and success criteria.
