@@ -11,6 +11,7 @@ exists.*
 | ADR | Decision | Status |
 |---|---|---|
 | [0001](0001-forkable-repo-for-personal-ai-preferences.md) | Distribute personal AI preferences as a forkable dotfiles repo | Accepted, provisional |
+| [0002](0002-adopt-storytelling-commit-convention.md) | Adopt the storytelling commit convention, scoped to two existing rules | Accepted |
 
 ## Conventions
 
