@@ -214,6 +214,68 @@
   .callout ul { margin: .5rem 0 0; padding-left: 1.15rem; }
   .callout li { margin: .3rem 0; }
   .youfork { color: var(--accent); font-weight: 700; }
+  /* sticky section nav */
+  .sticky-nav {
+    position: sticky; top: 0; z-index: 20; background: var(--bg);
+    border-bottom: 1px solid var(--border); backdrop-filter: saturate(180%) blur(8px);
+  }
+  .sticky-nav ul {
+    max-width: 860px; margin: 0 auto; padding: .5rem 1.25rem; list-style: none;
+    display: flex; gap: .25rem; flex-wrap: wrap; overflow-x: auto;
+  }
+  .sticky-nav a {
+    display: inline-block; padding: .3rem .6rem; border-radius: 6px; text-decoration: none;
+    color: var(--muted); font-size: .86rem; font-weight: 600; white-space: nowrap;
+  }
+  .sticky-nav a:hover { color: var(--fg); background: var(--card); }
+  section { scroll-margin-top: 3.5rem; }
+  /* quick start */
+  .quick { border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: 10px; background: var(--card); padding: 1.1rem 1.2rem; margin-top: 1.25rem; }
+  .quick ol { margin: .6rem 0 0; padding-left: 1.3rem; }
+  .quick li { margin: .45rem 0; }
+  /* copyable snippet */
+  .snip { position: relative; margin-top: .9rem; }
+  .snip pre {
+    margin: 0; padding: .9rem 1rem; overflow-x: auto; white-space: pre-wrap; word-break: break-word;
+    background: var(--term-bg); color: var(--term-fg); border-radius: 10px;
+    font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .82rem; line-height: 1.55;
+  }
+  .snip .copy {
+    position: absolute; top: .5rem; right: .5rem; font: inherit; font-size: .74rem; font-weight: 700;
+    padding: .25rem .6rem; border-radius: 6px; cursor: pointer;
+    background: rgba(255,255,255,.12); color: #e8e8e4; border: 1px solid rgba(255,255,255,.2);
+  }
+  .snip .copy:hover { background: rgba(255,255,255,.22); }
+  /* repo path input */
+  .repo-box {
+    border: 1px solid var(--border); border-radius: 10px; background: var(--card);
+    padding: .9rem 1rem; margin-top: 1.1rem;
+  }
+  .repo-box label { display: block; font-weight: 600; font-size: .93rem; margin-bottom: .15rem; }
+  .repo-box .hint { color: var(--muted); font-size: .84rem; }
+  .repo-box input {
+    font: inherit; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .86rem;
+    padding: .45rem .6rem; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--bg); color: var(--fg); width: 100%; max-width: 26rem; margin-top: .5rem;
+  }
+  .repo-box .state { font-size: .82rem; color: var(--muted); margin-top: .4rem; min-height: 1.2em; }
+  .repo-box .state b { color: var(--accent); font-family: ui-monospace, Menlo, Consolas, monospace; }
+  /* install path index */
+  .path-index { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: .5rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+  .path-index a {
+    display: block; text-decoration: none; color: inherit; border: 1px solid var(--border);
+    border-radius: 8px; padding: .55rem .75rem; background: var(--card);
+  }
+  .path-index a:hover { border-color: var(--accent); }
+  .path-index strong { display: block; font-size: .93rem; }
+  .path-index span { font-size: .8rem; color: var(--muted); }
+  kbd {
+    font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .8em;
+    border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 4px;
+    padding: .05em .35em; background: var(--bg);
+  }
   /* before / after demo */
   .demo { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; margin-top: 1.25rem; }
   .chat {
@@ -274,15 +336,59 @@
   <h1>dotfiles-ai<span class="dot">.</span></h1>
   <p class="tagline">Dotfiles, but for AI coding assistants — your personal working preferences, carried across every project and every tool.</p>
   <div class="buttons">
-    <a class="btn primary" href="#install">Install</a>
-    <a class="btn" href="https://github.com/mchelen/dotfiles-ai/fork">Fork it</a>
+    <a class="btn primary" href="#quick">Quick start</a>
+    <a class="btn" href="#modules">Modules</a>
+    <a class="btn" href="#install">Install</a>
     <a class="btn" href="#demo">See it in action</a>
     <a class="btn" href="https://github.com/mchelen/dotfiles-ai">View on GitHub</a>
   </div>
 </header>
 
+<nav class="sticky-nav" aria-label="Sections">
+  <ul>
+    <li><a href="#quick">Quick start</a></li>
+    <li><a href="#what">What it is</a></li>
+    <li><a href="#modules">Modules</a></li>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#demo">Before / after</a></li>
+    <li><a href="#install">Install</a></li>
+    <li><a href="#sync">Staying in sync</a></li>
+  </ul>
+</nav>
+
 <main>
-  <section>
+  <section id="quick">
+    <h2>Quick start</h2>
+    <p>Want the defaults working <em>right now</em>, in a session you already have open? Paste this in. It works in Claude Code — terminal, desktop, or <code>claude.ai/code</code> — and in any other assistant that can read a URL.</p>
+
+    <div class="snip">
+      <button class="copy" type="button" data-copy="quick-snippet">Copy</button>
+      <pre id="quick-snippet">Read https://raw.githubusercontent.com/<span class="qu">mchelen</span>/<span class="qr">dotfiles-ai</span>/main/INSTRUCTIONS.md
+and follow it for the rest of this session — those are my working defaults.
+
+Then tell me briefly how to keep them, and offer to set up whichever I pick:
+  - this project only: commit the block into CLAUDE.md (or AGENTS.md)
+  - every session: fork the repo, then run install.sh on my machine, or add it
+    to my Claude Code environment setup script
+
+If I later want to change a preference, remind me it lives in defaults/ in my
+fork — the copy you just read is disposable.</pre>
+    </div>
+
+    <div class="quick">
+      <p><strong>What that does</strong></p>
+      <ol>
+        <li><strong>Immediately:</strong> the assistant reads <code>INSTRUCTIONS.md</code> — every module, already assembled — and follows it for this session. Nothing is installed, nothing is committed, and it works in a session that's already running.</li>
+        <li><strong>Then:</strong> it explains the two ways to make that permanent and offers to do the work, so you don't have to come back here and read the install guide.</li>
+        <li><strong>Later:</strong> it knows to send you to <code>defaults/</code> in your own fork when you want to change something — never to the pasted copy, which is disposable by design.</li>
+      </ol>
+      <p class="lead" style="margin-bottom:0">Fetching needs network access. In a <code>claude.ai/code</code> session, <code>raw.githubusercontent.com</code> is on the default <em>Trusted</em> allowlist, so it works as-is. If your tool can't reach the internet, open <a href="https://github.com/mchelen/dotfiles-ai/blob/main/INSTRUCTIONS.md">INSTRUCTIONS.md</a>, click <em>Copy raw file</em>, and paste the block itself instead.</p>
+    </div>
+
+    <p class="lead">This is the zero-commitment version — it lasts one session and uses <em>this</em> repo's opinions. When you want them on every machine and every project, and edited to your taste, start at <a href="#install">Install</a>, which begins by forking.</p>
+  </section>
+
+  <section id="what">
     <h2>What it is</h2>
     <p>You have opinions about how an AI assistant should work with you: <em>show me a mockup before you build the feature. Write the test first. Don't commit unless I ask.</em> Today you re-explain those preferences in every session, or duplicate them into every project's instruction file.</p>
     <p><strong>dotfiles-ai</strong> keeps them in one place instead. Each preference is a small markdown module; an installer assembles the modules into the user-level instruction file of every AI tool on your machine — Claude Code, Codex, Copilot CLI, Gemini CLI, and friends — and a sync script keeps every machine current automatically.</p>
@@ -410,7 +516,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="how">
     <h2>How it works</h2>
     <p><span class="num">1.</span><strong>Fork, then install once.</strong> You start by forking, because the modules are meant to be edited and every copy should follow a repo you control. Then <code>install.sh</code> concatenates the modules into a marker-delimited block and inserts it into each detected tool's user-level instruction file. Your own content in those files is never touched, and re-runs replace the block in place.</p>
     <div class="term">
@@ -438,7 +544,7 @@ updated  /Users/you/.codex/AGENTS.md <span class="c">(previous version saved to 
     <p style="margin-top:2rem"><span class="num">3.</span><strong>Evolve by pull request.</strong> Notice a new preference mid-session? Add a module on any machine, merge it, and every other machine picks it up on its next shell start.</p>
   </section>
 
-  <section>
+  <section id="guardrails">
     <h2>Built-in guardrails</h2>
     <p>The repo practices its own defaults on itself:</p>
     <div class="cards">
@@ -448,7 +554,7 @@ updated  /Users/you/.codex/AGENTS.md <span class="c">(previous version saved to 
     </div>
   </section>
 
-  <section>
+  <section id="tools">
     <h2>Supported tools</h2>
     <div class="table-wrap">
     <table>
@@ -535,7 +641,7 @@ PASS  useAppearance > persists explicit dark</div>
         <div style="font-weight:600">Create a new fork</div>
         <div class="gh-note">A fork is a copy of a repository. Forking a repository allows you to freely experiment with changes without affecting the original project.</div>
         <div class="gh-row" style="margin-top:.75rem">
-          <span class="gh-note">Owner *</span><span class="gh-input">your-username ▾</span>
+          <span class="gh-note">Owner *</span><span class="gh-input"><span class="u">your-username</span> ▾</span>
           <span class="gh-note">Repository name *</span><span class="gh-input">dotfiles-ai</span>
         </div>
         <div class="gh-row"><span class="gh-note">☑ Copy the <code>main</code> branch only</span></div>
@@ -544,11 +650,11 @@ PASS  useAppearance > persists explicit dark</div>
     </div>
 
     <h3 class="steph"><span class="step">3.</span>Wait for the redirect to your copy</h3>
-    <p>GitHub lands you on <code>github.com/<span class="youfork">your-username</span>/dotfiles-ai</code>, marked <em>forked from mchelen/dotfiles-ai</em>. Everywhere below, <span class="youfork">your-username</span> means your GitHub account — this is now <em>your</em> repo, and you can edit any file in it, from the browser or from a clone.</p>
+    <p>GitHub lands you on <code>github.com/<span class="youfork u">your-username</span>/<span class="r">dotfiles-ai</span></code>, marked <em>forked from mchelen/dotfiles-ai</em>. Everywhere below, <span class="youfork u">your-username</span> means your GitHub account — this is now <em>your</em> repo, and you can edit any file in it, from the browser or from a clone.</p>
     <div class="browser">
-      <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">github.com/your-username/dotfiles-ai</span><span class="label">simulated</span></div>
+      <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">github.com/<span class="u">your-username</span>/<span class="r">dotfiles-ai</span></span><span class="label">simulated</span></div>
       <div class="browser-body">
-        <div class="gh-path">your-username / <strong>dotfiles-ai</strong></div>
+        <div class="gh-path"><span class="u">your-username</span> / <strong class="r">dotfiles-ai</strong></div>
         <div class="gh-note">forked from mchelen/dotfiles-ai</div>
         <div class="gh-row" style="margin-top:.7rem">
           <span class="gh-btn">&lt;&gt; Code</span><span class="gh-btn">Issues</span><span class="gh-btn">Pull requests</span><span class="gh-btn">Actions</span><span class="gh-btn">Settings</span>
@@ -557,24 +663,40 @@ PASS  useAppearance > persists explicit dark</div>
       </div>
     </div>
 
+    <div class="repo-box">
+      <label for="repo-input">Your fork's path</label>
+      <div class="hint">Enter it once and every command, URL, and screenshot below switches to your repo. Accepts <code>owner/repo</code>, just <code>owner</code>, or a full GitHub URL. Stored in this browser only.</div>
+      <input id="repo-input" type="text" spellcheck="false" autocapitalize="off" autocorrect="off"
+             placeholder="your-username/dotfiles-ai" aria-describedby="repo-state">
+      <div class="state" id="repo-state">Using the placeholder <b>your-username/dotfiles-ai</b> — fill this in to make the snippets copy-pasteable.</div>
+    </div>
+
     <p style="margin-top:1.75rem">Now pick your path. Each tab continues the numbering at step 4.</p>
 
+    <ul class="path-index">
+      <li><a href="#install-local"><strong>Local CLIs &amp; IDEs</strong><span>Claude Code, Codex, Copilot, Gemini, Qwen, OpenCode, Goose — one install covers all. Needs a terminal.</span></a></li>
+      <li><a href="#install-env"><strong>Claude web · every session</strong><span>One environment setup script; every repo you open, no per-project work.</span></a></li>
+      <li><a href="#install-web"><strong>Claude web · one project</strong><span>Commit the block into one repo's CLAUDE.md. Browser only, zero terminal steps.</span></a></li>
+      <li><a href="#install-codex"><strong>OpenAI Codex</strong><span>AGENTS.md — user-level for the CLI, in-repo for cloud and IDE.</span></a></li>
+      <li><a href="#install-ui"><strong>Cursor · Windsurf · Copilot web</strong><span>Paste into the tool's rules field. Browser only.</span></a></li>
+    </ul>
+
     <div class="tab-labels" role="tablist">
-      <button role="tab" id="tab-local" aria-controls="panel-local" aria-selected="true">Local CLIs &amp; IDEs</button>
-      <button role="tab" id="tab-env" aria-controls="panel-env" aria-selected="false">Claude web · every session</button>
-      <button role="tab" id="tab-web" aria-controls="panel-web" aria-selected="false">Claude web · one project</button>
-      <button role="tab" id="tab-codex" aria-controls="panel-codex" aria-selected="false">OpenAI Codex</button>
-      <button role="tab" id="tab-ui" aria-controls="panel-ui" aria-selected="false">Cursor · Windsurf · Copilot web</button>
+      <button role="tab" id="tab-local" data-slug="local" aria-controls="panel-local" aria-selected="true">Local CLIs &amp; IDEs</button>
+      <button role="tab" id="tab-env" data-slug="env" aria-controls="panel-env" aria-selected="false">Claude web · every session</button>
+      <button role="tab" id="tab-web" data-slug="web" aria-controls="panel-web" aria-selected="false">Claude web · one project</button>
+      <button role="tab" id="tab-codex" data-slug="codex" aria-controls="panel-codex" aria-selected="false">OpenAI Codex</button>
+      <button role="tab" id="tab-ui" data-slug="ui" aria-controls="panel-ui" aria-selected="false">Cursor · Windsurf · Copilot web</button>
     </div>
 
     <div class="tab-panel" id="panel-local" role="tabpanel" aria-labelledby="tab-local">
       <p>Covers Claude Code (CLI, desktop app, IDE extensions), Codex CLI, Copilot CLI, Gemini CLI, Qwen Code, OpenCode, and Goose — anything that reads a user-level instruction file. The installer writes to every tool it detects, so one run covers all of them. Needs a terminal.</p>
 
       <h3><span class="step">4.</span>Clone <em>your fork</em> to <code>~/dotfiles-ai</code></h3>
-      <p>Substitute your own account for <span class="youfork">your-username</span>. Clone your fork, <strong>not</strong> <code>mchelen/dotfiles-ai</code> — <code>sync.sh</code> pulls from whatever this clone's <code>origin</code> is, so cloning upstream means you can't push your own edits and every machine follows someone else's repo.</p>
+      <p>Substitute your own account for <span class="youfork u">your-username</span>. Clone your fork, <strong>not</strong> <code>mchelen/dotfiles-ai</code> — <code>sync.sh</code> pulls from whatever this clone's <code>origin</code> is, so cloning upstream means you can't push your own edits and every machine follows someone else's repo.</p>
       <div class="term">
         <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~ <span class="label">simulated output</span></div>
-        <pre><span class="p">$</span> git clone https://github.com/<span class="y">your-username</span>/dotfiles-ai ~/dotfiles-ai
+        <pre><span class="p">$</span> git clone https://github.com/<span class="y u">your-username</span>/<span class="r">dotfiles-ai</span> ~/dotfiles-ai
 Cloning into '/Users/you/dotfiles-ai'...
 remote: Enumerating objects: 214, done.
 Receiving objects: 100% (214/214), 82.11 KiB | 6.84 MiB/s, done.</pre>
@@ -618,18 +740,49 @@ installed /Users/you/.copilot/copilot-instructions.md
       <p>Pick the <em>one project</em> tab instead when the defaults should apply to a specific repo for everyone who works on it, including collaborators and other cloud agents.</p>
 
       <h3><span class="step">4.</span>Open the environment selector</h3>
-      <p>At <code>claude.ai/code</code>, click the cloud icon showing the current environment's name.</p>
+      <p>Go to <code>claude.ai/code</code>. Near the prompt box, alongside the repository and branch pickers, is a <strong>cloud icon showing your current environment's name</strong> — often <code>default</code> if you've never changed it. Click it to open the selector.</p>
+      <p class="lead">That control is the only entry point: environments aren't under your account settings, they're attached to where you start a session.</p>
+      <div class="browser">
+        <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">claude.ai/code</span><span class="label">simulated</span></div>
+        <div class="browser-body">
+          <div class="gh-note">What would you like Claude to work on?</div>
+          <div class="field" style="margin-top:.4rem">Describe a task…</div>
+          <div class="gh-row" style="margin-top:.6rem">
+            <span class="gh-btn"><span class="u">your-username</span>/<span class="r">dotfiles-ai</span> ▾</span>
+            <span class="gh-btn">main ▾</span>
+            <span class="gh-btn gh-hl">☁ default ▾</span>
+            <span class="gh-note">← the environment selector</span>
+          </div>
+        </div>
+      </div>
 
       <h3 style="margin-top:1.5rem"><span class="step">5.</span>Open that environment's settings</h3>
-      <p>Hover the environment in the list and click the settings icon that appears on its right. (Setting up a new one instead? Choose <em>Add environment</em> — the dialog has the same fields.)</p>
+      <p>The selector lists your environments. <strong>Hover the row</strong> you want and a settings (gear) icon appears at its right-hand end — click that, not the name, which would merely switch to it. Setting up a fresh one instead? Choose <strong>Add environment</strong> at the bottom; the dialog has the same fields.</p>
+      <div class="browser">
+        <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">claude.ai/code</span><span class="label">simulated</span></div>
+        <div class="browser-body">
+          <div class="gh-note" style="margin-bottom:.4rem">Environment</div>
+          <div class="gh-row" style="border:1px solid var(--border);border-radius:8px;padding:.4rem .55rem">
+            <span>☁ default</span>
+            <span class="gh-note">Trusted network</span>
+            <span class="gh-btn icon gh-hl" style="margin-left:auto" title="Settings">⚙</span>
+          </div>
+          <div class="gh-row" style="padding:.4rem .55rem">
+            <span>☁ scratch</span>
+            <span class="gh-note" style="margin-left:auto">hover a row for its ⚙</span>
+          </div>
+          <div class="gh-row" style="margin-top:.5rem"><span class="gh-btn">+ Add environment</span></div>
+        </div>
+      </div>
+      <p class="lead">Claude Code's own docs describe this path as: select the cloud icon showing the current environment's name to open the selector, hover an environment, and click the settings icon that appears on the right.</p>
 
       <h3 style="margin-top:1.5rem"><span class="step">6.</span>Paste this into the <em>Setup script</em> field</h3>
-      <p>Substitute your account for <span class="youfork">your-username</span>. The <code>mkdir</code> line matters: <code>install.sh</code> only writes a tool's file when that tool's config directory exists, and in a fresh container it doesn't yet.</p>
+      <p>Substitute your account for <span class="youfork u">your-username</span>. The <code>mkdir</code> line matters: <code>install.sh</code> only writes a tool's file when that tool's config directory exists, and in a fresh container it doesn't yet.</p>
       <div class="term">
         <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> environment → Setup script <span class="label">paste, don't run</span></div>
         <pre>#!/bin/bash
 <span class="c"># dotfiles-ai: user-level defaults for every session in this environment</span>
-git clone --depth 1 https://github.com/<span class="y">your-username</span>/dotfiles-ai /opt/dotfiles-ai || true
+git clone --depth 1 https://github.com/<span class="y u">your-username</span>/<span class="r">dotfiles-ai</span> /opt/dotfiles-ai || true
 mkdir -p "$HOME/.claude"
 /opt/dotfiles-ai/install.sh || true</pre>
       </div>
@@ -644,7 +797,7 @@ mkdir -p "$HOME/.claude"
           </div>
           <div class="gh-note" style="margin-top:.7rem">Setup script</div>
           <div class="field gh-hl">#!/bin/bash
-git clone --depth 1 https://github.com/<strong>your-username</strong>/dotfiles-ai /opt/dotfiles-ai || true
+git clone --depth 1 https://github.com/<strong class="u">your-username</strong>/<span class="r">dotfiles-ai</span> /opt/dotfiles-ai || true
 mkdir -p "$HOME/.claude"
 /opt/dotfiles-ai/install.sh || true</div>
           <div class="gh-row" style="margin-top:.8rem"><span class="gh-btn green">Save</span><span class="gh-btn">Cancel</span></div>
@@ -688,12 +841,12 @@ mkdir -p "$HOME/.claude"
       <p><strong>No terminal, no clone, nothing installed.</strong> Every step below happens in the browser. That works because your fork carries a generated file at its root, <code>INSTRUCTIONS.md</code> — every module in <code>defaults/</code>, already assembled into one marker-delimited block, ready to copy. A GitHub Actions workflow regenerates it on every change to <code>defaults/</code> on <code>main</code>, so it is current even when you edit modules from the web editor.</p>
 
       <h3><span class="step">4.</span>Open <code>INSTRUCTIONS.md</code> in your fork</h3>
-      <p>Go to <code>github.com/<span class="youfork">your-username</span>/dotfiles-ai</code> and click <strong>INSTRUCTIONS.md</strong> in the file list. Direct link, with your account substituted in: <code>github.com/<span class="youfork">your-username</span>/dotfiles-ai/blob/main/INSTRUCTIONS.md</code></p>
+      <p>Go to <code>github.com/<span class="youfork u">your-username</span>/<span class="r">dotfiles-ai</span></code> and click <strong>INSTRUCTIONS.md</strong> in the file list. Direct link, with your account substituted in: <code>github.com/<span class="youfork u">your-username</span>/<span class="r">dotfiles-ai</span>/blob/main/INSTRUCTIONS.md</code></p>
 
       <h3 style="margin-top:1.5rem"><span class="step">5.</span>Click <em>Copy raw file</em></h3>
       <p>It's the two-overlapping-squares icon in the toolbar above the file content, to the right — next to the download arrow and the pencil. One click puts the whole block on your clipboard.</p>
       <div class="browser">
-        <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">github.com/your-username/dotfiles-ai/blob/main/INSTRUCTIONS.md</span><span class="label">simulated</span></div>
+        <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">github.com/<span class="u">your-username</span>/<span class="r">dotfiles-ai</span>/blob/main/INSTRUCTIONS.md</span><span class="label">simulated</span></div>
         <div class="browser-body">
           <div class="gh-toolbar">
             <span class="gh-path">INSTRUCTIONS.md</span>
@@ -723,7 +876,7 @@ mkdir -p "$HOME/.claude"
       <h3 style="margin-top:1.5rem"><span class="step">9.</span>Paste at the end of the file</h3>
       <p>Click into the editor, press <kbd>⌘↓</kbd> / <kbd>Ctrl-End</kbd> to reach the bottom, add a blank line, then paste with <kbd>⌘V</kbd> / <kbd>Ctrl-V</kbd>. Keep the <code>BEGIN</code>/<code>END</code> comment lines — they're what lets you replace the block later without touching the rest of the file.</p>
       <div class="browser">
-        <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">github.com/your-username/your-project/edit/main/CLAUDE.md</span><span class="label">simulated</span></div>
+        <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">github.com/<span class="u">your-username</span>/your-project/edit/main/CLAUDE.md</span><span class="label">simulated</span></div>
         <div class="browser-body">
           <div class="gh-toolbar">
             <span class="gh-path">CLAUDE.md</span>
@@ -781,7 +934,7 @@ installed /Users/you/.codex/AGENTS.md
       </div>
 
       <h3 style="margin-top:1.5rem"><span class="step">4b.</span>Codex cloud &amp; IDE — open <code>INSTRUCTIONS.md</code> in your fork</h3>
-      <p>Same reasoning as Claude Code on the web: the container only has your repository, so the block has to be committed into it. And the same no-terminal route works — <code>github.com/<span class="youfork">your-username</span>/dotfiles-ai/blob/main/INSTRUCTIONS.md</code>.</p>
+      <p>Same reasoning as Claude Code on the web: the container only has your repository, so the block has to be committed into it. And the same no-terminal route works — <code>github.com/<span class="youfork u">your-username</span>/<span class="r">dotfiles-ai</span>/blob/main/INSTRUCTIONS.md</code>.</p>
 
       <h3 style="margin-top:1.5rem"><span class="step">5.</span>Click <em>Copy raw file</em></h3>
       <p>The two-overlapping-squares icon in the file toolbar, right-hand side.</p>
@@ -809,7 +962,7 @@ until you've looked.</div>
       <p>These tools take user-level rules through a settings field rather than a file on disk, so the defaults get pasted in once. No terminal needed here either. Re-paste after you change a module.</p>
 
       <h3><span class="step">4.</span>Open <code>INSTRUCTIONS.md</code> in your fork</h3>
-      <p><code>github.com/<span class="youfork">your-username</span>/dotfiles-ai/blob/main/INSTRUCTIONS.md</code></p>
+      <p><code>github.com/<span class="youfork u">your-username</span>/<span class="r">dotfiles-ai</span>/blob/main/INSTRUCTIONS.md</code></p>
 
       <h3 style="margin-top:1.5rem"><span class="step">5.</span>Click <em>Copy raw file</em></h3>
       <p>The two-overlapping-squares icon in the file toolbar, right-hand side. (From a local clone instead: <code>~/dotfiles-ai/install.sh --print | pbcopy</code>, or <code>| xclip -sel clip</code> on Linux.)</p>
@@ -850,11 +1003,11 @@ When I ask for a new feature or a significant change:
 
     <h3 class="cat">Your fork ← upstream <span>— pulling in changes from mchelen/dotfiles-ai</span></h3>
     <p>When this repo gains a module you want, GitHub can fast-forward your fork for you — no terminal, no remotes to configure.</p>
-    <p><span class="num">1.</span>Open <code>github.com/<span class="youfork">your-username</span>/dotfiles-ai</code> on the <em>Code</em> tab.</p>
+    <p><span class="num">1.</span>Open <code>github.com/<span class="youfork u">your-username</span>/<span class="r">dotfiles-ai</span></code> on the <em>Code</em> tab.</p>
     <p><span class="num">2.</span>Click <strong>Sync fork</strong> in the banner above the file list — it appears whenever upstream is ahead.</p>
     <p><span class="num">3.</span>Click <strong>Update branch</strong> in the dropdown.</p>
     <div class="browser">
-      <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">github.com/your-username/dotfiles-ai</span><span class="label">simulated</span></div>
+      <div class="browser-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">github.com/<span class="u">your-username</span>/<span class="r">dotfiles-ai</span></span><span class="label">simulated</span></div>
       <div class="browser-body">
         <div class="gh-row">
           <span class="gh-path">main ▾</span>
@@ -901,18 +1054,109 @@ updated  /Users/you/.codex/AGENTS.md <span class="c">(previous version saved to 
 
 <script>
   document.documentElement.classList.add('js');
+
+  /* ---- tabs, addressable by #install-<slug> so paths can be linked ---- */
   const tablist = document.querySelector('.tab-labels');
+  const tabs = tablist ? [...tablist.querySelectorAll('button[role=tab]')] : [];
+
+  function selectTab(tab, {updateHash = true} = {}) {
+    if (!tab) return;
+    for (const t of tabs) {
+      const selected = t === tab;
+      t.setAttribute('aria-selected', String(selected));
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !selected;
+    }
+    // replaceState, not location.hash: linkable without a second scroll jump
+    if (updateHash) history.replaceState(null, '', '#install-' + tab.dataset.slug);
+  }
+
+  const tabForSlug = slug => tabs.find(t => t.dataset.slug === slug);
+
   if (tablist) {
-    tablist.addEventListener('click', e => {
-      const tab = e.target.closest('button[role=tab]');
-      if (!tab) return;
-      for (const t of tablist.querySelectorAll('button[role=tab]')) {
-        const selected = t === tab;
-        t.setAttribute('aria-selected', String(selected));
-        document.getElementById(t.getAttribute('aria-controls')).hidden = !selected;
-      }
+    tablist.addEventListener('click', e => selectTab(e.target.closest('button[role=tab]')));
+  }
+
+  function applyHash() {
+    const m = /^#install-([a-z]+)$/.exec(location.hash);
+    if (!m) return false;
+    const tab = tabForSlug(m[1]);
+    if (!tab) return false;
+    selectTab(tab, {updateHash: false});
+    document.getElementById('install').scrollIntoView({behavior: 'smooth', block: 'start'});
+    return true;
+  }
+  addEventListener('hashchange', applyHash);
+
+  /* ---- fork path: type it once, every snippet and URL follows ---- */
+  const STORE = 'dotfiles-ai:fork';
+  const DEFAULT = {owner: 'your-username', repo: 'dotfiles-ai'};
+  const UPSTREAM = {owner: 'mchelen', repo: 'dotfiles-ai'};
+  const input = document.getElementById('repo-input');
+  const state = document.getElementById('repo-state');
+
+  function parseFork(raw) {
+    const v = String(raw || '')
+      .trim()
+      .replace(/^https?:\/\/(www\.)?github\.com\//i, '')
+      .replace(/\.git$/i, '')
+      .replace(/^\/+|\/+$/g, '');
+    if (!v) return null;
+    const [owner, repo] = v.split('/');
+    if (!/^[\w.-]+$/.test(owner || '')) return null;
+    if (repo && !/^[\w.-]+$/.test(repo)) return null;
+    return {owner, repo: repo || DEFAULT.repo};
+  }
+
+  function applyFork(fork, {isDefault = false} = {}) {
+    for (const el of document.querySelectorAll('.u')) el.textContent = fork.owner;
+    for (const el of document.querySelectorAll('.r')) el.textContent = fork.repo;
+    // the quick-start snippet points upstream until you name your own fork,
+    // and reverts to upstream if you clear the field again
+    const quick = isDefault ? UPSTREAM : fork;
+    for (const el of document.querySelectorAll('.qu')) el.textContent = quick.owner;
+    for (const el of document.querySelectorAll('.qr')) el.textContent = quick.repo;
+    if (!state) return;
+    state.innerHTML = isDefault
+      ? 'Using the placeholder <b>your-username/dotfiles-ai</b> — fill this in to make the snippets copy-pasteable.'
+      : 'Snippets now use <b>' + fork.owner + '/' + fork.repo + '</b>.';
+  }
+
+  if (input) {
+    let saved = null;
+    try { saved = parseFork(localStorage.getItem(STORE)); } catch (_) {}
+    if (saved) { input.value = saved.owner + '/' + saved.repo; applyFork(saved); }
+    input.addEventListener('input', () => {
+      const fork = parseFork(input.value);
+      applyFork(fork || DEFAULT, {isDefault: !fork});
+      try {
+        if (fork) localStorage.setItem(STORE, fork.owner + '/' + fork.repo);
+        else localStorage.removeItem(STORE);
+      } catch (_) {}
     });
   }
+
+  /* ---- copy buttons ---- */
+  document.addEventListener('click', async e => {
+    const btn = e.target.closest('.copy');
+    if (!btn) return;
+    const src = document.getElementById(btn.dataset.copy);
+    if (!src) return;
+    try {
+      await navigator.clipboard.writeText(src.innerText);
+      const was = btn.textContent;
+      btn.textContent = 'Copied';
+      setTimeout(() => { btn.textContent = was; }, 1600);
+    } catch (_) {
+      btn.textContent = 'Press ⌘C';
+      const range = document.createRange();
+      range.selectNodeContents(src);
+      const sel = getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  });
+
+  applyHash();
 </script>
 
 <footer>
