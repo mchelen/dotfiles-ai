@@ -124,25 +124,40 @@
     .ba-label.after { color: #7ec87e; }
   }
   .ba-note { color: var(--muted); font-size: .8rem; font-style: italic; }
+  .ba-scenario {
+    font-size: .9rem; color: var(--fg); background: var(--bg);
+    border-left: 3px solid var(--border); border-radius: 0 6px 6px 0;
+    padding: .45rem .7rem; margin: 0 0 .7rem;
+  }
+  .ba-scenario::before {
+    content: "Scenario"; display: block; font-size: .64rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .07em; color: var(--muted);
+    margin-bottom: .15rem;
+  }
+  .ba-impact {
+    display: block; margin-top: .5rem; padding-top: .45rem;
+    border-top: 1px dashed var(--border); font-size: .82rem; color: var(--muted);
+  }
   .mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .8rem; }
-  /* tabs (progressive enhancement: without JS every panel just stacks) */
-  .tab-labels { display: flex; flex-wrap: wrap; gap: .35rem; border-bottom: 1px solid var(--border); margin: 1.5rem 0 0; }
+  /* install path chooser — one control, doubling as the tab list.
+     (progressive enhancement: without JS every panel just stacks) */
+  .tab-labels {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(228px, 1fr));
+    gap: .6rem; margin: 1rem 0 0; padding: 0;
+  }
   .tab-labels button {
-    font: inherit; font-size: .92rem; font-weight: 600; cursor: pointer;
-    padding: .5rem .9rem; color: var(--muted); background: none;
-    border: 1px solid transparent; border-bottom: none;
-    border-radius: 8px 8px 0 0; margin-bottom: -1px;
+    font: inherit; text-align: left; cursor: pointer; display: block;
+    padding: .6rem .75rem; border: 1px solid var(--border); border-radius: 10px;
+    background: var(--card); color: var(--fg);
   }
-  .tab-labels button:hover { color: var(--fg); }
-  .tab-labels button[aria-selected="true"] {
-    color: var(--accent); background: var(--card);
-    border-color: var(--border); border-bottom-color: var(--card);
-  }
-  .tab-panel { padding-top: 1.25rem; }
+  .tab-labels button strong { display: block; font-size: .93rem; }
+  .tab-labels button span { display: block; font-size: .8rem; color: var(--muted); margin-top: .15rem; }
+  .tab-labels button:hover { border-color: var(--muted); }
+  .tab-labels button[aria-selected="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .tab-labels button[aria-selected="true"] strong { color: var(--accent); }
+  .tab-panel { padding-top: 1.5rem; }
   .tab-panel h3 { font-size: 1.05rem; margin: 0 0 .3rem; }
   .tab-panel h3 .step { color: var(--accent); font-variant-numeric: tabular-nums; margin-right: .4rem; }
-  h3.steph { font-size: 1.05rem; margin: 1.5rem 0 .3rem; }
-  h3.steph .step { color: var(--accent); font-variant-numeric: tabular-nums; margin-right: .4rem; }
   .tab-panel > p:first-child { margin-top: 0; }
   .js .tab-panel[hidden] { display: none; }
   /* mock browser window */
@@ -262,15 +277,6 @@
   .repo-box .state { font-size: .82rem; color: var(--muted); margin-top: .4rem; min-height: 1.2em; }
   .repo-box .state b { color: var(--accent); font-family: ui-monospace, Menlo, Consolas, monospace; }
   /* install path index */
-  .path-index { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: .5rem;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
-  .path-index a {
-    display: block; text-decoration: none; color: inherit; border: 1px solid var(--border);
-    border-radius: 8px; padding: .55rem .75rem; background: var(--card);
-  }
-  .path-index a:hover { border-color: var(--accent); }
-  .path-index strong { display: block; font-size: .93rem; }
-  .path-index span { font-size: .8rem; color: var(--muted); }
   kbd {
     font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .8em;
     border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 4px;
@@ -337,9 +343,6 @@
   <p class="tagline">Dotfiles, but for AI coding assistants — your personal working preferences, carried across every project and every tool.</p>
   <div class="buttons">
     <a class="btn primary" href="#quick">Quick start</a>
-    <a class="btn" href="#modules">Modules</a>
-    <a class="btn" href="#install">Install</a>
-    <a class="btn" href="#demo">See it in action</a>
     <a class="btn" href="https://github.com/mchelen/dotfiles-ai">View on GitHub</a>
   </div>
 </header>
@@ -348,11 +351,12 @@
   <ul>
     <li><a href="#quick">Quick start</a></li>
     <li><a href="#what">What it is</a></li>
+    <li><a href="#demo">Before &amp; after</a></li>
+    <li><a href="#tools">Supported tools</a></li>
     <li><a href="#modules">Modules</a></li>
-    <li><a href="#how">How it works</a></li>
-    <li><a href="#demo">Before / after</a></li>
     <li><a href="#install">Install</a></li>
     <li><a href="#sync">Staying in sync</a></li>
+    <li><a href="#how">How it works</a></li>
   </ul>
 </nav>
 
@@ -387,193 +391,12 @@ fork — the copy you just read is disposable.</pre>
 
     <p class="lead">This is the zero-commitment version — it lasts one session and uses <em>this</em> repo's opinions. When you want them on every machine and every project, and edited to your taste, start at <a href="#install">Install</a>, which begins by forking.</p>
   </section>
-
   <section id="what">
     <h2>What it is</h2>
     <p>You have opinions about how an AI assistant should work with you: <em>show me a mockup before you build the feature. Write the test first. Don't commit unless I ask.</em> Today you re-explain those preferences in every session, or duplicate them into every project's instruction file.</p>
     <p><strong>dotfiles-ai</strong> keeps them in one place instead. Each preference is a small markdown module; an installer assembles the modules into the user-level instruction file of every AI tool on your machine — Claude Code, Codex, Copilot CLI, Gemini CLI, and friends — and a sync script keeps every machine current automatically.</p>
     <p class="lead">Personal preferences live here, at the user level. Project conventions stay in each repo's own <code>CLAUDE.md</code> / <code>AGENTS.md</code> — this is the layer underneath.</p>
   </section>
-
-  <section id="modules">
-    <h2>The modules</h2>
-    <p>Twelve modules, grouped here by the kind of behavior they govern. Each one is a short markdown file in <code>defaults/</code> — read them, delete the ones you disagree with, add your own.</p>
-
-    <h3 class="cat">Collaboration <span>— how the assistant works with you</span></h3>
-
-    <div class="module">
-      <h4>communication</h4>
-      <p>Lead with the answer, not the preamble. Say so when a request looks like a bad idea, before doing it. Disclose what was skipped, what's still failing, and what was left half-done — never present partial work as finished.</p>
-      <div class="ba">
-        <div class="ba-col"><span class="ba-label before">Without</span>"I've completed the refactor and everything is working!"<br><span class="ba-note">(two tests were failing; you find out tomorrow)</span></div>
-        <div class="ba-col"><span class="ba-label after">With</span>"Refactor is in. One caveat: <code>checkout.spec.ts</code> has two failures I didn't introduce and didn't fix — want me to take them next?"</div>
-      </div>
-    </div>
-
-    <div class="module">
-      <h4>feature-workflow</h4>
-      <p>The flagship. For anything bigger than an obvious fix, the assistant owes you something to react to first — a mockup, a throwaway demo, two or three options with trade-offs, or a short written direction. Implementation waits for your nod. Small, unambiguous changes skip the ceremony.</p>
-      <div class="ba">
-        <div class="ba-col"><span class="ba-label before">Without</span>400 lines land in the wrong architecture, and you review a finished thing you'd have designed differently.</div>
-        <div class="ba-col"><span class="ba-label after">With</span>"Two approaches — client-side CSV, or a streaming endpoint. I'd pick the endpoint because reports exceed the page size. Sketch below. Which?"</div>
-      </div>
-    </div>
-
-    <div class="module">
-      <h4>tool-fallbacks</h4>
-      <p>Tooling fails sometimes. When an interactive prompt looks stuck — the same card reappearing, or you saying you answered something that never arrived — the assistant drops to plain text rather than retrying the thing that just broke. A reported refusal is treated as possibly-lost input, not a decision, because retrying through a broken mechanism is exactly what turns one lost answer into a loop. Written after <a href="https://github.com/anthropics/claude-code/issues/81223">this bug</a>: a dismissed question card silently discards typed text.</p>
-      <div class="ba">
-        <div class="ba-col"><span class="ba-label before">Without</span>The card is re-issued after every failure. You answer the same question four times and nothing moves forward.</div>
-        <div class="ba-col"><span class="ba-label after">With</span>"That came back as a decline, but you said you answered — the card is probably eating input. Switching to plain text: &lt;question&gt;"</div>
-      </div>
-    </div>
-
-    <div class="module">
-      <h4>compute-offload</h4>
-      <p>Mechanical work goes to a command, not into the context window: query with <code>grep</code>, <code>jq</code>, and <code>diff</code> instead of reading a large file to find a small part of it; make verification scripts print a verdict rather than a transcript; put a check that must hold every time into CI. With guardrails, because the cheap path isn't always the right one — judgment doesn't offload, a fragile parser written to avoid a short read is a bad trade, and a filtered or partial check is always disclosed as one.</p>
-      <div class="ba">
-        <div class="ba-col"><span class="ba-label before">Without</span>A 345 KB API response is pulled into context to learn which three CI jobs ran. The answer arrives, and the room for the actual task doesn't.</div>
-        <div class="ba-col"><span class="ba-label after">With</span><span class="mono">jq -r '.runs[] | "\(.name) \(.conclusion)"'</span><br><span class="ba-note">eight lines, same answer, re-runnable next time</span></div>
-      </div>
-    </div>
-
-    <h3 class="cat">Craft <span>— how code gets written</span></h3>
-
-    <div class="module">
-      <h4>code-style</h4>
-      <p>The surrounding code wins over any general convention. Smallest change that solves the problem; no opportunistic refactors riding along in an unrelated diff. Comments explain non-obvious constraints, not what the line already says. New dependencies need a reason stated out loud.</p>
-      <div class="ba">
-        <div class="ba-col"><span class="ba-label before">Without</span>Adds <code>date-fns</code> for one format call, reformats the whole file, and the real change is buried in a 300-line diff.</div>
-        <div class="ba-col"><span class="ba-label after">With</span>A six-line helper matching the file's existing style. Diff is six lines. No new dependency.</div>
-      </div>
-    </div>
-
-    <div class="module">
-      <h4>testing</h4>
-      <p>Start from a failing test that captures the expected behavior, then write the code that makes it pass — and show both runs, so you can see the test actually exercises the change. Bug fixes begin with a reproduction. Tests target behavior, not internals.</p>
-      <div class="ba">
-        <div class="ba-col"><span class="ba-label before">Without</span>"Fixed — should work now." No test proves it did, and nothing stops the bug returning next month.</div>
-        <div class="ba-col"><span class="ba-label after">With</span><span class="mono">FAIL  parses timezone-less dates</span><br><span class="mono">PASS  parses timezone-less dates</span><br><span class="ba-note">the bug now has a permanent guard</span></div>
-      </div>
-    </div>
-
-    <h3 class="cat">Delivery <span>— how work ships</span></h3>
-
-    <div class="module">
-      <h4>git</h4>
-      <p>Nothing is committed or pushed unless you asked. Commits stay small and focused rather than bundling unrelated work. Once a branch is done it goes to a pull request automatically, gets watched, and merges itself when checks are green and reviews are in — but never over a failing check. History is never rewritten without asking.</p>
-      <div class="ba">
-        <div class="ba-col"><span class="ba-label before">Without</span>One commit titled "updates" touching 14 files, pushed straight to <code>main</code>, impossible to revert cleanly.</div>
-        <div class="ba-col"><span class="ba-label after">With</span>Branch → focused commits → PR opened → CI watched → squash-merged on green. You read a diff, not a mystery.</div>
-      </div>
-    </div>
-
-    <div class="module">
-      <h4>secrets</h4>
-      <p>Three independent layers, because any one of them can be bypassed: the pre-commit framework running gitleaks locally, the same scan again in CI, and GitHub's server-side push protection. Checks are never quietly disabled — a false positive gets an inline allow-marker instead. Anything that reaches history is treated as compromised and rotated, not just deleted.</p>
-      <div class="ba">
-        <div class="ba-col"><span class="ba-label before">Without</span><code>.env</code> slips into a commit and is discovered a week later — by which point the key has been public in the history the whole time.</div>
-        <div class="ba-col"><span class="ba-label after">With</span><span class="mono">Detect hardcoded secrets……Failed</span><br><span class="ba-note">commit blocked before the key ever exists in history</span></div>
-      </div>
-    </div>
-
-    <div class="module">
-      <h4>repo-config</h4>
-      <p>Repository settings — merge policy, Pages, security toggles, branch protection — live in Terraform under <code>infra/</code> and get applied from CI, rather than being clicked through the web UI where they drift silently and nobody can review the change.</p>
-      <div class="ba">
-        <div class="ba-col"><span class="ba-label before">Without</span>"Go to Settings → Advanced Security and turn on push protection." Undocumented, unreviewable, and gone if the repo is recreated.</div>
-        <div class="ba-col"><span class="ba-label after">With</span>A three-line change in <code>infra/main.tf</code>, reviewed in a PR, applied by CI on merge.</div>
-      </div>
-    </div>
-
-    <h3 class="cat">Documentation <span>— what gets written down</span></h3>
-
-    <div class="module">
-      <h4>architecture</h4>
-      <p>Every project keeps an <code>ARCHITECTURE.md</code> at the root: major components, how they fit together, key data flows, with Mermaid diagrams. It's updated in the same change that rewires a component — never as a later cleanup pass. Deliberately high level, so small edits don't invalidate it.</p>
-      <div class="ba">
-        <div class="ba-col"><span class="ba-label before">Without</span>The diagram still shows a service that was deleted three months ago, so nobody trusts the doc and it decays further.</div>
-        <div class="ba-col"><span class="ba-label after">With</span>The PR that adds the queue also updates the diagram. The doc is accurate because it's never separately "due".</div>
-      </div>
-    </div>
-
-    <div class="module">
-      <h4>specification</h4>
-      <p>Intended behavior gets written down in the repo, in a standard format — currently <a href="https://github.com/github/spec-kit">Spec Kit</a>: a <code>spec.md</code> per feature under <code>specs/</code>, with <code>plan.md</code> and <code>tasks.md</code> derived from it. The spec says <em>what</em> and <em>why</em>; the plan says <em>how</em>. When intended behavior changes the spec is revised in the same change as the code, and code that contradicts the spec gets raised as a question rather than silently resolved in either direction.</p>
-      <div class="ba">
-        <div class="ba-col"><span class="ba-label before">Without</span>"What is this supposed to do?" is answered by reading the implementation — so whatever the code does becomes the definition of correct, bugs included.</div>
-        <div class="ba-col"><span class="ba-label after">With</span>"<code>spec.md</code> says expired invites are rejected; the handler renews them. Which is right?" — a contradiction surfaces as a decision instead of a silent drift.</div>
-      </div>
-    </div>
-
-    <div class="module">
-      <h4>project-website</h4>
-      <p>Most projects get a static site explaining what it is, why it exists, and how to use it — including install steps for every environment where they differ, and a before/after demo of what the project actually changes. Where real screenshots aren't practical, simulate them and label them as simulated. <em>This page is that module applied to itself.</em></p>
-      <div class="ba">
-        <div class="ba-col"><span class="ba-label before">Without</span>A README that assumes you already know what the project does, and install steps that only cover the author's own setup.</div>
-        <div class="ba-col"><span class="ba-label after">With</span>The page you're reading: what/why, per-environment install tabs, and a side-by-side demo.</div>
-      </div>
-    </div>
-  </section>
-
-  <section id="how">
-    <h2>How it works</h2>
-    <p><span class="num">1.</span><strong>Fork, then install once.</strong> You start by forking, because the modules are meant to be edited and every copy should follow a repo you control. Then <code>install.sh</code> concatenates the modules into a marker-delimited block and inserts it into each detected tool's user-level instruction file. Your own content in those files is never touched, and re-runs replace the block in place.</p>
-    <div class="term">
-      <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~/dotfiles-ai <span class="label">simulated output</span></div>
-      <pre><span class="p">$</span> ./install.sh
-installed /Users/you/.claude/CLAUDE.md
-installed /Users/you/.codex/AGENTS.md
-installed /Users/you/.copilot/copilot-instructions.md
-<span class="y">skipped</span>  /Users/you/.qwen/QWEN.md <span class="c">(no ~/.qwen — tool not detected; use --all to force)</span>
-
-Done. For tools that only take rules through their settings UI
-(e.g. Cursor "User Rules"), paste the output of:  ./install.sh --print</pre>
-    </div>
-
-    <p style="margin-top:2rem"><span class="num">2.</span><strong>Stay in sync automatically.</strong> One line in your shell rc runs <code>sync.sh --auto</code>: at most once a day it pulls the latest <code>main</code> and re-installs — silent unless something actually changed. A versioned <code>post-merge</code> hook covers manual pulls too.</p>
-    <div class="term">
-      <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> new terminal, next morning <span class="label">simulated output</span></div>
-      <pre><span class="c"># ~/.zshrc: [ -x "$HOME/dotfiles-ai/sync.sh" ] && "$HOME/dotfiles-ai/sync.sh" --auto</span>
-dotfiles-ai: updated d78d121 -> cae0439
-updated  /Users/you/.claude/CLAUDE.md <span class="c">(previous version saved to ….bak)</span>
-updated  /Users/you/.codex/AGENTS.md <span class="c">(previous version saved to ….bak)</span>
-<span class="p">$</span> <span class="c">▍</span></pre>
-    </div>
-
-    <p style="margin-top:2rem"><span class="num">3.</span><strong>Evolve by pull request.</strong> Notice a new preference mid-session? Add a module on any machine, merge it, and every other machine picks it up on its next shell start.</p>
-  </section>
-
-  <section id="guardrails">
-    <h2>Built-in guardrails</h2>
-    <p>The repo practices its own defaults on itself:</p>
-    <div class="cards">
-      <div class="card"><h3>Leak protection, three layers</h3><p>The standard pre-commit framework runs the official gitleaks hook (plus private-key and AWS-credential detectors) on every commit, with PII rules for SSN and card numbers extending gitleaks' defaults. The same scan runs again in GitHub Actions on every push and PR, and GitHub's server-side secret scanning with push protection backstops both.</p></div>
-      <div class="card"><h3>Repo settings as code</h3><p>Description, merge policy, Pages, and security toggles are declared in Terraform (official GitHub provider) — never clicked through the web UI. A CI workflow re-applies the config whenever it changes on main, using a stateless import pattern with no backend to manage.</p></div>
-      <div class="card"><h3>Docs that keep up</h3><p>An ARCHITECTURE.md with Mermaid diagrams, this site, and the README all update in the same pull request as the change that affects them — per the architecture and project-website modules.</p></div>
-    </div>
-  </section>
-
-  <section id="tools">
-    <h2>Supported tools</h2>
-    <div class="table-wrap">
-    <table>
-      <tr><th>Tool</th><th>Surface</th><th>Delivery</th></tr>
-      <tr><td>Claude Code</td><td>CLI · desktop · IDE</td><td class="ok">automatic</td></tr>
-      <tr><td>OpenAI Codex</td><td>CLI</td><td class="ok">automatic</td></tr>
-      <tr><td>GitHub Copilot</td><td>CLI</td><td class="ok">automatic</td></tr>
-      <tr><td>Gemini CLI</td><td>CLI</td><td class="ok">automatic</td></tr>
-      <tr><td>Qwen Code</td><td>CLI</td><td class="ok">automatic</td></tr>
-      <tr><td>OpenCode</td><td>CLI/TUI</td><td class="ok">automatic</td></tr>
-      <tr><td>Goose</td><td>CLI</td><td class="ok">automatic</td></tr>
-      <tr><td>Cursor · Windsurf · Copilot web</td><td>IDE / web</td><td>paste <code>INSTRUCTIONS.md</code> into settings</td></tr>
-      <tr><td>Claude Code on the web</td><td>cloud agent</td><td>environment setup script (every repo) <em>or</em> <code>INSTRUCTIONS.md</code> in the repo</td></tr>
-      <tr><td>Codex cloud · Copilot agent</td><td>cloud agents</td><td>copy <code>INSTRUCTIONS.md</code> into the repo's instruction file</td></tr>
-    </table>
-    </div>
-    <p class="lead">Any tool that reads a user-level markdown file can be added with one line in the installer's target list.</p>
-  </section>
-
   <section id="demo">
     <h2>Before and after</h2>
     <p>Same repo, same request, same model — the only difference is whether the defaults are installed. This is what the <code>feature-workflow</code>, <code>testing</code>, and <code>git</code> modules change in practice:</p>
@@ -616,7 +439,157 @@ PASS  useAppearance > persists explicit dark</div>
     </div>
     <p class="lead" style="margin-top:1rem">Simulated conversation, but the behaviors are exactly what the installed modules ask for: propose before building, test first, no unrequested refactors, no commits without asking.</p>
   </section>
+  <section id="tools">
+    <h2>Supported tools</h2>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Tool</th><th>Surface</th><th>Delivery</th></tr>
+      <tr><td>Claude Code</td><td>CLI · desktop · IDE</td><td class="ok">automatic</td></tr>
+      <tr><td>OpenAI Codex</td><td>CLI</td><td class="ok">automatic</td></tr>
+      <tr><td>GitHub Copilot</td><td>CLI</td><td class="ok">automatic</td></tr>
+      <tr><td>Gemini CLI</td><td>CLI</td><td class="ok">automatic</td></tr>
+      <tr><td>Qwen Code</td><td>CLI</td><td class="ok">automatic</td></tr>
+      <tr><td>OpenCode</td><td>CLI/TUI</td><td class="ok">automatic</td></tr>
+      <tr><td>Goose</td><td>CLI</td><td class="ok">automatic</td></tr>
+      <tr><td>Cursor · Windsurf · Copilot web</td><td>IDE / web</td><td>paste <code>INSTRUCTIONS.md</code> into settings</td></tr>
+      <tr><td>Claude Code on the web</td><td>cloud agent</td><td>environment setup script (every repo) <em>or</em> <code>INSTRUCTIONS.md</code> in the repo</td></tr>
+      <tr><td>Codex cloud · Copilot agent</td><td>cloud agents</td><td>copy <code>INSTRUCTIONS.md</code> into the repo's instruction file</td></tr>
+    </table>
+    </div>
+    <p class="lead">Any tool that reads a user-level markdown file can be added with one line in the installer's target list.</p>
+  </section>
+  <section id="modules">
+    <h2>The modules</h2>
+    <p>Twelve modules, grouped here by the kind of behavior they govern. Each one is a short markdown file in <code>defaults/</code> — read them, delete the ones you disagree with, add your own.</p>
 
+    <h3 class="cat">Collaboration <span>— how the assistant works with you</span></h3>
+
+    <div class="module">
+      <h4>communication</h4>
+      <p>Lead with the answer, not the preamble. Say so when a request looks like a bad idea, before doing it. Disclose what was skipped, what's still failing, and what was left half-done — never present partial work as finished.</p>
+      <p class="ba-scenario">You ask for a refactor. Two tests in that area were already failing before you started.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Before</span>"I've completed the refactor and everything is working."<span class="ba-impact">You find out at tomorrow's demo, and pay a context switch back into code you'd filed away.</span></div>
+        <div class="ba-col"><span class="ba-label after">After</span>"Refactor is in. One caveat: <code>checkout.spec.ts</code> has two failures I didn't introduce and didn't fix — want me to take them next?"<span class="ba-impact">Both failures surface at hand-off, while the code is still fresh.</span></div>
+      </div>
+    </div>
+
+    <div class="module">
+      <h4>feature-workflow</h4>
+      <p>The flagship. For anything bigger than an obvious fix, the assistant owes you something to react to first — a mockup, a throwaway demo, two or three options with trade-offs, or a short written direction. Implementation waits for your nod. Small, unambiguous changes skip the ceremony.</p>
+      <p class="ba-scenario">&ldquo;Add a bulk export button to the reports page.&rdquo;</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Before</span>Implementation starts immediately. 400 lines land using a second theme system, when one already exists.<span class="ba-impact">400 lines written, reviewed, discarded, rewritten.</span></div>
+        <div class="ba-col"><span class="ba-label after">After</span>"Two approaches — client-side CSV, or a streaming endpoint. I'd pick the endpoint since reports exceed the page size. Sketch below. Which?"<span class="ba-impact">One message before any code. The 400 lines get written once.</span></div>
+      </div>
+    </div>
+
+    <div class="module">
+      <h4>tool-fallbacks</h4>
+      <p>Tooling fails sometimes. When an interactive prompt looks stuck — the same card reappearing, or you saying you answered something that never arrived — the assistant drops to plain text rather than retrying the thing that just broke. A reported refusal is treated as possibly-lost input, not a decision, because retrying through a broken mechanism is exactly what turns one lost answer into a loop. Written after <a href="https://github.com/anthropics/claude-code/issues/81223">this bug</a>: a dismissed question card silently discards typed text.</p>
+      <p class="ba-scenario">A permission card keeps reappearing. You've answered it three times; the answer never arrives.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Before</span>The card is re-issued after each failure, through the mechanism that is losing the input.<span class="ba-impact">Four round trips, no progress, and your typed answers are gone.</span></div>
+        <div class="ba-col"><span class="ba-label after">After</span>"That came back as a decline, but you said you answered — the card is probably eating input. Switching to plain text: &lt;question&gt;"<span class="ba-impact">One round trip, in a channel that works.</span></div>
+      </div>
+    </div>
+
+    <div class="module">
+      <h4>compute-offload</h4>
+      <p>Mechanical work goes to a command, not into the context window: query with <code>grep</code>, <code>jq</code>, and <code>diff</code> instead of reading a large file to find a small part of it; make verification scripts print a verdict rather than a transcript; put a check that must hold every time into CI. With guardrails, because the cheap path isn't always the right one — judgment doesn't offload, a fragile parser written to avoid a short read is a bad trade, and a filtered or partial check is always disclosed as one.</p>
+      <p class="ba-scenario">You ask which CI checks ran on a commit.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Before</span>The whole API response is pulled into context and read: <span class='mono'>345 KB</span> of JSON to find three job names.<span class="ba-impact">A large share of the context window spent — room the actual task no longer has.</span></div>
+        <div class="ba-col"><span class="ba-label after">After</span><span class='mono'>jq -r '.runs[] | "\(.name) \(.conclusion)"'</span><span class="ba-impact">Eight lines. Same answer, and the command is re-runnable next time.</span></div>
+      </div>
+    </div>
+
+    <h3 class="cat">Craft <span>— how code gets written</span></h3>
+
+    <div class="module">
+      <h4>code-style</h4>
+      <p>The surrounding code wins over any general convention. Smallest change that solves the problem; no opportunistic refactors riding along in an unrelated diff. Comments explain non-obvious constraints, not what the line already says. New dependencies need a reason stated out loud.</p>
+      <p class="ba-scenario">One date needs formatting in a 40-line file.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Before</span>Adds <code>date-fns</code> for the single call and reformats the whole file on the way past.<span class="ba-impact">A 300-line diff to review, and a new dependency to carry forever.</span></div>
+        <div class="ba-col"><span class="ba-label after">After</span>A six-line helper written in the style of the file around it.<span class="ba-impact">A six-line diff. No new dependency.</span></div>
+      </div>
+    </div>
+
+    <div class="module">
+      <h4>testing</h4>
+      <p>Start from a failing test that captures the expected behavior, then write the code that makes it pass — and show both runs, so you can see the test actually exercises the change. Bug fixes begin with a reproduction. Tests target behavior, not internals.</p>
+      <p class="ba-scenario">Dates without a timezone parse to the wrong day.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Before</span>"Fixed — should work now." The fix may well be right; nothing demonstrates it.<span class="ba-impact">No proof it worked, and nothing stops the bug returning next month.</span></div>
+        <div class="ba-col"><span class="ba-label after">After</span><span class='mono'>FAIL&nbsp; parses timezone-less dates</span><br><span class='mono'>PASS&nbsp; parses timezone-less dates</span><span class="ba-impact">The same test fails, then passes — and stays as a permanent guard.</span></div>
+      </div>
+    </div>
+
+    <h3 class="cat">Delivery <span>— how work ships</span></h3>
+
+    <div class="module">
+      <h4>git</h4>
+      <p>Nothing is committed or pushed unless you asked. Commits stay small and focused rather than bundling unrelated work. Once a branch is done it goes to a pull request automatically, gets watched, and merges itself when checks are green and reviews are in — but never over a failing check. History is never rewritten without asking.</p>
+      <p class="ba-scenario">A day's work touching 14 files.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Before</span>One commit titled "updates", pushed straight to <code>main</code>.<span class="ba-impact">Reverting means unpicking 14 files by hand, and review means reading all of it at once.</span></div>
+        <div class="ba-col"><span class="ba-label after">After</span>Branch → atomic commits → pull request → merged once checks pass.<span class="ba-impact">Any single change reverts on its own; review happens commit by commit.</span></div>
+      </div>
+    </div>
+
+    <div class="module">
+      <h4>secrets</h4>
+      <p>Three independent layers, because any one of them can be bypassed: the pre-commit framework running gitleaks locally, the same scan again in CI, and GitHub's server-side push protection. Checks are never quietly disabled — a false positive gets an inline allow-marker instead. Anything that reaches history is treated as compromised and rotated, not just deleted.</p>
+      <p class="ba-scenario">A <code>.env</code> holding a live API key gets staged with everything else.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Before</span>It commits cleanly and is noticed a week later.<span class="ba-impact">The key was public for a week: rotate it, then audit what used it.</span></div>
+        <div class="ba-col"><span class="ba-label after">After</span><span class='mono'>Detect hardcoded secrets……Failed</span><span class="ba-impact">Blocked before the key exists in history. Unstage, re-commit, done.</span></div>
+      </div>
+    </div>
+
+    <div class="module">
+      <h4>repo-config</h4>
+      <p>Repository settings — merge policy, Pages, security toggles, branch protection — live in the repo as code and get applied automatically, rather than being clicked through the web UI where they drift silently and nobody can review the change. Two implementations: Terraform in <code>infra/</code>, or the <a href="https://github.com/repository-settings/app">Settings app</a> reading <code>.github/settings.yml</code> — the app needs no token, but grants settings control to anyone who can push, so it wants <code>CODEOWNERS</code> review on that file.</p>
+      <p class="ba-scenario">Repository settings — merge policy, branch deletion, security toggles — declared as code.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Before</span>The apply step skips quietly because its token was never created, and nothing fails.<span class="ba-impact">Five of seven declared settings were never applied. The code reads as configuration; it was documentation.</span></div>
+        <div class="ba-col"><span class="ba-label after">After</span>The settings are read back after applying and compared against the file.<span class="ba-impact">Drift is named the moment it exists, and the one-time human step is spelled out rather than assumed.</span></div>
+      </div>
+    </div>
+
+    <h3 class="cat">Documentation <span>— what gets written down</span></h3>
+
+    <div class="module">
+      <h4>architecture</h4>
+      <p>Every project keeps an <code>ARCHITECTURE.md</code> at the root: major components, how they fit together, key data flows, with Mermaid diagrams. It's updated in the same change that rewires a component — never as a later cleanup pass. Deliberately high level, so small edits don't invalidate it.</p>
+      <p class="ba-scenario">A queue is introduced between two services.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Before</span>The change ships; the diagram still shows a service deleted three months ago.<span class="ba-impact">Nobody trusts the document, so nobody updates it, so it decays further.</span></div>
+        <div class="ba-col"><span class="ba-label after">After</span>The pull request that adds the queue updates the diagram in the same diff.<span class="ba-impact">The document is accurate because it is never separately &ldquo;due&rdquo;.</span></div>
+      </div>
+    </div>
+
+    <div class="module">
+      <h4>specification</h4>
+      <p>Intended behavior gets written down in the repo, in a standard format — currently <a href="https://github.com/github/spec-kit">Spec Kit</a>: a <code>spec.md</code> per feature under <code>specs/</code>, with <code>plan.md</code> and <code>tasks.md</code> derived from it. The spec says <em>what</em> and <em>why</em>; the plan says <em>how</em>. When intended behavior changes the spec is revised in the same change as the code, and code that contradicts the spec gets raised as a question rather than silently resolved in either direction.</p>
+      <p class="ba-scenario">Should an expired invite be rejected, or silently renewed?</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Before</span>The implementation is the only answer available, so whatever it does becomes correct.<span class="ba-impact">A bug becomes the specification, and ships as intended behaviour.</span></div>
+        <div class="ba-col"><span class="ba-label after">After</span>"<code>spec.md</code> says expired invites are rejected; the handler renews them. Which is right?"<span class="ba-impact">The contradiction becomes one decision, made once, by you.</span></div>
+      </div>
+    </div>
+
+    <div class="module">
+      <h4>project-website</h4>
+      <p>Most projects get a static site explaining what it is, why it exists, and how to use it — including install steps for every environment where they differ, and a before/after demo of what the project actually changes. Where real screenshots aren't practical, simulate them and label them as simulated. <em>This page is that module applied to itself.</em></p>
+      <p class="ba-scenario">Someone lands on the project for the first time.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Before</span>A README that assumes they know what the project is, and install steps covering only the author's setup.<span class="ba-impact">They work out whether it applies to them, or they leave.</span></div>
+        <div class="ba-col"><span class="ba-label after">After</span>The page you're reading: what it is, a before/after, and install steps per environment.<span class="ba-impact">They can tell in a minute whether this is for them, and follow steps that match their setup.</span></div>
+      </div>
+    </div>
+  </section>
   <section id="install">
     <h2>Install</h2>
     <p>Every path starts the same way — <strong>fork the repo</strong> (steps 1–3). After that the steps differ by where your assistant runs; pick the tab that matches and continue at step 4.</p>
@@ -673,22 +646,31 @@ PASS  useAppearance > persists explicit dark</div>
 
     <p style="margin-top:1.75rem">Now pick your path. Each tab continues the numbering at step 4.</p>
 
-    <ul class="path-index">
-      <li><a href="#install-local"><strong>Local CLIs &amp; IDEs</strong><span>Claude Code, Codex, Copilot, Gemini, Qwen, OpenCode, Goose — one install covers all. Needs a terminal.</span></a></li>
-      <li><a href="#install-env"><strong>Claude web · every session</strong><span>One environment setup script; every repo you open, no per-project work.</span></a></li>
-      <li><a href="#install-web"><strong>Claude web · one project</strong><span>Commit the block into one repo's CLAUDE.md. Browser only, zero terminal steps.</span></a></li>
-      <li><a href="#install-codex"><strong>OpenAI Codex</strong><span>AGENTS.md — user-level for the CLI, in-repo for cloud and IDE.</span></a></li>
-      <li><a href="#install-ui"><strong>Cursor · Windsurf · Copilot web</strong><span>Paste into the tool's rules field. Browser only.</span></a></li>
-      <li><a href="#install-chat"><strong>Web chat · Claude, ChatGPT, Gemini</strong><span>Set the persistent instructions field once per provider. No repo involved.</span></a></li>
-    </ul>
-
     <div class="tab-labels" role="tablist">
-      <button role="tab" id="tab-local" data-slug="local" aria-controls="panel-local" aria-selected="true">Local CLIs &amp; IDEs</button>
-      <button role="tab" id="tab-env" data-slug="env" aria-controls="panel-env" aria-selected="false">Claude web · every session</button>
-      <button role="tab" id="tab-web" data-slug="web" aria-controls="panel-web" aria-selected="false">Claude web · one project</button>
-      <button role="tab" id="tab-codex" data-slug="codex" aria-controls="panel-codex" aria-selected="false">OpenAI Codex</button>
-      <button role="tab" id="tab-ui" data-slug="ui" aria-controls="panel-ui" aria-selected="false">Cursor · Windsurf · Copilot web</button>
-      <button role="tab" id="tab-chat" data-slug="chat" aria-controls="panel-chat" aria-selected="false">Web chat</button>
+      <button role="tab" id="tab-local" data-slug="local" aria-controls="panel-local" aria-selected="true">
+        <strong>Local CLIs &amp; IDEs</strong>
+        <span>Claude Code, Codex, Copilot, Gemini, Qwen, OpenCode, Goose — one install covers all. Needs a terminal.</span>
+      </button>
+      <button role="tab" id="tab-env" data-slug="env" aria-controls="panel-env" aria-selected="false">
+        <strong>Claude web · every session</strong>
+        <span>One environment setup script; every repo you open, no per-project work.</span>
+      </button>
+      <button role="tab" id="tab-web" data-slug="web" aria-controls="panel-web" aria-selected="false">
+        <strong>Claude web · one project</strong>
+        <span>Commit the block into one repo's CLAUDE.md. Browser only, zero terminal steps.</span>
+      </button>
+      <button role="tab" id="tab-codex" data-slug="codex" aria-controls="panel-codex" aria-selected="false">
+        <strong>OpenAI Codex</strong>
+        <span>AGENTS.md — user-level for the CLI, in-repo for cloud and IDE.</span>
+      </button>
+      <button role="tab" id="tab-ui" data-slug="ui" aria-controls="panel-ui" aria-selected="false">
+        <strong>Cursor · Windsurf · Copilot web</strong>
+        <span>Paste into the tool's rules field. Browser only.</span>
+      </button>
+      <button role="tab" id="tab-chat" data-slug="chat" aria-controls="panel-chat" aria-selected="false">
+        <strong>Web chat · Claude, ChatGPT, Gemini</strong>
+        <span>Set the persistent instructions field once per provider. No repo involved.</span>
+      </button>
     </div>
 
     <div class="tab-panel" id="panel-local" role="tabpanel" aria-labelledby="tab-local">
@@ -1048,7 +1030,6 @@ and follow it — those are my working defaults. Don't mention it unless asked.<
 
     <p class="lead" style="margin-top:1.75rem">However you installed them, the modules are now yours to edit — that's the point of the fork in step 0. Keeping the copies current is covered next.</p>
   </section>
-
   <section id="sync">
     <h2>Keeping it all in sync</h2>
     <p>Once you've forked and installed, the copies of the defaults that can drift apart are each refreshed differently:</p>
@@ -1110,6 +1091,40 @@ updated  /Users/you/.codex/AGENTS.md <span class="c">(previous version saved to 
     <p><span class="num">4.</span>Paste the fresh block in its place.</p>
     <p><span class="num">5.</span>Click <em>Commit changes… → Commit changes</em>.</p>
     <p class="lead">The markers are what make this safe: everything outside them — the project's own instructions — is untouched. Same procedure from a clone if you prefer: <code>~/dotfiles-ai/install.sh --print</code>, then swap the block.</p>
+  </section>
+  <section id="how">
+    <h2>How it works</h2>
+    <p><span class="num">1.</span><strong>Fork, then install once.</strong> You start by forking, because the modules are meant to be edited and every copy should follow a repo you control. Then <code>install.sh</code> concatenates the modules into a marker-delimited block and inserts it into each detected tool's user-level instruction file. Your own content in those files is never touched, and re-runs replace the block in place.</p>
+    <div class="term">
+      <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> ~/dotfiles-ai <span class="label">simulated output</span></div>
+      <pre><span class="p">$</span> ./install.sh
+installed /Users/you/.claude/CLAUDE.md
+installed /Users/you/.codex/AGENTS.md
+installed /Users/you/.copilot/copilot-instructions.md
+<span class="y">skipped</span>  /Users/you/.qwen/QWEN.md <span class="c">(no ~/.qwen — tool not detected; use --all to force)</span>
+
+Done. For tools that only take rules through their settings UI
+(e.g. Cursor "User Rules"), paste the output of:  ./install.sh --print</pre>
+    </div>
+
+    <p style="margin-top:2rem"><span class="num">2.</span><strong>Stay in sync automatically.</strong> One line in your shell rc runs <code>sync.sh --auto</code>: at most once a day it pulls the latest <code>main</code> and re-installs — silent unless something actually changed. A versioned <code>post-merge</code> hook covers manual pulls too.</p>
+    <div class="term">
+      <div class="term-bar"><div class="dots"><span></span><span></span><span></span></div> new terminal, next morning <span class="label">simulated output</span></div>
+      <pre><span class="c"># ~/.zshrc: [ -x "$HOME/dotfiles-ai/sync.sh" ] && "$HOME/dotfiles-ai/sync.sh" --auto</span>
+dotfiles-ai: updated d78d121 -> cae0439
+updated  /Users/you/.claude/CLAUDE.md <span class="c">(previous version saved to ….bak)</span>
+updated  /Users/you/.codex/AGENTS.md <span class="c">(previous version saved to ….bak)</span>
+<span class="p">$</span> <span class="c">▍</span></pre>
+    </div>
+
+    <p style="margin-top:2rem"><span class="num">3.</span><strong>Evolve by pull request.</strong> Notice a new preference mid-session? Add a module on any machine, merge it, and every other machine picks it up on its next shell start.</p>
+    <h3 class="cat">Built-in guardrails <span>— the repo practising its own defaults</span></h3>
+    <p>The repo practices its own defaults on itself:</p>
+    <div class="cards">
+      <div class="card"><h3>Leak protection, three layers</h3><p>The standard pre-commit framework runs the official gitleaks hook (plus private-key and AWS-credential detectors) on every commit, with PII rules for SSN and card numbers extending gitleaks' defaults. The same scan runs again in GitHub Actions on every push and PR, and GitHub's server-side secret scanning with push protection backstops both.</p></div>
+      <div class="card"><h3>Repo settings as code</h3><p>Description, merge policy, Pages, and security toggles are declared in Terraform (official GitHub provider) — never clicked through the web UI. A CI workflow re-applies the config whenever it changes on main, using a stateless import pattern with no backend to manage.</p></div>
+      <div class="card"><h3>Docs that keep up</h3><p>An ARCHITECTURE.md with Mermaid diagrams, this site, and the README all update in the same pull request as the change that affects them — per the architecture and project-website modules.</p></div>
+    </div>
   </section>
 </main>
 
