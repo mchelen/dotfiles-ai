@@ -57,6 +57,12 @@ flowchart LR
   no-terminal install path depends on this file being current. Its consumers
   copy it by hand (web editor, settings fields), so it is a snapshot
   wherever it lands, refreshed by replacing the marker-delimited block.
+- **`test.sh`** — the acceptance scenarios from `specs/001-user-level-install`
+  made executable: each case builds a throwaway `HOME`, runs `install.sh`
+  against it, and asserts the outcome. No framework, no dependencies. Run by
+  **`.github/workflows/test.yml`** on every push and pull request, so a
+  regression fails the build instead of being discovered in someone's
+  instruction file.
 - **`docs/`** — the project website (static HTML/CSS, no generator),
   published to GitHub Pages by **`.github/workflows/deploy-pages.yml`**
   (`actions/deploy-pages`) on merges to `main` that touch `docs/`.

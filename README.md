@@ -240,6 +240,17 @@ The markers are what make this safe: the project's own instructions, outside
 the block, are untouched. From a clone, `./install.sh --print` gives the same
 text.
 
+## Tests
+
+```sh
+./test.sh
+```
+
+The acceptance scenarios from [`specs/001-user-level-install`](specs/001-user-level-install/spec.md),
+executable: each case runs `install.sh` against a throwaway `HOME` and checks
+the result. No framework — bash and `mktemp`. CI runs it on every push and pull
+request.
+
 ## Guarding against leaked secrets
 
 This repo practices what [`defaults/secrets.md`](defaults/secrets.md)

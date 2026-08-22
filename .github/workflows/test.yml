@@ -1,0 +1,21 @@
+name: test
+
+# Runs the behavioral tests for install.sh on every push and pull request.
+# They are the acceptance scenarios from specs/001-user-level-install/spec.md,
+# made executable — so a regression fails the build rather than being noticed
+# later by whoever's instruction file it damaged.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./test.sh
