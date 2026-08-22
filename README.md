@@ -12,10 +12,26 @@ Like classic dotfiles, these encode *individual* preferences (workflow,
 communication style, guardrails), not project conventions. Project-specific
 instructions still belong in each repo's own `CLAUDE.md` / `AGENTS.md`.
 
-**Why this exists, and why it's built this way** — including the alternatives
-considered (per-tool config, chezmoi, `rulesync`, `AGENTS.md`, auto memory) and
-what would make this approach obsolete — is recorded in
-[`adr/0001`](adr/0001-forkable-repo-for-personal-ai-preferences.md).
+## Status: experimental
+
+This is an experiment, not a product. It exists to work out whether personal
+defaults can be set once and follow you everywhere — across Claude Code,
+Codex, Gemini, web chat, cloud sessions, and however many machines you use —
+and to try implementation options for doing it. Nobody has settled that
+question. The *project* layer converged on `AGENTS.md`; the *personal* layer
+still has each tool keeping its own user-level file, or offering only a
+settings text box, and none of them syncing.
+
+A forkable repo of markdown modules, assembled into a marker-delimited block,
+is **one** option. The [decision records](adr/) weigh the others — per-tool
+config, a general dotfiles manager like chezmoi, `rulesync`, `AGENTS.md`
+itself, a tool's own auto-memory, the Agent Skills standard — and name what
+would make this approach obsolete;
+[`adr/0001`](adr/0001-forkable-repo-for-personal-ai-preferences.md) is marked
+*accepted, provisional* and means it.
+
+Read it for the problem framing and the options; fork it if the modules are
+useful to you. Don't build on it expecting it to hold still.
 
 ## What's here
 

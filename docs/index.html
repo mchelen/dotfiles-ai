@@ -267,6 +267,13 @@
   .callout ul { margin: .5rem 0 0; padding-left: 1.15rem; }
   .callout li { margin: .3rem 0; }
   .callout.caution { border-left-color: var(--caution); background: var(--caution-bg); }
+  .badge {
+    display: inline-block; margin: 0 0 .35rem; padding: .15rem .55rem;
+    border: 1px solid var(--caution); border-radius: 999px; background: var(--caution-bg);
+    color: var(--fg); font-size: .72rem; font-weight: 700; letter-spacing: .04em;
+    text-transform: uppercase; text-decoration: none;
+  }
+  a.badge:hover { border-color: var(--fg); }
   .youfork { color: var(--accent); font-weight: 700; }
   /* sticky section nav */
   .sticky-nav {
@@ -379,6 +386,7 @@
 <body>
 <header>
   <h1>dotfiles-ai<span class="dot">.</span></h1>
+  <p><a class="badge" href="#what">Experimental</a></p>
   <p class="tagline">Dotfiles, but for AI coding assistants — your personal working preferences, carried across every project and every tool.</p>
   <div class="buttons">
     <a class="btn primary" href="#quick">Quick start</a>
@@ -442,6 +450,12 @@ copy you just read.</pre>
     <p>You have opinions about how an AI assistant should work with you: <em>show me a mockup before you build the feature. Write the test first. Don't commit unless I ask.</em> Today you re-explain those preferences in every session, or duplicate them into every project's instruction file.</p>
     <p><strong>dotfiles-ai</strong> keeps them in one place instead. Each preference is a small markdown module; an installer assembles the modules into the user-level instruction file of every AI tool on your machine — Claude Code, Codex, Copilot CLI, Gemini CLI, and friends — and a sync script keeps every machine current automatically.</p>
     <p class="lead">Personal preferences live here, at the user level. Project conventions stay in each repo's own <code>CLAUDE.md</code> / <code>AGENTS.md</code> — this is the layer underneath.</p>
+
+    <div class="callout">
+      <p><strong>It's an experiment, not a product.</strong> The question it exists to answer is whether personal defaults can be set once and follow you everywhere — across Claude Code, Codex, Gemini, web chat, cloud sessions, and however many machines you use. Nobody has settled that. The <em>project</em> layer converged on <code>AGENTS.md</code>; the <em>personal</em> layer still has each tool keeping its own file, or only a settings text box, and none of them syncing.</p>
+      <p>A forkable repo of markdown modules, assembled into a marker-delimited block, is <em>one</em> implementation option. The <a href="https://github.com/mchelen/dotfiles-ai/tree/main/adr">decision records</a> weigh the others — per-tool config, a general dotfiles manager like chezmoi, <code>rulesync</code>, <code>AGENTS.md</code> itself, a tool's own auto-memory, the Agent Skills standard — and name what would make this approach obsolete. <a href="https://github.com/mchelen/dotfiles-ai/blob/main/adr/0001-forkable-repo-for-personal-ai-preferences.md">ADR-0001</a> is marked <em>accepted, provisional</em>, and means it.</p>
+      <p>So: worth a read for the problem framing and the options, worth forking if the modules are useful to you. Not something to depend on holding still.</p>
+    </div>
   </section>
   <section id="demo">
     <h2>Before and after</h2>

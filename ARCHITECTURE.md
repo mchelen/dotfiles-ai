@@ -1,5 +1,9 @@
 # Architecture
 
+This describes one implementation of an unsettled problem — see
+[Status: experimental](README.md#status-experimental) in the README, and the
+[decision records](adr/) for the options weighed against it.
+
 dotfiles-ai has two moving parts: a set of preference modules and an
 installer that assembles them into the instruction files AI coding tools
 read at the user level. The same assembled block is also committed to the
