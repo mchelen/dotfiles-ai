@@ -1,7 +1,7 @@
 # Testing
 
-**Start from a failing test that captures the expected behavior, then write the
-code that makes it pass — and show me both runs.**
+**Start from a failing test, write the code that makes it pass, and show me
+both runs.**
 
 - Write tests **before** implementation by default: start from a failing test
   that captures the expected behavior, then write the code to make it pass.

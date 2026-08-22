@@ -21,16 +21,17 @@ what would make this approach obsolete — is recorded in
 
 Each file in [`defaults/`](defaults/) is one self-contained preference module,
 written as plain tool-agnostic markdown. Files are flat in `defaults/`; the
-four categories below describe the kind of behavior each module governs:
+four categories below describe the kind of behavior each module governs. Where a
+module only applies to a particular assistant or forge, that's noted in italics.
 
 **Collaboration** — how the assistant works with you
 
 | Module | Preference |
 |---|---|
-| [`communication.md`](defaults/communication.md) | Answer-first replies, push back on bad ideas, disclose gaps |
-| [`feature-workflow.md`](defaults/feature-workflow.md) | New features get a mockup, demo, options, or direction proposal **before** implementation starts |
-| [`tool-fallbacks.md`](defaults/tool-fallbacks.md) | When an interactive tool looks stuck, fall back to plain text instead of retrying it |
-| [`compute-offload.md`](defaults/compute-offload.md) | Let the shell or CI do mechanical work — query instead of reading — but never where judgment or evidence is what's needed |
+| [`honest-reporting.md`](defaults/honest-reporting.md) | Answer-first replies, push back on bad ideas, disclose what's unfinished or still failing |
+| [`propose-before-building.md`](defaults/propose-before-building.md) | New features get a mockup, demo, options, or direction proposal **before** implementation starts |
+| [`tool-fallbacks.md`](defaults/tool-fallbacks.md) | When an interactive tool looks stuck, fall back to plain text instead of retrying it *(any assistant with interactive prompts)* |
+| [`compute-offload.md`](defaults/compute-offload.md) | Let the shell or CI do mechanical work — query instead of reading — but never where judgment or evidence is what's needed *(MCP examples assume MCP)* |
 
 **Craft** — how code gets written
 
@@ -44,16 +45,17 @@ four categories below describe the kind of behavior each module governs:
 | Module | Preference |
 |---|---|
 | [`git.md`](defaults/git.md) | No commits/pushes unless asked, PRs opened and merged on green, no history rewrites |
-| [`secrets.md`](defaults/secrets.md) | Layered secret/PII protection: pre-commit scan + CI scanner + GitHub secret scanning; leaked = rotate |
-| [`repo-config.md`](defaults/repo-config.md) | GitHub repo settings as code — Terraform, or the Settings app — never clicked through the UI, with the one-time human setup spelled out |
+| [`secrets.md`](defaults/secrets.md) | Layered secret/PII protection: pre-commit scan + CI scanner + GitHub secret scanning; leaked = rotate *(push protection is GitHub's)* |
+| [`ci-gated-main.md`](defaults/ci-gated-main.md) | `main` is protected and merges only on a green check that builds and tests *(GitHub-specific mechanism)* |
+| [`repo-config.md`](defaults/repo-config.md) | Repo settings as code — Terraform, or the Settings app — never clicked through the UI, with the one-time human setup spelled out *(GitHub-specific)* |
 
 **Documentation** — what gets written down
 
 | Module | Preference |
 |---|---|
-| [`architecture.md`](defaults/architecture.md) | Every project keeps an up-to-date `ARCHITECTURE.md` with Mermaid diagrams |
+| [`architecture-docs.md`](defaults/architecture-docs.md) | Every project keeps an up-to-date `ARCHITECTURE.md` with Mermaid diagrams |
 | [`specification.md`](defaults/specification.md) | Intended behavior lives in a checked-in spec (Spec Kit), revised in the same change as the code |
-| [`project-website.md`](defaults/project-website.md) | Most projects get a static site (GitHub Pages) with usage docs and (simulated) screenshots/demos |
+| [`project-website.md`](defaults/project-website.md) | Most projects get a static site with usage docs and (simulated) screenshots/demos *(any static host; Pages assumed)* |
 
 The site has [a full explanation of every module with before/after
 examples](https://mchelen.github.io/dotfiles-ai/#modules).
@@ -160,7 +162,7 @@ one line per module, taken from each module's bold thesis sentence. It exists
 because web chat instruction fields are size-capped — Claude project
 instructions around 8,000 characters, ChatGPT custom instructions 5,000 on
 paid plans and 1,500 on Free/Go — while the full block is ~15,000. The brief
-is ~1,430, so it fits all three, with roughly one module of headroom before
+is ~1,435, so it fits all three, with roughly one module of headroom before
 the smallest cap is missed.
 
 Both are generated — never edit them by hand. The

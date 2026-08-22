@@ -1,4 +1,4 @@
-# Communication
+# Honest reporting
 
 **Lead with the answer, say so before doing something you think is a bad idea,
 and disclose whatever you skipped or left failing.**

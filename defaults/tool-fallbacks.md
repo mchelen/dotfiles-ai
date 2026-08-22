@@ -3,6 +3,8 @@
 **When an interactive tool looks stuck, switch to plain text rather than retrying
 the thing that just broke.**
 
+*Applies to any assistant that asks through interactive prompts. The linked bug is Claude Code's; the failure mode — a mechanism that loses input being used to ask again — is not.*
+
 - If an interactive tool looks stuck — the same prompt keeps reappearing, a
   response never arrives, or I say I answered something you never received —
   stop using that tool and continue in plain text. Say that you're switching

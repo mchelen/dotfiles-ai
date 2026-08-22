@@ -3,6 +3,8 @@
 **For anything beyond a small change, keep a written specification in the repo,
 in a standard format, and keep it true.**
 
+*Agent-agnostic: Spec Kit is a file format plus a CLI, not a feature of one assistant.*
+
 The current format is
 [Spec Kit](https://github.com/github/spec-kit).
 
