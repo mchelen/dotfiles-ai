@@ -3,6 +3,8 @@
 **Repository settings live in the repo as code and are applied automatically,
 never clicked through the web UI.**
 
+*GitHub-specific. The principle — settings as code, applied automatically, never clicked — carries to any forge; both implementations below are GitHub's.*
+
 Settings that belong in code: description and homepage, feature toggles, merge
 policy, Pages, vulnerability alerts, secret scanning and push protection, and
 branch protection rules once they exist. When one must change, change the file

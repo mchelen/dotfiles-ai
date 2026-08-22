@@ -192,8 +192,9 @@ written to standard output and no target file is created or modified.
 - **SC-007**: Every acceptance scenario above is executable. `./test.sh` runs
   them against a throwaway `HOME` and fails the build if any regresses.
 - **SC-006**: The condensed form fits the smallest instruction field this
-  project documents. It is currently 1,430 characters against a 1,500
-  character floor, so roughly one further module exhausts the margin — at
+  project documents. It is currently 1,435 characters against a 1,500
+  character floor, and the thirteenth module already required tightening two
+  thesis sentences to stay under it — at
   which point the floor is missed and the guide must say so rather than
   quietly overflow.
 

@@ -2,6 +2,8 @@
 
 **Mechanical work belongs in a command, not in your context.**
 
+*Tool-agnostic. The MCP examples assume an assistant with MCP servers attached, which by 2026 includes Claude Code, Cursor, Copilot and Windsurf among others, but the principle holds with any tooling.*
+
 When a shell
 command, script, or CI job produces the same answer, run it instead of loading
 the material and working it out yourself — it's cheaper, it's reproducible, and

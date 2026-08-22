@@ -3,6 +3,8 @@
 **Secrets are stopped by three independent layers, and a failing check is never
 quietly disabled.**
 
+*The scanning layers are tool-agnostic; push protection is GitHub's. On another forge, keep the first two and find the third's equivalent.*
+
 - Every repo gets a pre-commit hook that scans staged changes for
   credentials, key material, and PII before they can be committed. Use
   standard tooling — the pre-commit framework with the official gitleaks

@@ -13,6 +13,54 @@ rewires a component.**
 - Stay high level: components and boundaries, not function-by-function
   detail. If the diagram needs updating for small edits, it's too detailed.
 
+# CI-gated main
+
+**`main` is protected, and merges only through a green CI check.**
+
+*GitHub-specific in mechanism; the rule — no unreviewed, untested code on the
+default branch — carries to any forge.*
+
+- **Protect the default branch.** No direct pushes, no force-pushes, no
+  deletion. Changes reach `main` through a pull request.
+- **Require at least one status check**, and require it to *pass* — a check
+  that runs but isn't required is a suggestion. Include administrators in the
+  rule: a gate you can walk around is a gate for other people.
+- **The check does real work, honestly.** Install dependencies, build the
+  project if it has a build, run the tests if it has tests. Where there is
+  neither, the check should say so in its output and pass — not print a green
+  tick that means nothing. A check that always passes is worse than no check,
+  because it looks like coverage.
+- Keep it fast enough that nobody wants to bypass it. If the full suite is
+  slow, gate on the fast subset and run the rest after merge.
+- **Configure it as code**, through whatever mechanism the repo already uses
+  for settings (see the repo-config module) — not by clicking through branch
+  protection screens.
+
+## Automation that pushes to `main`
+
+Branch protection blocks bots too. Before enabling it, look for workflows that
+commit or push to the default branch — a docs generator, a formatter, a
+version bumper — because they will start failing.
+
+Resolve it deliberately, and say which you chose:
+
+- Give that one workflow a documented bypass, narrowest possible; or
+- Convert it to open a pull request instead of pushing.
+
+Preferring the second is usually right: it keeps the gate absolute, and the
+bot's output gets the same review as anyone else's.
+
+## Setting it up for the first time
+
+Branch protection needs admin rights, so it is a one-time human step. Write out
+what to do rather than stalling or assuming, in the same shape the repo-config
+module describes: which rule to add, which check to mark required, whether
+administrators are included, and what happens to any existing bot pushes.
+
+Then confirm it took effect — read the protection back, or open a throwaway
+pull request and check that merge is blocked until the check reports. An
+unenforced rule and an enforced one look identical from the settings page.
+
 # Code style
 
 **Match the surrounding code, make the smallest change that solves the problem,
@@ -26,22 +74,11 @@ and never add a dependency without saying why.**
 - Don't add new dependencies for something a few lines of code can do.
   If a dependency is genuinely warranted, say so and why before adding it.
 
-# Communication
-
-**Lead with the answer, say so before doing something you think is a bad idea,
-and disclose whatever you skipped or left failing.**
-
-- Lead with the answer or outcome, then supporting detail.
-- If something I asked for seems like a bad idea, say so before doing it —
-  a one-line "heads up, X might be better because Y" is enough.
-- When you're unsure about intent, ask one focused question rather than
-  guessing and building the wrong thing.
-- Tell me what you *didn't* do: skipped steps, failing tests, known gaps.
-  Don't present partially working results as done.
-
 # Offloading mechanical work
 
 **Mechanical work belongs in a command, not in your context.**
+
+*Tool-agnostic. The MCP examples assume an assistant with MCP servers attached, which by 2026 includes Claude Code, Cursor, Copilot and Windsurf among others, but the principle holds with any tooling.*
 
 When a shell
 command, script, or CI job produces the same answer, run it instead of loading
@@ -74,28 +111,6 @@ Don't offload when it costs correctness:
 - **Never quietly sample.** If you filtered, truncated, or checked only part of
   something, say so. A partial check reported as a complete one is worse than
   no check at all.
-
-# Feature development workflow
-
-**For anything bigger than an obvious fix, put something concrete in front of me
-and wait for a yes before implementing.**
-
-When I ask for a new feature or a significant change (as opposed to a bug fix,
-small tweak, or something I've already specified in detail):
-
-- Do **not** jump straight into implementation.
-- First give me something concrete to react to. Pick whichever fits the task:
-  - **Mockup** — an ASCII sketch, quick HTML page, or description of the UI/UX
-  - **Demo / spike** — a minimal throwaway version that shows the core idea working
-  - **Options** — 2–3 approaches with trade-offs and a recommendation
-  - **Direction** — a short proposal: approach, affected files, data model, risks
-- Wait for my confirmation or feedback before writing production code.
-
-Skip this ceremony when:
-
-- The change is small and unambiguous (rename, typo, obvious bug fix)
-- I've explicitly said to just build it
-- I've already approved a direction and this is a follow-up within it
 
 # Git
 
@@ -151,10 +166,25 @@ request that merges only on green.**
 - Prefer a scheduled re-check over tight polling loops when waiting on CI
   or a deployment.
 
+# Honest reporting
+
+**Lead with the answer, say so before doing something you think is a bad idea,
+and disclose whatever you skipped or left failing.**
+
+- Lead with the answer or outcome, then supporting detail.
+- If something I asked for seems like a bad idea, say so before doing it —
+  a one-line "heads up, X might be better because Y" is enough.
+- When you're unsure about intent, ask one focused question rather than
+  guessing and building the wrong thing.
+- Tell me what you *didn't* do: skipped steps, failing tests, known gaps.
+  Don't present partially working results as done.
+
 # Project website
 
-**Most projects get a static site — what it is, why it exists, how to use it —
-with demos simulated and labeled when real ones aren't practical.**
+**Most projects get a static site: what it is, why it exists, how to use it,
+with any simulated demo labelled as simulated.**
+
+*Any static host works. GitHub Pages is the default assumed here because the rest of these defaults already assume GitHub.*
 
 - Most projects should have a static website (GitHub Pages or similar)
   covering: what the project is, why it exists, and how to use it.
@@ -178,10 +208,34 @@ with demos simulated and labeled when real ones aren't practical.**
   too small for it to add anything — and ask before publishing anything
   publicly for the first time.
 
+# Propose before building
+
+**For anything bigger than an obvious fix, put something concrete in front of me
+and wait for a yes before implementing.**
+
+When I ask for a new feature or a significant change (as opposed to a bug fix,
+small tweak, or something I've already specified in detail):
+
+- Do **not** jump straight into implementation.
+- First give me something concrete to react to. Pick whichever fits the task:
+  - **Mockup** — an ASCII sketch, quick HTML page, or description of the UI/UX
+  - **Demo / spike** — a minimal throwaway version that shows the core idea working
+  - **Options** — 2–3 approaches with trade-offs and a recommendation
+  - **Direction** — a short proposal: approach, affected files, data model, risks
+- Wait for my confirmation or feedback before writing production code.
+
+Skip this ceremony when:
+
+- The change is small and unambiguous (rename, typo, obvious bug fix)
+- I've explicitly said to just build it
+- I've already approved a direction and this is a follow-up within it
+
 # Repo configuration as code
 
 **Repository settings live in the repo as code and are applied automatically,
 never clicked through the web UI.**
+
+*GitHub-specific. The principle — settings as code, applied automatically, never clicked — carries to any forge; both implementations below are GitHub's.*
 
 Settings that belong in code: description and homepage, feature toggles, merge
 policy, Pages, vulnerability alerts, secret scanning and push protection, and
@@ -255,6 +309,8 @@ doing the same thing.
 **Secrets are stopped by three independent layers, and a failing check is never
 quietly disabled.**
 
+*The scanning layers are tool-agnostic; push protection is GitHub's. On another forge, keep the first two and find the third's equivalent.*
+
 - Every repo gets a pre-commit hook that scans staged changes for
   credentials, key material, and PII before they can be committed. Use
   standard tooling — the pre-commit framework with the official gitleaks
@@ -277,6 +333,8 @@ quietly disabled.**
 
 **For anything beyond a small change, keep a written specification in the repo,
 in a standard format, and keep it true.**
+
+*Agent-agnostic: Spec Kit is a file format plus a CLI, not a feature of one assistant.*
 
 The current format is
 [Spec Kit](https://github.com/github/spec-kit).
@@ -311,8 +369,8 @@ throwaway spikes — the same threshold as the feature workflow.
 
 # Testing
 
-**Start from a failing test that captures the expected behavior, then write the
-code that makes it pass — and show me both runs.**
+**Start from a failing test, write the code that makes it pass, and show me
+both runs.**
 
 - Write tests **before** implementation by default: start from a failing test
   that captures the expected behavior, then write the code to make it pass.
@@ -334,6 +392,8 @@ Skip test-first when:
 
 **When an interactive tool looks stuck, switch to plain text rather than retrying
 the thing that just broke.**
+
+*Applies to any assistant that asks through interactive prompts. The linked bug is Claude Code's; the failure mode — a mechanism that loses input being used to ask again — is not.*
 
 - If an interactive tool looks stuck — the same prompt keeps reappearing, a
   response never arrives, or I say I answered something you never received —

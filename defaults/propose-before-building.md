@@ -1,4 +1,4 @@
-# Feature development workflow
+# Propose before building
 
 **For anything bigger than an obvious fix, put something concrete in front of me
 and wait for a yes before implementing.**

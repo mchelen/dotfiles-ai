@@ -108,6 +108,11 @@
     color: var(--accent);
   }
   .module > p { margin: 0 0 .85rem; font-size: .93rem; }
+  .module-scope {
+    font-size: .8rem; color: var(--muted); margin: -.5rem 0 .85rem;
+    padding-left: .6rem; border-left: 2px solid var(--border);
+  }
+  .module-scope::before { content: "Applies to: "; font-weight: 600; }
   .ba { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .75rem; }
   .ba-col {
     border: 1px solid var(--border); border-radius: 8px; padding: .6rem .7rem;
@@ -460,12 +465,12 @@ PASS  useAppearance > persists explicit dark</div>
   </section>
   <section id="modules">
     <h2>The modules</h2>
-    <p>Twelve modules, grouped here by the kind of behavior they govern. Each one is a short markdown file in <code>defaults/</code> — read them, delete the ones you disagree with, add your own.</p>
+    <p>Thirteen modules, grouped here by the kind of behavior they govern. Each one is a short markdown file in <code>defaults/</code> — read them, delete the ones you disagree with, add your own.</p>
 
     <h3 class="cat">Collaboration <span>— how the assistant works with you</span></h3>
 
     <div class="module">
-      <h4>communication</h4>
+      <h4>honest-reporting</h4>
       <p>Lead with the answer, not the preamble. Say so when a request looks like a bad idea, before doing it. Disclose what was skipped, what's still failing, and what was left half-done — never present partial work as finished.</p>
       <p class="ba-scenario">You ask for a refactor. Two tests in that area were already failing before you started.</p>
       <div class="ba">
@@ -475,7 +480,7 @@ PASS  useAppearance > persists explicit dark</div>
     </div>
 
     <div class="module">
-      <h4>feature-workflow</h4>
+      <h4>propose-before-building</h4>
       <p>The flagship. For anything bigger than an obvious fix, the assistant owes you something to react to first — a mockup, a throwaway demo, two or three options with trade-offs, or a short written direction. Implementation waits for your nod. Small, unambiguous changes skip the ceremony.</p>
       <p class="ba-scenario">&ldquo;Add a bulk export button to the reports page.&rdquo;</p>
       <div class="ba">
@@ -487,6 +492,7 @@ PASS  useAppearance > persists explicit dark</div>
     <div class="module">
       <h4>tool-fallbacks</h4>
       <p>Tooling fails sometimes. When an interactive prompt looks stuck — the same card reappearing, or you saying you answered something that never arrived — the assistant drops to plain text rather than retrying the thing that just broke. A reported refusal is treated as possibly-lost input, not a decision, because retrying through a broken mechanism is exactly what turns one lost answer into a loop. Written after <a href="https://github.com/anthropics/claude-code/issues/81223">this bug</a>: a dismissed question card silently discards typed text.</p>
+      <p class="module-scope">Any assistant that asks through interactive prompts. The linked bug is Claude Code's; the failure mode isn't.</p>
       <p class="ba-scenario">A permission card keeps reappearing. You've answered it three times; the answer never arrives.</p>
       <div class="ba">
         <div class="ba-col"><span class="ba-label before">Before</span>The card is re-issued after each failure, through the mechanism that is losing the input.<span class="ba-impact">Four round trips, no progress, and your typed answers are gone.</span></div>
@@ -497,6 +503,7 @@ PASS  useAppearance > persists explicit dark</div>
     <div class="module">
       <h4>compute-offload</h4>
       <p>Mechanical work goes to a command, not into the context window: query with <code>grep</code>, <code>jq</code>, and <code>diff</code> instead of reading a large file to find a small part of it; make verification scripts print a verdict rather than a transcript; put a check that must hold every time into CI. With guardrails, because the cheap path isn't always the right one — judgment doesn't offload, a fragile parser written to avoid a short read is a bad trade, and a filtered or partial check is always disclosed as one.</p>
+      <p class="module-scope">Tool-agnostic. The MCP examples assume MCP servers are attached — Claude Code, Cursor, Copilot, Windsurf and others — but the principle holds without them.</p>
       <p class="ba-scenario">You ask which CI checks ran on a commit.</p>
       <div class="ba">
         <div class="ba-col"><span class="ba-label before">Before</span>The whole API response is pulled into context and read: <span class='mono'>345 KB</span> of JSON to find three job names.<span class="ba-impact">A large share of the context window spent — room the actual task no longer has.</span></div>
@@ -539,8 +546,20 @@ PASS  useAppearance > persists explicit dark</div>
     </div>
 
     <div class="module">
+      <h4>ci-gated-main</h4>
+      <p>The default branch takes pull requests only — no direct pushes, no force-pushes, no deletion — and merging waits on a check that installs, builds, and runs the tests. The rule includes administrators, because a gate you can walk around is a gate for other people. Where a project has nothing to build or test, the check says so and passes, rather than showing a green tick that means nothing.</p>
+      <p class="module-scope">GitHub-specific in mechanism. The rule — no unreviewed, untested code on the default branch — carries to any forge.</p>
+      <p class="ba-scenario">A change needs to reach <code>main</code>.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Before</span>Anyone with push access can put anything on <code>main</code>. Whether the tests ran is not visible from the branch.<span class="ba-impact">A broken <code>main</code> is discovered by the next person to pull from it.</span></div>
+        <div class="ba-col"><span class="ba-label after">After</span>A pull request, and a merge button that stays disabled until the check reports green.<span class="ba-impact">Broken code stops at the gate — including yours, since administrators are covered too.</span></div>
+      </div>
+    </div>
+
+    <div class="module">
       <h4>secrets</h4>
       <p>Three independent layers, because any one of them can be bypassed: the pre-commit framework running gitleaks locally, the same scan again in CI, and GitHub's server-side push protection. Checks are never quietly disabled — a false positive gets an inline allow-marker instead. Anything that reaches history is treated as compromised and rotated, not just deleted.</p>
+      <p class="module-scope">The scanning layers are tool-agnostic; push protection is GitHub's.</p>
       <p class="ba-scenario">A <code>.env</code> holding a live API key gets staged with everything else.</p>
       <div class="ba">
         <div class="ba-col"><span class="ba-label before">Before</span>It commits cleanly and is noticed a week later.<span class="ba-impact">The key was public for a week: rotate it, then audit what used it.</span></div>
@@ -551,6 +570,7 @@ PASS  useAppearance > persists explicit dark</div>
     <div class="module">
       <h4>repo-config</h4>
       <p>Repository settings — merge policy, Pages, security toggles, branch protection — live in the repo as code and get applied automatically, rather than being clicked through the web UI where they drift silently and nobody can review the change. Two implementations: Terraform in <code>infra/</code>, or the <a href="https://github.com/repository-settings/app">Settings app</a> reading <code>.github/settings.yml</code> — the app needs no token, but grants settings control to anyone who can push, so it wants <code>CODEOWNERS</code> review on that file.</p>
+      <p class="module-scope">GitHub-specific. The principle carries to any forge; both implementations are GitHub's.</p>
       <p class="ba-scenario">Repository settings — merge policy, branch deletion, security toggles — declared as code.</p>
       <div class="ba">
         <div class="ba-col"><span class="ba-label before">Before</span>The apply step skips quietly because its token was never created, and nothing fails.<span class="ba-impact">Five of seven declared settings were never applied. The code reads as configuration; it was documentation.</span></div>
@@ -561,7 +581,7 @@ PASS  useAppearance > persists explicit dark</div>
     <h3 class="cat">Documentation <span>— what gets written down</span></h3>
 
     <div class="module">
-      <h4>architecture</h4>
+      <h4>architecture-docs</h4>
       <p>Every project keeps an <code>ARCHITECTURE.md</code> at the root: major components, how they fit together, key data flows, with Mermaid diagrams. It's updated in the same change that rewires a component — never as a later cleanup pass. Deliberately high level, so small edits don't invalidate it.</p>
       <p class="ba-scenario">A queue is introduced between two services.</p>
       <div class="ba">
@@ -573,6 +593,7 @@ PASS  useAppearance > persists explicit dark</div>
     <div class="module">
       <h4>specification</h4>
       <p>Intended behavior gets written down in the repo, in a standard format — currently <a href="https://github.com/github/spec-kit">Spec Kit</a>: a <code>spec.md</code> per feature under <code>specs/</code>, with <code>plan.md</code> and <code>tasks.md</code> derived from it. The spec says <em>what</em> and <em>why</em>; the plan says <em>how</em>. When intended behavior changes the spec is revised in the same change as the code, and code that contradicts the spec gets raised as a question rather than silently resolved in either direction.</p>
+      <p class="module-scope">Agent-agnostic — Spec Kit is a file format plus a CLI, not a feature of one assistant.</p>
       <p class="ba-scenario">Should an expired invite be rejected, or silently renewed?</p>
       <div class="ba">
         <div class="ba-col"><span class="ba-label before">Before</span>The implementation is the only answer available, so whatever it does becomes correct.<span class="ba-impact">A bug becomes the specification, and ships as intended behaviour.</span></div>
@@ -583,6 +604,7 @@ PASS  useAppearance > persists explicit dark</div>
     <div class="module">
       <h4>project-website</h4>
       <p>Most projects get a static site explaining what it is, why it exists, and how to use it — including install steps for every environment where they differ, and a before/after demo of what the project actually changes. Where real screenshots aren't practical, simulate them and label them as simulated. <em>This page is that module applied to itself.</em></p>
+      <p class="module-scope">Any static host. GitHub Pages is assumed only because the rest of these defaults already assume GitHub.</p>
       <p class="ba-scenario">Someone lands on the project for the first time.</p>
       <div class="ba">
         <div class="ba-col"><span class="ba-label before">Before</span>A README that assumes they know what the project is, and install steps covering only the author's setup.<span class="ba-impact">They work out whether it applies to them, or they leave.</span></div>
@@ -988,13 +1010,13 @@ When I ask for a new feature or a significant change:
       <p><strong>The catch is size.</strong> These fields are capped, and the full block is nowhere near small enough:</p>
       <div class="table-wrap">
       <table>
-        <tr><th>Field</th><th>Cap</th><th>Full block (14,948)</th><th>Condensed (1,430)</th></tr>
-        <tr><td>Claude — project instructions</td><td>~8,000</td><td>✗ 6,948 over</td><td class="ok">✓ fits</td></tr>
-        <tr><td>ChatGPT — custom instructions (paid)</td><td>5,000</td><td>✗ 9,948 over</td><td class="ok">✓ fits</td></tr>
-        <tr><td>ChatGPT — custom instructions (Free/Go)</td><td>1,500</td><td>✗ 13,448 over</td><td class="ok">✓ fits, barely</td></tr>
+        <tr><th>Field</th><th>Cap</th><th>Full block (21,874)</th><th>Condensed (1,435)</th></tr>
+        <tr><td>Claude — project instructions</td><td>~8,000</td><td>✗ 13,874 over</td><td class="ok">✓ fits</td></tr>
+        <tr><td>ChatGPT — custom instructions (paid)</td><td>5,000</td><td>✗ 16,874 over</td><td class="ok">✓ fits</td></tr>
+        <tr><td>ChatGPT — custom instructions (Free/Go)</td><td>1,500</td><td>✗ 20,374 over</td><td class="ok">✓ fits, barely</td></tr>
       </table>
       </div>
-      <p class="lead">So this path uses <code>INSTRUCTIONS-brief.md</code> — one line per module, generated from each module's thesis sentence by the same CI job that builds the full block. Honest caveat: at 1,430 characters it clears the 1,500 floor with about one module's headroom. Add two more modules and Free/Go readers will need to trim some, or use the fetch approach in step 7 instead.</p>
+      <p class="lead">So this path uses <code>INSTRUCTIONS-brief.md</code> — one line per module, generated from each module's thesis sentence by the same CI job that builds the full block. Honest caveat: at 1,435 characters it clears the 1,500 floor by 65. That is under one module's worth — the thirteenth module already forced two thesis sentences to be tightened to fit. The next one breaks it, and Free/Go readers will have to trim modules or use the fetch approach in step 7.</p>
 
       <h3><span class="step">4.</span>Open <code>INSTRUCTIONS-brief.md</code> in your fork</h3>
       <p><code>github.com/<span class="youfork u">your-username</span>/<span class="r">dotfiles-ai</span>/blob/main/INSTRUCTIONS-brief.md</code></p>
