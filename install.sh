@@ -10,10 +10,21 @@
 # for tools you don't use.
 #
 # Usage:
-#   ./install.sh            install/update the managed block for detected tools
-#   ./install.sh --all      install for every known tool, detected or not
-#   ./install.sh --print    print the assembled block to stdout and exit
-#   ./install.sh --brief    print the condensed one-line-per-module block and exit
+#   ./install.sh                  install/update the managed block for detected tools
+#   ./install.sh --all            install for every known tool, detected or not
+#   ./install.sh --print          print the assembled block to stdout and exit
+#   ./install.sh --brief          print the condensed one-line-per-module block and exit
+#   ./install.sh --list           list the modules, marking which are selected
+#   ./install.sh --only a,b       use only these modules (remembered)
+#   ./install.sh --except a,b     use every module but these (remembered)
+#   ./install.sh --all-modules    forget any saved selection and use all modules
+#
+# Not everyone wants all thirteen modules. A selection made with --only or
+# --except is saved, because sync.sh re-runs this script unattended: a
+# selection that lasted until the next daily sync would be a trap, not a
+# feature. The durable way to curate is still to delete modules you don't want
+# from defaults/ in your fork; the saved selection is for keeping a subset on
+# one machine without changing the repo.
 
 set -euo pipefail
 
@@ -33,19 +44,121 @@ TARGETS=(
   "$HOME/.config/goose/.goosehints"         # Goose
 )
 
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-ai"
+SELECTION_FILE="$STATE_DIR/modules"
+
+all_modules() { # every module name, in filename order
+  local f
+  for f in "$REPO_DIR"/defaults/*.md; do
+    [[ -f "$f" ]] || continue
+    basename "$f" .md
+  done
+}
+
+# The module names to use, one per line. Set by resolve_selection().
+SELECTED=()
+selection_source=""
+
+# Turn --only / --except / a saved selection into SELECTED, rejecting names
+# that don't exist. A typo must fail loudly: silently installing twelve of the
+# thirteen modules someone asked for is the kind of error nobody notices.
+resolve_selection() { # resolve_selection <only-csv> <except-csv> <forget:0|1>
+  local only="$1" except="$2" forget="$3"
+  local -a available; mapfile -t available < <(all_modules)
+  [[ ${#available[@]} -gt 0 ]] || { echo "no modules found in $REPO_DIR/defaults/" >&2; return 1; }
+
+  if [[ $forget -eq 1 ]]; then
+    SELECTED=("${available[@]}"); selection_source="all"; return 0
+  fi
+
+  if [[ -z "$only" && -z "$except" && -s "$SELECTION_FILE" ]]; then
+    mapfile -t only_names < "$SELECTION_FILE"
+    only="$(IFS=,; echo "${only_names[*]}")"
+    selection_source="saved"
+  elif [[ -n "$only" || -n "$except" ]]; then
+    selection_source="flag"
+  else
+    SELECTED=("${available[@]}"); selection_source="all"; return 0
+  fi
+
+  local -a named; IFS=',' read -r -a named <<< "${only:-$except}"
+  local n known
+  local -a kept=()
+  for n in "${named[@]}"; do
+    [[ -n "$n" ]] || continue
+    known=0
+    for m in "${available[@]}"; do [[ "$m" == "$n" ]] && known=1; done
+    if [[ $known -eq 1 ]]; then
+      kept+=("$n")
+    elif [[ "$selection_source" == "saved" ]]; then
+      # A saved selection names modules, and a module can be deleted from the
+      # fork after the selection was made. Failing there would break every
+      # unattended sync.sh run until someone noticed; the name is simply gone.
+      echo "saved selection names $n, which no longer exists — dropping it" >&2
+    else
+      echo "unknown module: $n" >&2
+      echo "available: $(IFS=,; echo "${available[*]}")" >&2
+      return 3
+    fi
+  done
+  named=("${kept[@]+"${kept[@]}"}")
+
+  SELECTED=()
+  for m in "${available[@]}"; do
+    local wanted=0
+    for n in "${named[@]}"; do [[ "$m" == "$n" ]] && wanted=1; done
+    if [[ -n "$only" ]]; then
+      [[ $wanted -eq 1 ]] && SELECTED+=("$m")
+    else
+      [[ $wanted -eq 0 ]] && SELECTED+=("$m")
+    fi
+  done
+
+  if [[ ${#SELECTED[@]} -eq 0 ]]; then
+    echo "that selection leaves no modules — nothing to install" >&2
+    return 3
+  fi
+
+
+}
+
+# Only an actual install writes the saved selection. --print / --brief / --list
+# are queries: an assistant reads them while building the "which of these?"
+# prompt, long before anyone has decided anything.
+remember_selection() { # remember_selection <forget:0|1>
+  if [[ "$1" -eq 1 ]]; then rm -f "$SELECTION_FILE"; return 0; fi
+  [[ "$selection_source" == "all" ]] && return 0
+  # Written on every install, not only when a flag set it: an --except list and
+  # a saved list that has been pruned both resolve to names worth writing back,
+  # so the file converges on what is actually installed.
+  mkdir -p "$STATE_DIR"
+  printf '%s\n' "${SELECTED[@]}" > "$SELECTION_FILE"
+}
+
+selected_files() { local m; for m in "${SELECTED[@]}"; do echo "$REPO_DIR/defaults/$m.md"; done; }
+
 # Modules are flat files in defaults/; categories are a documentation
 # concept (see the README), not a directory layout.
 assemble() {
-  local found=0
+  local f
   echo "$BEGIN_MARK"
-  for f in "$REPO_DIR"/defaults/*.md; do
-    [[ -f "$f" ]] || continue
-    found=1
+  while read -r f; do
     cat "$f"
     echo
-  done
+  done < <(selected_files)
   echo "$END_MARK"
-  [[ $found -eq 1 ]] || { echo "no modules found in $REPO_DIR/defaults/" >&2; return 1; }
+}
+
+# One line per module: the name, then its thesis sentence. This is what an
+# assistant reads to build the "which of these do you want?" list, so it has
+# to be parseable without knowing anything about markdown.
+list_modules() {
+  local m mark
+  for m in $(all_modules); do
+    mark=" "
+    for sel in "${SELECTED[@]}"; do [[ "$sel" == "$m" ]] && mark="x"; done
+    printf '[%s] %-24s %s\n' "$mark" "$m" "$(thesis "$REPO_DIR/defaults/$m.md")"
+  done
 }
 
 # Condensed form: the H1 and the bold thesis sentence from each module, one
@@ -57,28 +170,29 @@ assemble() {
 # "Web chat" install path). Every module must carry a thesis sentence — a
 # paragraph wrapped in ** ** directly under its heading — and assembly fails
 # loudly rather than silently dropping a module that lacks one.
+thesis() { # the bold paragraph under a module's heading, unwrapped to one line
+  local line
+  line="$(awk '
+    /^\*\*/ && !done {
+      buf = $0
+      while (buf !~ /\*\*[[:space:]]*$/) { if ((getline nxt) <= 0) break; buf = buf " " nxt }
+      sub(/^\*\*/, "", buf); sub(/\*\*[[:space:]]*$/, "", buf)
+      print buf; done = 1
+    }' "$1")"
+  if [[ -z "$line" ]]; then
+    echo "no thesis sentence (a **bold** paragraph under the heading) in $1" >&2
+    return 1
+  fi
+  echo "$line"
+}
+
 brief() {
-  local found=0
+  local f
   echo "My working defaults (dotfiles-ai). Follow these unless I say otherwise."
   echo
-  for f in "$REPO_DIR"/defaults/*.md; do
-    [[ -f "$f" ]] || continue
-    found=1
-    local line
-    line="$(awk '
-      /^\*\*/ && !done {
-        buf = $0
-        while (buf !~ /\*\*[[:space:]]*$/) { if ((getline nxt) <= 0) break; buf = buf " " nxt }
-        sub(/^\*\*/, "", buf); sub(/\*\*[[:space:]]*$/, "", buf)
-        print buf; done = 1
-      }' "$f")"
-    if [[ -z "$line" ]]; then
-      echo "no thesis sentence (a **bold** paragraph under the heading) in $f" >&2
-      return 1
-    fi
-    echo "- $line"
-  done
-  [[ $found -eq 1 ]] || { echo "no modules found in $REPO_DIR/defaults/" >&2; return 1; }
+  while read -r f; do
+    echo "- $(thesis "$f")"
+  done < <(selected_files)
 }
 
 # Remove an existing managed block from $1, writing the remainder to $2, and
@@ -111,15 +225,50 @@ strip_block() {
 }
 
 install_all=0
-case "${1:-}" in
-  --print) assemble; exit 0 ;;
-  --brief) brief; exit 0 ;;
-  --all)   install_all=1 ;;
-  "")      ;;
-  *)       echo "unknown option: $1" >&2; exit 2 ;;
+action="install"
+only=""
+except=""
+forget=0
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --print)       action="print" ;;
+    --brief)       action="brief" ;;
+    --list)        action="list" ;;
+    --all)         install_all=1 ;;
+    --all-modules) forget=1 ;;
+    --only)        only="${2:-}"; shift ;;
+    --only=*)      only="${1#*=}" ;;
+    --except)      except="${2:-}"; shift ;;
+    --except=*)    except="${1#*=}" ;;
+    *)             echo "unknown option: $1" >&2; exit 2 ;;
+  esac
+  shift
+done
+
+if [[ -n "$only" && -n "$except" ]]; then
+  echo "--only and --except are alternatives; pass one" >&2; exit 2
+fi
+
+resolve_selection "$only" "$except" "$forget"
+
+case "$action" in
+  print) assemble; exit 0 ;;
+  brief) brief; exit 0 ;;
+  list)  list_modules; exit 0 ;;
 esac
 
+remember_selection "$forget"
 block="$(assemble)"
+
+if [[ ${#SELECTED[@]} -lt $(all_modules | wc -l) ]]; then
+  case "$selection_source" in
+    saved) echo "using your saved selection: $(IFS=,; echo "${SELECTED[*]}")" ;;
+    flag)  echo "installing these modules, and remembering the choice: $(IFS=,; echo "${SELECTED[*]}")" ;;
+  esac
+  echo "(./install.sh --all-modules restores every module)"
+  echo
+fi
 
 for target in "${TARGETS[@]}"; do
   dir="$(dirname "$target")"

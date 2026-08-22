@@ -84,6 +84,15 @@ block in the user-level instruction file of each AI CLI it detects on your
 machine (detection = the tool's config directory exists). Use
 `./install.sh --all` to write every target regardless.
 
+**Installing only some modules.** `./install.sh --list` prints every module
+with its one-line summary; `--only git,testing` or `--except repo-config`
+installs a subset. The choice is remembered in
+`~/.local/state/dotfiles-ai/modules`, because `sync.sh` re-runs the installer
+unattended and a selection that lasted until the next daily sync would be a
+trap. `--all-modules` forgets it. The durable way to curate is still to delete
+modules you don't want from `defaults/` in your fork — the saved selection is
+for keeping a subset on one machine without changing the repo.
+
 Re-running the script replaces the managed block in place (a `.bak` backup is
 saved), so anything you keep in those files outside the block is untouched.
 

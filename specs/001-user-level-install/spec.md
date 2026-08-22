@@ -95,6 +95,40 @@ written to standard output and no target file is created or modified.
 
 ---
 
+### User Story 4 - Take some of the preferences, not all of them (Priority: P2)
+
+Someone reads the module list, agrees with most of it, and wants the rest left
+alone. They pick the modules they want; only those are installed, and the
+choice sticks.
+
+**Why this priority**: These are one person's opinions. A set you must accept
+whole is a set most people bounce off, and the alternative — editing the fork
+before you have decided you like any of it — is too much to ask of a first run.
+
+**Independent Test**: Install with a named subset, confirm the block contains
+those modules and no others, then re-run with no arguments and confirm the
+subset is still what is installed.
+
+**Acceptance Scenarios**:
+
+1. **Given** a request naming two modules, **When** the installer runs,
+   **Then** the managed block contains exactly those two and the run says which
+   modules it installed.
+2. **Given** a selection was made on a previous run, **When** the installer
+   runs with no arguments, **Then** the same subset is installed and the run
+   says it is using the saved selection.
+3. **Given** a selection was made, **When** the installer runs in the mode that
+   forgets it, **Then** every module is installed again and the saved selection
+   is gone.
+4. **Given** a request naming a module that does not exist, **When** the
+   installer runs, **Then** it exits non-zero naming the unknown module and the
+   modules that do exist, and installs nothing.
+5. **Given** any machine state, **When** the installer lists the modules,
+   **Then** each module appears on one line with its thesis sentence and a mark
+   showing whether it is selected, and no selection is saved.
+
+---
+
 ### Edge Cases
 
 - **No modules present.** The run fails with a message naming the empty
@@ -118,6 +152,17 @@ written to standard output and no target file is created or modified.
   "is there a block?" and "which lines are the block?" were answered by
   different code. They are now one function, so the two answers cannot
   disagree again.
+- **A selection that names every module, or none of them.** Naming every
+  module is indistinguishable from taking the default and is allowed. A
+  selection that resolves to zero modules is refused, rather than writing an
+  empty managed block over an existing one.
+- **A selection made, then a module deleted from the fork.** *Resolved: a
+  stale name in a **saved** selection is dropped with a notice and the saved
+  file is rewritten without it; a stale name passed as an **argument** still
+  fails.* The two differ because the argument is a claim the user just made,
+  while the saved file is a record that the repo has since moved past — and
+  failing there would break every unattended `sync.sh` run until someone read
+  the output.
 - **Target directory exists but the file is read-only or not writable.** Not
   currently distinguished from other failures. [NEEDS CLARIFICATION: should one
   unwritable target abort the whole run or be reported and skipped?]
@@ -163,6 +208,24 @@ written to standard output and no target file is created or modified.
 - **FR-013**: A `BEGIN` marker with no matching `END` MUST abort with a
   distinct non-zero status, naming the file, and MUST leave that file
   unmodified. Destroying unauthored content is never the fallback.
+- **FR-014**: The system MUST support installing a named subset of the
+  modules — both "only these" and "all but these" — and MUST apply the same
+  subset to every mode that emits the block, including both print modes. An
+  unrecognized module name MUST abort with a distinct non-zero status, naming
+  the unknown module and listing the ones that exist; installing the remainder
+  would be a silent partial success.
+- **FR-015**: A subset chosen at install time MUST persist, so that a later
+  run with no arguments installs the same subset and says that it is doing so.
+  A mode to forget it MUST exist. A persisted name that no longer matches a
+  module MUST be dropped with a notice rather than failing the run, and the
+  stored selection MUST be rewritten without it. Persistence is a requirement rather than a
+  convenience: `sync.sh` re-runs the installer unattended, so a selection that
+  did not persist would be silently reverted within a day.
+- **FR-016**: The system MUST offer a listing of the modules — one line each,
+  carrying the module's name, its thesis sentence, and whether it is currently
+  selected — and that listing MUST NOT change any saved state. It is what an
+  assistant reads to build a "which of these do you want?" prompt, before the
+  user has chosen anything.
 
 ### Key Entities
 
@@ -173,6 +236,9 @@ written to standard output and no target file is created or modified.
   form.
 - **Managed block**: the assembled modules plus their delimiting markers; the
   unit that is inserted, replaced, and removed as a whole.
+- **Selection**: the set of module names to assemble. Absent one, it is every
+  module. It is stored per machine, not in the repo, because the repo-level way
+  to curate is to delete modules from the fork.
 - **Target**: the absolute path of one tool's user-level instruction file,
   paired with the directory whose existence signals that the tool is in use.
 
@@ -189,6 +255,8 @@ written to standard output and no target file is created or modified.
 - **SC-004**: No file is created for a tool that is not installed on the machine.
 - **SC-005**: Adding a module changes no file other than the new module and the
   generated copies of the block.
+- **SC-008**: A subset chosen once is still the subset in place after an
+  unattended `sync.sh` run — no manual step re-asserts it.
 - **SC-007**: Every acceptance scenario above is executable. `./test.sh` runs
   them against a throwaway `HOME` and fails the build if any regresses.
 - **SC-006**: The condensed form fits the smallest instruction field this

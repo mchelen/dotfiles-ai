@@ -385,17 +385,28 @@
 <main>
   <section id="quick">
     <h2>Quick start</h2>
-    <p>Want the defaults working <em>right now</em>, in a session you already have open? Paste this in. It works in Claude Code — terminal, desktop, or <code>claude.ai/code</code> — and in any other assistant that can read a URL.</p>
+    <p>Want the defaults working <em>right now</em>, in a session you already have open? Paste this in. It works in Claude Code — terminal, desktop, or <code>claude.ai/code</code> — and in any other assistant that can read a URL. It asks which modules you want before it applies anything.</p>
 
     <div class="snip">
       <button class="copy" type="button" data-copy="quick-snippet">Copy</button>
       <pre id="quick-snippet">Read https://raw.githubusercontent.com/<span class="qu">mchelen</span>/<span class="qr">dotfiles-ai</span>/main/INSTRUCTIONS.md
-and follow it for the rest of this session — those are my working defaults.
+— those are my working defaults, one module per "# " heading.
+
+Before applying anything, ask me which modules I want. Show them as a
+multi-select I can check off — in Claude Code use AskUserQuestion with
+multiSelect, in any other agent use whatever equivalent picker it has. If you
+have no picker, list them numbered, one line each with the module's bold
+summary sentence, and let me answer with numbers. Everything is checked by
+default; I'll uncheck what I don't want.
+
+Follow only the modules I picked, for the rest of this session.
 
 Then tell me briefly how to keep them, and offer to set up whichever I pick:
-  - this project only: commit the block into CLAUDE.md (or AGENTS.md)
-  - every session: fork the repo, then run install.sh on my machine, or add it
-    to my Claude Code environment setup script
+  - this project only: commit the block for those modules into CLAUDE.md
+    (or AGENTS.md)
+  - every session: fork the repo, then run
+      ./install.sh --only &lt;the modules I picked&gt;
+    on my machine, or put that line in my Claude Code environment setup script
 
 If I later want to change a preference, remind me it lives in defaults/ in my
 fork — the copy you just read is disposable.</pre>
@@ -404,8 +415,8 @@ fork — the copy you just read is disposable.</pre>
     <div class="quick">
       <p><strong>What that does</strong></p>
       <ol>
-        <li><strong>Immediately:</strong> the assistant reads <code>INSTRUCTIONS.md</code> — every module, already assembled — and follows it for this session. Nothing is installed, nothing is committed, and it works in a session that's already running.</li>
-        <li><strong>Then:</strong> it explains the two ways to make that permanent and offers to do the work, so you don't have to come back here and read the install guide.</li>
+        <li><strong>Immediately:</strong> the assistant reads <code>INSTRUCTIONS.md</code> — every module, already assembled — and asks which ones you want, as a checklist you can uncheck. Nothing is installed, nothing is committed, and it works in a session that's already running.</li>
+        <li><strong>Then:</strong> it follows the modules you kept, explains the two ways to make that permanent, and offers to do the work — so you don't have to come back here and read the install guide. The permanent version carries your choice: <code>./install.sh --only git,testing</code> installs just those, and remembers, so the next automatic sync doesn't quietly restore the rest.</li>
         <li><strong>Later:</strong> it knows to send you to <code>defaults/</code> in your own fork when you want to change something — never to the pasted copy, which is disposable by design.</li>
       </ol>
       <p class="lead" style="margin-bottom:0">Fetching needs network access. In a <code>claude.ai/code</code> session, <code>raw.githubusercontent.com</code> is on the default <em>Trusted</em> allowlist, so it works as-is. If your tool can't reach the internet, open <a href="https://github.com/mchelen/dotfiles-ai/blob/main/INSTRUCTIONS.md">INSTRUCTIONS.md</a>, click <em>Copy raw file</em>, and paste the block itself instead.</p>
@@ -421,7 +432,7 @@ fork — the copy you just read is disposable.</pre>
   </section>
   <section id="demo">
     <h2>Before and after</h2>
-    <p>Same repo, same request, same model — the only difference is whether the defaults are installed. This is what the <code>feature-workflow</code>, <code>testing</code>, and <code>git</code> modules change in practice:</p>
+    <p>Same repo, same request, same model — the only difference is whether the defaults are installed. This is what the <code>propose-before-building</code>, <code>testing</code>, and <code>git</code> modules change in practice:</p>
     <div class="demo">
       <div class="chat">
         <div class="chat-head before"><span class="pill">before</span> <span class="note">no defaults installed</span></div>
@@ -483,6 +494,7 @@ PASS  useAppearance > persists explicit dark</div>
   <section id="modules">
     <h2>The modules</h2>
     <p>Thirteen modules, grouped here by the kind of behavior they govern. Each one is a short markdown file in <code>defaults/</code> — read them, delete the ones you disagree with, add your own.</p>
+    <p class="lead">You don't have to take all thirteen. The <a href="#quick">quick start</a> asks which ones you want before it applies anything, and <code>./install.sh --only git,testing</code> installs just those and remembers the choice (<code>--list</code> shows them all, <code>--all-modules</code> forgets).</p>
 
     <h3 class="cat">Collaboration <span>— how the assistant works with you</span></h3>
 
@@ -1417,7 +1429,7 @@ Before I build this, two approaches — client-side CSV from the
 loaded rows, or a server endpoint that streams the full result
 set. I'd recommend the endpoint since reports can exceed the
 page size. Mockup of the button placement below…</div>
-          <div style="font-size:.78rem;color:var(--muted);margin-top:.5rem">↑ proposing first, because CLAUDE.md carries the feature-workflow module</div>
+          <div style="font-size:.78rem;color:var(--muted);margin-top:.5rem">↑ proposing first, because CLAUDE.md carries the propose-before-building module</div>
         </div>
       </div>
 

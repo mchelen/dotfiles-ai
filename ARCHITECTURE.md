@@ -47,7 +47,13 @@ flowchart LR
   Targets are a plain list in the script — adding a tool means adding a
   path there. A target is skipped unless its tool's config directory
   already exists (`--all` overrides), so only tools actually in use get
-  instruction files.
+  instruction files. Which *modules* go into the block is also selectable
+  (`--list`, `--only`, `--except`, `--all-modules`): the set is one person's
+  opinions and a take-it-whole set is one most people bounce off. A selection
+  is saved to `~/.local/state/dotfiles-ai/modules` rather than to the repo,
+  because `sync.sh` re-runs the installer unattended — a choice that did not
+  persist would be silently reverted within a day — while the repo-level way
+  to curate stays "delete the module from your fork".
 - **`INSTRUCTIONS.md`** — the assembled block, committed at the repo root as
   a build artifact of `install.sh --print`. Generated, never hand-edited:
   **`.github/workflows/generate-instructions.yml`** regenerates and commits
