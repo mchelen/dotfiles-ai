@@ -9,6 +9,13 @@ on:
     paths:
       - 'docs/**'
       - '.github/workflows/deploy-pages.yml'
+  # generate-instructions rewrites docs/index.html when a module changes, but a
+  # push made with GITHUB_TOKEN never triggers another workflow's push event.
+  # Without this the regenerated site would sit unpublished until the next
+  # hand-edit of docs/.
+  workflow_run:
+    workflows: [generate-instructions]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
