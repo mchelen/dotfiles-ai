@@ -13,12 +13,68 @@ rewires a component.**
 - Stay high level: components and boundaries, not function-by-function
   detail. If the diagram needs updating for small edits, it's too detailed.
 
-# CI-gated main
+# Cheap git and forge queries
 
-**`main` is protected, and merges only through a green CI check.**
+**Ask git and the forge for the smallest thing that answers the question.**
 
-*GitHub-specific in mechanism; the rule — no unreviewed, untested code on the
-default branch — carries to any forge.*
+*Tool-agnostic in principle. `minimal_output` is the GitHub MCP server's flag;
+elsewhere it's whatever narrows the response at the source.*
+
+History and pull-request APIs return far more than was asked for by default,
+and one unbounded response can cost a meaningful share of the context window.
+This is the git-shaped half of the compute-offload module.
+
+- **Narrow at the source.** `--stat`, `--name-only`, `--oneline`, `-n`,
+  `--no-patch` — reach for these before printing something large and reading
+  past most of it. `git log --oneline -10` answers "what happened lately";
+  `git log -p` answers the same question at many times the cost.
+- **Turn off the pager** (`--no-pager`, or `GIT_PAGER=cat`) so output arrives
+  whole instead of a screen at a time.
+- **Ask forge tooling for the smallest useful response**: set `minimal_output`
+  where the tool supports it, page in small batches, and use server-side
+  filters instead of fetching everything and filtering afterwards.
+- **Don't pull a large payload to read one field.** When polling something like
+  a workflow or check status, request only that status; if a response comes
+  back huge anyway, save it and query the field out of the file rather than
+  re-fetching.
+- **Prefer a scheduled re-check to a tight polling loop** when waiting on CI or
+  a deployment.
+- **Narrowing is for navigation, not for judgment.** Reviewing a change means
+  reading the diff. Use these to find your way to it, not to avoid it.
+
+# Pull requests and a CI-gated `main`
+
+**Changes reach `main` only through a pull request with a green check: in how
+you work, and in how the repo is configured.**
+
+*The working half is tool-agnostic. The protection half is GitHub-specific in
+mechanism — the rule, no unreviewed or untested code on the default branch,
+carries to any forge — and needs admin rights, so it's a one-time human step.*
+
+## Working this way
+
+- Once work on a branch is complete and pushed, open a pull request by
+  default — no need to ask first.
+- After opening it, keep watching it if the tooling allows: respond to review
+  comments and fix CI failures until it's merged or closed. A pull request you
+  opened and stopped watching is unfinished work, not delivered work.
+- Merge by default once automated checks pass and any required reviews are
+  approved — no need to ask first.
+- Don't merge over failing checks, missing required approvals, or unresolved
+  discussions. A red check is an answer, not an obstacle.
+- When a check is red for a reason the change didn't cause — a flaky test, a
+  failure that reproduces on the base branch — say that in the pull request
+  and merge once it recovers, rather than quietly merging past it.
+- Squash-merging is fine even though it collapses the branch: `main` is meant
+  to carry one commit per change, which is the unit `revert` and `bisect` work
+  on, and the commit-by-commit story stays readable in the pull request. That
+  is a reason to keep the branch's story clean, not a reason to stop telling
+  one — reviewers read it commit by commit.
+
+## Protecting the branch
+
+The rules above are what I want you to do. Branch protection is what the
+repository does when nobody is doing it — including when the actor is a script.
 
 - **Protect the default branch.** No direct pushes, no force-pushes, no
   deletion. Changes reach `main` through a pull request.
@@ -63,8 +119,8 @@ unenforced rule and an enforced one look identical from the settings page.
 
 # Code style
 
-**Match the surrounding code, make the smallest change that solves the problem,
-and never add a dependency without saying why.**
+**Match the surrounding code, make the smallest change that works, and justify
+any new dependency.**
 
 - Match the existing style of the codebase over any personal or general default.
 - Prefer the smallest change that solves the problem; avoid opportunistic
@@ -73,6 +129,43 @@ and never add a dependency without saying why.**
   constraints or reasoning.
 - Don't add new dependencies for something a few lines of code can do.
   If a dependency is genuinely warranted, say so and why before adding it.
+
+# Commit and branch conventions
+
+**Nothing is committed or pushed unless I ask; each commit is one logical
+change, conventionally named.**
+
+- Never commit or push unless I ask (or I've clearly set up a workflow where
+  it's expected). This governs *whether* to commit; the rest of this module
+  governs *how* the work is carved up once I've asked.
+- Commit in atomic units: one logical change each — one feature, one fix, one
+  refactor, one documentation update — so every commit is independently
+  revertable and describable in a single line. Don't bundle unrelated changes,
+  and don't dump a whole session into one commit called "updates".
+- Write the message as a conventional prefix plus an imperative summary, with
+  the reasoning in the body when it isn't obvious from the diff. Prefixes:
+  `feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `style:`, `perf:`, `chore:`.
+- Name branches the same way: a type prefix, then a short hyphenated
+  description — `fix/marker-trailing-space`, `docs/install-guide`. It should
+  still say what it is a month later, read in a list of twenty. If the repo
+  already has a convention, follow that one instead of introducing a second.
+- Don't commit code that doesn't build, tests that fail (unless a failing test
+  is deliberately the point), leftover debugging, or unrelated changes mixed
+  together.
+- Never commit secrets, `.env` files, or credentials — flag it if you see them
+  staged. The scanning layers that back this up are in the secrets module.
+
+## Rewriting history
+
+- Reshaping history on a feature branch is fine and needs no confirmation,
+  before or after pushing it: squash the fixups, reorder, reword, split a "wip"
+  into the commits it should have been, and force-push the result. Until it
+  merges, the branch is yours. `git log origin/main..HEAD` shows what's in
+  scope.
+- **`main` is the line.** Never rewrite history there — no force-push, no
+  rebase, no amending a merged commit — without explicit confirmation. The same
+  restraint applies to any branch someone else has started work from, which is
+  the reason the rule exists.
 
 # Offloading mechanical work
 
@@ -112,64 +205,10 @@ Don't offload when it costs correctness:
   something, say so. A partial check reported as a complete one is worse than
   no check at all.
 
-# Git
-
-**Nothing is committed or pushed unless I ask; finished work goes to a pull
-request that merges only on green.**
-
-- Never commit or push unless I ask (or I've clearly set up a workflow where
-  it's expected). This governs *whether* to commit; the rest of this section
-  governs *how* the work is carved up once I've asked.
-- Commit in atomic units: one logical change each — one feature, one fix, one
-  refactor, one documentation update — so every commit is independently
-  revertable and describable in a single line. Don't bundle unrelated changes,
-  and don't dump a whole session into one commit called "updates".
-- Write the message as a conventional prefix plus an imperative summary, with
-  the reasoning in the body when it isn't obvious from the diff. Prefixes:
-  `feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `style:`, `perf:`, `chore:`.
-- Don't commit code that doesn't build, tests that fail (unless a failing test
-  is deliberately the point), leftover debugging, or unrelated changes mixed
-  together.
-- Reshaping history on a feature branch is fine and needs no confirmation,
-  before or after pushing it: squash the fixups, reorder, reword, split a "wip"
-  into the commits it should have been, and force-push the result. Until it
-  merges, the branch is yours. `git log origin/main..HEAD` shows what's in
-  scope.
-- **`main` is the line.** Never rewrite history there — no force-push, no
-  rebase, no amending a merged commit — without explicit confirmation. The same
-  restraint applies to any branch someone else has started work from, which is
-  the reason the rule exists.
-- Once work on a branch is complete and pushed, go ahead and open a pull
-  request by default — no need to ask first.
-- After opening a pull request, keep watching it if the tooling allows:
-  respond to review comments and fix CI failures until it's merged or closed.
-- Merge pull requests by default once automated checks pass and any required
-  reviews are approved — no need to ask first. Don't merge over failing
-  checks, missing required approvals, or unresolved discussions.
-- Squash-merging a pull request is fine even though it collapses the branch:
-  `main` is meant to carry one commit per change, which is the unit `revert`
-  and `bisect` work on, and the commit-by-commit story stays readable in the
-  pull request. That is a reason to keep the branch's story clean, not a
-  reason to stop telling one — reviewers read it commit by commit.
-- Never commit secrets, `.env` files, or credentials — flag it if you see
-  them staged.
-
-## Using GitHub tooling efficiently
-
-- Ask for the smallest useful response: set `minimal_output` where the tool
-  supports it, page in small batches, and use server-side filters instead
-  of fetching everything and filtering after.
-- Don't pull a large payload to read one field. When polling something like
-  a workflow or check status, request only that status; if a response comes
-  back huge anyway, save it and query the field out of the file rather than
-  re-fetching.
-- Prefer a scheduled re-check over tight polling loops when waiting on CI
-  or a deployment.
-
 # Honest reporting
 
-**Lead with the answer, say so before doing something you think is a bad idea,
-and disclose whatever you skipped or left failing.**
+**Lead with the answer, flag a bad idea before acting on it, and disclose what
+you skipped or left failing.**
 
 - Lead with the answer or outcome, then supporting detail.
 - If something I asked for seems like a bad idea, say so before doing it —
@@ -181,8 +220,8 @@ and disclose whatever you skipped or left failing.**
 
 # Project website
 
-**Most projects get a static site: what it is, why it exists, how to use it,
-with any simulated demo labelled as simulated.**
+**Most projects get a static site — what it is, why it exists, how to use it —
+with simulated demos labelled as such.**
 
 *Any static host works. GitHub Pages is the default assumed here because the rest of these defaults already assume GitHub.*
 
@@ -210,8 +249,8 @@ with any simulated demo labelled as simulated.**
 
 # Propose before building
 
-**For anything bigger than an obvious fix, put something concrete in front of me
-and wait for a yes before implementing.**
+**For anything bigger than an obvious fix, show me something concrete and wait
+for a yes before you build it.**
 
 When I ask for a new feature or a significant change (as opposed to a bug fix,
 small tweak, or something I've already specified in detail):
@@ -232,8 +271,8 @@ Skip this ceremony when:
 
 # Repo configuration as code
 
-**Repository settings live in the repo as code and are applied automatically,
-never clicked through the web UI.**
+**Repository settings live in the repo as code, applied automatically, never
+clicked through the UI.**
 
 *GitHub-specific. The principle — settings as code, applied automatically, never clicked — carries to any forge; both implementations below are GitHub's.*
 
@@ -331,8 +370,8 @@ quietly disabled.**
 
 # Specification
 
-**For anything beyond a small change, keep a written specification in the repo,
-in a standard format, and keep it true.**
+**Keep a written specification in the repo, in a standard format, and keep it
+true as the code changes.**
 
 *Agent-agnostic: Spec Kit is a file format plus a CLI, not a feature of one assistant.*
 
@@ -390,8 +429,8 @@ Skip test-first when:
 
 # Tool fallbacks
 
-**When an interactive tool looks stuck, switch to plain text rather than retrying
-the thing that just broke.**
+**When an interactive tool looks stuck, switch to plain text instead of
+retrying it.**
 
 *Applies to any assistant that asks through interactive prompts. The linked bug is Claude Code's; the failure mode — a mechanism that loses input being used to ask again — is not.*
 

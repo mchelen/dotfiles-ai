@@ -260,11 +260,13 @@ subset is still what is installed.
 - **SC-007**: Every acceptance scenario above is executable. `./test.sh` runs
   them against a throwaway `HOME` and fails the build if any regresses.
 - **SC-006**: The condensed form fits the smallest instruction field this
-  project documents. It is currently 1,435 characters against a 1,500
-  character floor, and the thirteenth module already required tightening two
-  thesis sentences to stay under it — at
-  which point the floor is missed and the guide must say so rather than
-  quietly overflow.
+  project documents. It is currently 1,446 characters against a 1,500
+  character floor. The margin is under one module's worth, and it has been
+  bought twice now by tightening thesis sentences: splitting the `git` module
+  in two took the total to 1,606, and nine theses were shortened to get back
+  under. When tightening stops being honest, the guide must say the floor is
+  missed rather than quietly overflow — and point at `--brief --only`, which
+  lets a reader fit the modules they actually want into the field they have.
 
 ## Assumptions
 

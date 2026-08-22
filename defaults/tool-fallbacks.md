@@ -1,7 +1,7 @@
 # Tool fallbacks
 
-**When an interactive tool looks stuck, switch to plain text rather than retrying
-the thing that just broke.**
+**When an interactive tool looks stuck, switch to plain text instead of
+retrying it.**
 
 *Applies to any assistant that asks through interactive prompts. The linked bug is Claude Code's; the failure mode — a mechanism that loses input being used to ask again — is not.*
 

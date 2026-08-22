@@ -48,6 +48,7 @@ module only applies to a particular assistant or forge, that's noted in italics.
 | [`propose-before-building.md`](defaults/propose-before-building.md) | New features get a mockup, demo, options, or direction proposal **before** implementation starts |
 | [`tool-fallbacks.md`](defaults/tool-fallbacks.md) | When an interactive tool looks stuck, fall back to plain text instead of retrying it *(any assistant with interactive prompts)* |
 | [`compute-offload.md`](defaults/compute-offload.md) | Let the shell or CI do mechanical work — query instead of reading — but never where judgment or evidence is what's needed *(MCP examples assume MCP)* |
+| [`cheap-git-queries.md`](defaults/cheap-git-queries.md) | Narrow git and forge output at the source, so one history or pull-request query can't eat the context window *(`minimal_output` is GitHub MCP's)* |
 
 **Craft** — how code gets written
 
@@ -60,9 +61,9 @@ module only applies to a particular assistant or forge, that's noted in italics.
 
 | Module | Preference |
 |---|---|
-| [`git.md`](defaults/git.md) | No commits/pushes unless asked, PRs opened and merged on green, no history rewrites |
+| [`commit-conventions.md`](defaults/commit-conventions.md) | No commits/pushes unless asked; atomic commits, conventional messages and branch names, no rewriting `main` |
 | [`secrets.md`](defaults/secrets.md) | Layered secret/PII protection: pre-commit scan + CI scanner + GitHub secret scanning; leaked = rotate *(push protection is GitHub's)* |
-| [`ci-gated-main.md`](defaults/ci-gated-main.md) | `main` is protected and merges only on a green check that builds and tests *(GitHub-specific mechanism)* |
+| [`ci-gated-main.md`](defaults/ci-gated-main.md) | Work ships as pull requests merged on green, and `main` is protected so nothing else can reach it *(protection half is GitHub-specific)* |
 | [`repo-config.md`](defaults/repo-config.md) | Repo settings as code — Terraform, or the Settings app — never clicked through the UI, with the one-time human setup spelled out *(GitHub-specific)* |
 
 **Documentation** — what gets written down
@@ -101,7 +102,8 @@ machine (detection = the tool's config directory exists). Use
 `./install.sh --all` to write every target regardless.
 
 **Installing only some modules.** `./install.sh --list` prints every module
-with its one-line summary; `--only git,testing` or `--except repo-config`
+with its one-line summary; `--only commit-conventions,testing` or
+`--except repo-config`
 installs a subset. The choice is remembered in
 `~/.local/state/dotfiles-ai/modules`, because `sync.sh` re-runs the installer
 unattended and a selection that lasted until the next daily sync would be a
