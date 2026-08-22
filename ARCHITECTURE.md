@@ -85,7 +85,10 @@ flowchart LR
   before/after example; this script fills the middle part, copying every
   `defaults/*.md` verbatim into its card between per-module
   `BEGIN`/`END module-text` markers — the same technique `install.sh` uses on
-  instruction files. It exists because the site previously paraphrased each
+  instruction files. It also fills the `data-gen` spans in the web-chat
+  section with the measured sizes of both generated artifacts, and how far the
+  full block overshoots each documented cap: hand-typed, those numbers were
+  wrong within two changes of being written. It exists because the site previously paraphrased each
   module: a reader could not see what would actually be installed, and the
   paraphrase drifted the moment the module changed. `--check` exits non-zero
   when the page is stale, and `test.sh` runs it, so drift fails the build.

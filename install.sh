@@ -32,6 +32,11 @@ REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 BEGIN_MARK="<!-- BEGIN dotfiles-ai (managed block, edit in the dotfiles-ai repo) -->"
 END_MARK="<!-- END dotfiles-ai -->"
 
+# The smallest persistent-instruction field this project documents: ChatGPT
+# Free/Go. Claude Projects (~8,000) and ChatGPT Plus (5,000) are far larger, so
+# clearing this one clears all of them.
+BRIEF_FLOOR=1500
+
 # User-level instruction files of tools that read markdown guidance.
 # Add or remove entries to match the tools you use.
 TARGETS=(
@@ -187,12 +192,22 @@ thesis() { # the bold paragraph under a module's heading, unwrapped to one line
 }
 
 brief() {
-  local f
-  echo "My working defaults (dotfiles-ai). Follow these unless I say otherwise."
-  echo
+  local f out
+  out="My working defaults (dotfiles-ai) — follow unless I say otherwise."$'\n'
   while read -r f; do
-    echo "- $(thesis "$f")"
+    out+=$'\n'"- $(thesis "$f")"
   done < <(selected_files)
+  printf '%s\n' "$out"
+
+  # The floor is enforced here rather than remembered. Adding a module is the
+  # only thing that breaks it, and the person adding one is not the person who
+  # later finds the field silently truncated.
+  local size=$(( ${#out} + 1 ))
+  if [[ $size -gt $BRIEF_FLOOR ]]; then
+    echo "warning: $size characters, over the $BRIEF_FLOOR-character floor this" >&2
+    echo "project documents (ChatGPT Free/Go). Tighten a thesis sentence, or use" >&2
+    echo "--brief --only with the modules that matter for that field." >&2
+  fi
 }
 
 # Remove an existing managed block from $1, writing the remainder to $2, and

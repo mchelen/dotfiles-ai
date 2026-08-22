@@ -123,6 +123,15 @@ check "FR-015 stale saved name is pruned from the file" "saved names" \
   "$(tr '\n' ' ' < "$h/.local/state/dotfiles-ai/modules")" "testing "
 rm -rf "$h"
 
+# --- SC-006: the condensed form fits the smallest documented field ----------
+# Adding a module is the only thing that breaks this, and the person adding one
+# is not the person who later finds their settings field silently truncated.
+h="$(new_home)"
+brief_size="$(run "$h" --brief 2>/dev/null | wc -c | tr -d ' ')"
+check "SC-006 condensed form fits the documented floor" "$brief_size characters against a 1500 floor" \
+  "$([[ $brief_size -le 1500 ]] && echo fits || echo over)" "fits"
+rm -rf "$h"
+
 # --- the site carries each module's exact text, and it is current -----------
 # build-site.sh injects defaults/*.md into docs/index.html. Nothing stops a
 # module from being edited without the site being rebuilt, so the drift check

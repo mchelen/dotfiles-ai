@@ -49,6 +49,23 @@ for f in "$REPO_DIR"/defaults/*.md; do
   mv "$work.next" "$work"
 done
 
+# The web-chat section quotes the size of both generated artifacts, and every
+# cap they clear or miss. Hand-typed, those numbers were wrong within two
+# changes of being written — so they are computed here from the artifacts
+# themselves and substituted into <span data-gen="KEY"> elements.
+commas() { echo "$1" | sed -e :a -e 's/\B[0-9]\{3\}\>/,&/;ta'; }
+
+full=$(( $("$REPO_DIR/install.sh" --print | wc -c) ))
+brief=$(( $("$REPO_DIR/install.sh" --brief 2>/dev/null | wc -c) ))
+set_gen() { # set_gen <key> <text>
+  sed -i "s|<span data-gen=\"$1\">[^<]*</span>|<span data-gen=\"$1\">$2</span>|g" "$work"
+}
+set_gen full  "$(commas "$full")"
+set_gen brief "$(commas "$brief")"
+for cap in 8000 5000 1500; do
+  set_gen "over-$cap" "$(commas $(( full - cap )))"
+done
+
 if [[ $check -eq 1 ]]; then
   if diff -q "$SITE" "$work" >/dev/null; then
     echo "docs/index.html is current"

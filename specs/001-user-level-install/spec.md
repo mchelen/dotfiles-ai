@@ -185,7 +185,10 @@ subset is still what is installed.
 - **FR-005a**: The system MUST offer a second print mode producing a condensed
   form — one line per module, drawn from that module's thesis sentence — for
   destinations that cap instruction length. It MUST fail, naming the file,
-  when a module has no thesis sentence, rather than silently omitting it.
+  when a module has no thesis sentence, rather than silently omitting it. It
+  MUST warn on standard error, without failing, when the result exceeds the
+  smallest instruction field this project documents: the operator may have
+  added modules deliberately and still want the output.
   The condensed form carries no `BEGIN`/`END` markers: its destinations are
   replaced wholesale, so markers would spend a meaningful share of a hard
   character budget on nothing.
@@ -260,13 +263,14 @@ subset is still what is installed.
 - **SC-007**: Every acceptance scenario above is executable. `./test.sh` runs
   them against a throwaway `HOME` and fails the build if any regresses.
 - **SC-006**: The condensed form fits the smallest instruction field this
-  project documents. It is currently 1,446 characters against a 1,500
-  character floor. The margin is under one module's worth, and it has been
-  bought twice now by tightening thesis sentences: splitting the `git` module
-  in two took the total to 1,606, and nine theses were shortened to get back
-  under. When tightening stops being honest, the guide must say the floor is
-  missed rather than quietly overflow — and point at `--brief --only`, which
-  lets a reader fit the modules they actually want into the field they have.
+  project documents — 1,500 characters, ChatGPT Free/Go. It is currently
+  1,294, roughly two modules of headroom. The floor is checked rather than
+  remembered: `./install.sh --brief` warns on standard error when it is
+  exceeded, and `./test.sh` fails, because the person who adds a module is
+  not the person who later finds a settings field silently truncated. When
+  tightening thesis sentences stops being honest, the answer is
+  `--brief --only`, not another squeeze — a reader fits the modules they
+  actually want into the field they actually have.
 
 ## Assumptions
 

@@ -1,7 +1,6 @@
 # Pull requests and a CI-gated `main`
 
-**Changes reach `main` only through a pull request with a green check: in how
-you work, and in how the repo is configured.**
+**Changes reach `main` only through a pull request with a green check.**
 
 *The working half is tool-agnostic. The protection half is GitHub-specific in
 mechanism — the rule, no unreviewed or untested code on the default branch,
