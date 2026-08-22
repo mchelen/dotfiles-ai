@@ -45,7 +45,7 @@ four categories below describe the kind of behavior each module governs:
 |---|---|
 | [`git.md`](defaults/git.md) | No commits/pushes unless asked, PRs opened and merged on green, no history rewrites |
 | [`secrets.md`](defaults/secrets.md) | Layered secret/PII protection: pre-commit scan + CI scanner + GitHub secret scanning; leaked = rotate |
-| [`repo-config.md`](defaults/repo-config.md) | GitHub repo settings managed as code (Terraform GitHub provider), never clicked through the UI |
+| [`repo-config.md`](defaults/repo-config.md) | GitHub repo settings as code — Terraform, or the Settings app — never clicked through the UI, with the one-time human setup spelled out |
 
 **Documentation** — what gets written down
 
