@@ -1,9 +1,36 @@
-# CI-gated main
+# Pull requests and a CI-gated `main`
 
-**`main` is protected, and merges only through a green CI check.**
+**Changes reach `main` only through a pull request with a green check: in how
+you work, and in how the repo is configured.**
 
-*GitHub-specific in mechanism; the rule — no unreviewed, untested code on the
-default branch — carries to any forge.*
+*The working half is tool-agnostic. The protection half is GitHub-specific in
+mechanism — the rule, no unreviewed or untested code on the default branch,
+carries to any forge — and needs admin rights, so it's a one-time human step.*
+
+## Working this way
+
+- Once work on a branch is complete and pushed, open a pull request by
+  default — no need to ask first.
+- After opening it, keep watching it if the tooling allows: respond to review
+  comments and fix CI failures until it's merged or closed. A pull request you
+  opened and stopped watching is unfinished work, not delivered work.
+- Merge by default once automated checks pass and any required reviews are
+  approved — no need to ask first.
+- Don't merge over failing checks, missing required approvals, or unresolved
+  discussions. A red check is an answer, not an obstacle.
+- When a check is red for a reason the change didn't cause — a flaky test, a
+  failure that reproduces on the base branch — say that in the pull request
+  and merge once it recovers, rather than quietly merging past it.
+- Squash-merging is fine even though it collapses the branch: `main` is meant
+  to carry one commit per change, which is the unit `revert` and `bisect` work
+  on, and the commit-by-commit story stays readable in the pull request. That
+  is a reason to keep the branch's story clean, not a reason to stop telling
+  one — reviewers read it commit by commit.
+
+## Protecting the branch
+
+The rules above are what I want you to do. Branch protection is what the
+repository does when nobody is doing it — including when the actor is a script.
 
 - **Protect the default branch.** No direct pushes, no force-pushes, no
   deletion. Changes reach `main` through a pull request.

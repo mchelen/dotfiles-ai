@@ -5,6 +5,12 @@
   the "Not adopted: the packaging" reasoning was wrong. The convention's
   adoption and both tension resolutions stand.
 - **Date:** 2026-07-26
+- **File moved, 2026-08-22:** `defaults/git.md` was later split three ways —
+  message and branch conventions to `commit-conventions.md`, pull requests and
+  merging folded into `ci-gated-main.md`, forge-query efficiency to
+  `cheap-git-queries.md`. Every rule this record names still exists; the
+  paths below are where they lived when it was written. Nothing about the
+  decision changed, so this is a pointer, not an amendment.
 
 ## Context
 

@@ -1,7 +1,7 @@
 # Repo configuration as code
 
-**Repository settings live in the repo as code and are applied automatically,
-never clicked through the web UI.**
+**Repository settings live in the repo as code, applied automatically, never
+clicked through the UI.**
 
 *GitHub-specific. The principle — settings as code, applied automatically, never clicked — carries to any forge; both implementations below are GitHub's.*
 

@@ -19,7 +19,7 @@
 #   ./install.sh --except a,b     use every module but these (remembered)
 #   ./install.sh --all-modules    forget any saved selection and use all modules
 #
-# Not everyone wants all thirteen modules. A selection made with --only or
+# Not everyone wants every module. A selection made with --only or
 # --except is saved, because sync.sh re-runs this script unattended: a
 # selection that lasted until the next daily sync would be a trap, not a
 # feature. The durable way to curate is still to delete modules you don't want
@@ -60,8 +60,8 @@ SELECTED=()
 selection_source=""
 
 # Turn --only / --except / a saved selection into SELECTED, rejecting names
-# that don't exist. A typo must fail loudly: silently installing twelve of the
-# thirteen modules someone asked for is the kind of error nobody notices.
+# that don't exist. A typo must fail loudly: silently installing all but one of
+# the modules someone asked for is the kind of error nobody notices.
 resolve_selection() { # resolve_selection <only-csv> <except-csv> <forget:0|1>
   local only="$1" except="$2" forget="$3"
   local -a available; mapfile -t available < <(all_modules)
