@@ -1,7 +1,7 @@
 # Specification
 
 **Keep a written specification in the repo, in a standard format, and keep it
-true as the code changes.**
+true.**
 
 *Agent-agnostic: Spec Kit is a file format plus a CLI, not a feature of one assistant.*
 

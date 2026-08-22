@@ -1,7 +1,7 @@
 # Propose before building
 
 **For anything bigger than an obvious fix, show me something concrete and wait
-for a yes before you build it.**
+for a yes.**
 
 When I ask for a new feature or a significant change (as opposed to a bug fix,
 small tweak, or something I've already specified in detail):

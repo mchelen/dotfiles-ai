@@ -1,7 +1,7 @@
 # Project website
 
-**Most projects get a static site — what it is, why it exists, how to use it —
-with simulated demos labelled as such.**
+**Most projects get a static site, with anything simulated on it labelled as
+simulated.**
 
 *Any static host works. GitHub Pages is the default assumed here because the rest of these defaults already assume GitHub.*
 

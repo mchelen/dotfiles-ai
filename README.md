@@ -188,9 +188,12 @@ Cursor's *User Rules*.
 one line per module, taken from each module's bold thesis sentence. It exists
 because web chat instruction fields are size-capped — Claude project
 instructions around 8,000 characters, ChatGPT custom instructions 5,000 on
-paid plans and 1,500 on Free/Go — while the full block is ~15,000. The brief
-is ~1,435, so it fits all three, with roughly one module of headroom before
-the smallest cap is missed.
+paid plans and 1,500 on Free/Go — while the full block is around 24,000. The
+brief is around 1,300, so it fits all three. The 1,500 floor is enforced, not
+remembered: `install.sh --brief` warns on stderr when it's exceeded, and
+`test.sh` fails, so a module that would overflow the smallest field is caught
+before it ships. `--brief --only` is the escape hatch if you add enough of
+your own to break it.
 
 Both are generated — never edit them by hand. The
 [`generate-instructions` workflow](.github/workflows/generate-instructions.yml)

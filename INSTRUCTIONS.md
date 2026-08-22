@@ -44,8 +44,7 @@ This is the git-shaped half of the compute-offload module.
 
 # Pull requests and a CI-gated `main`
 
-**Changes reach `main` only through a pull request with a green check: in how
-you work, and in how the repo is configured.**
+**Changes reach `main` only through a pull request with a green check.**
 
 *The working half is tool-agnostic. The protection half is GitHub-specific in
 mechanism — the rule, no unreviewed or untested code on the default branch,
@@ -220,8 +219,8 @@ you skipped or left failing.**
 
 # Project website
 
-**Most projects get a static site — what it is, why it exists, how to use it —
-with simulated demos labelled as such.**
+**Most projects get a static site, with anything simulated on it labelled as
+simulated.**
 
 *Any static host works. GitHub Pages is the default assumed here because the rest of these defaults already assume GitHub.*
 
@@ -250,7 +249,7 @@ with simulated demos labelled as such.**
 # Propose before building
 
 **For anything bigger than an obvious fix, show me something concrete and wait
-for a yes before you build it.**
+for a yes.**
 
 When I ask for a new feature or a significant change (as opposed to a bug fix,
 small tweak, or something I've already specified in detail):
@@ -271,8 +270,8 @@ Skip this ceremony when:
 
 # Repo configuration as code
 
-**Repository settings live in the repo as code, applied automatically, never
-clicked through the UI.**
+**Repository settings live in the repo as code, never clicked through the
+UI.**
 
 *GitHub-specific. The principle — settings as code, applied automatically, never clicked — carries to any forge; both implementations below are GitHub's.*
 
@@ -371,7 +370,7 @@ quietly disabled.**
 # Specification
 
 **Keep a written specification in the repo, in a standard format, and keep it
-true as the code changes.**
+true.**
 
 *Agent-agnostic: Spec Kit is a file format plus a CLI, not a feature of one assistant.*
 

@@ -561,7 +561,7 @@ you skipped or left failing.**
         <pre># Propose before building
 
 **For anything bigger than an obvious fix, show me something concrete and wait
-for a yes before you build it.**
+for a yes.**
 
 When I ask for a new feature or a significant change (as opposed to a bug fix,
 small tweak, or something I've already specified in detail):
@@ -851,11 +851,10 @@ change, conventionally named.**
       <p class="module-scope">The working half is tool-agnostic. The branch-protection half is GitHub-specific in mechanism and needs admin rights, so it's a one-time human step.</p>
       <!-- BEGIN module-text: ci-gated-main -->
       <details class="module-text">
-        <summary>Exact text — 74 lines, verbatim as installed</summary>
+        <summary>Exact text — 73 lines, verbatim as installed</summary>
         <pre># Pull requests and a CI-gated `main`
 
-**Changes reach `main` only through a pull request with a green check: in how
-you work, and in how the repo is configured.**
+**Changes reach `main` only through a pull request with a green check.**
 
 *The working half is tool-agnostic. The protection half is GitHub-specific in
 mechanism — the rule, no unreviewed or untested code on the default branch,
@@ -984,8 +983,8 @@ quietly disabled.**
         <summary>Exact text — 73 lines, verbatim as installed</summary>
         <pre># Repo configuration as code
 
-**Repository settings live in the repo as code, applied automatically, never
-clicked through the UI.**
+**Repository settings live in the repo as code, never clicked through the
+UI.**
 
 *GitHub-specific. The principle — settings as code, applied automatically, never clicked — carries to any forge; both implementations below are GitHub's.*
 
@@ -1104,7 +1103,7 @@ rewires a component.**
         <pre># Specification
 
 **Keep a written specification in the repo, in a standard format, and keep it
-true as the code changes.**
+true.**
 
 *Agent-agnostic: Spec Kit is a file format plus a CLI, not a feature of one assistant.*
 
@@ -1156,8 +1155,8 @@ throwaway spikes — the same threshold as the feature workflow.</pre>
         <summary>Exact text — 28 lines, verbatim as installed</summary>
         <pre># Project website
 
-**Most projects get a static site — what it is, why it exists, how to use it —
-with simulated demos labelled as such.**
+**Most projects get a static site, with anything simulated on it labelled as
+simulated.**
 
 *Any static host works. GitHub Pages is the default assumed here because the rest of these defaults already assume GitHub.*
 
@@ -1589,13 +1588,13 @@ When I ask for a new feature or a significant change:
       <p><strong>The catch is size.</strong> These fields are capped, and the full block is nowhere near small enough:</p>
       <div class="table-wrap">
       <table>
-        <tr><th>Field</th><th>Cap</th><th>Full block (21,874)</th><th>Condensed (1,435)</th></tr>
-        <tr><td>Claude — project instructions</td><td>~8,000</td><td>✗ 13,874 over</td><td class="ok">✓ fits</td></tr>
-        <tr><td>ChatGPT — custom instructions (paid)</td><td>5,000</td><td>✗ 16,874 over</td><td class="ok">✓ fits</td></tr>
-        <tr><td>ChatGPT — custom instructions (Free/Go)</td><td>1,500</td><td>✗ 20,374 over</td><td class="ok">✓ fits, barely</td></tr>
+        <tr><th>Field</th><th>Cap</th><th>Full block (<span data-gen="full">23,865</span>)</th><th>Condensed (<span data-gen="brief">1,294</span>)</th></tr>
+        <tr><td>Claude — project instructions</td><td>~8,000</td><td>✗ <span data-gen="over-8000">15,865</span> over</td><td class="ok">✓ fits</td></tr>
+        <tr><td>ChatGPT — custom instructions (paid)</td><td>5,000</td><td>✗ <span data-gen="over-5000">18,865</span> over</td><td class="ok">✓ fits</td></tr>
+        <tr><td>ChatGPT — custom instructions (Free/Go)</td><td>1,500</td><td>✗ <span data-gen="over-1500">22,365</span> over</td><td class="ok">✓ fits</td></tr>
       </table>
       </div>
-      <p class="lead">So this path uses <code>INSTRUCTIONS-brief.md</code> — one line per module, generated from each module's thesis sentence by the same CI job that builds the full block. Honest caveat: at 1,446 characters it clears the 1,500 floor by 54 — under one module's worth. Splitting the old <code>git</code> module in two pushed it to 1,606, and nine thesis sentences had to be tightened to get back under. The next module breaks it again, and the answer then is <code>--brief --only</code> with the modules that matter to you, or the fetch approach in step 7.</p>
+      <p class="lead">So this path uses <code>INSTRUCTIONS-brief.md</code> — one line per module, generated from each module's thesis sentence by the same CI job that builds the full block. At <span data-gen="brief">1,294</span> characters it clears the 1,500 floor with about two modules to spare. That floor is checked, not remembered: <code>install.sh --brief</code> warns when it's exceeded and the test suite fails, so a module that would overflow your settings field is caught before it ships. If you add enough of your own to break it, use <code>--brief --only</code> with the modules that matter to you, or the fetch approach in step 7.</p>
 
       <h3><span class="step">4.</span>Open <code>INSTRUCTIONS-brief.md</code> in your fork</h3>
       <p><code>github.com/<span class="youfork u">your-username</span>/<span class="r">dotfiles-ai</span>/blob/main/INSTRUCTIONS-brief.md</code></p>
