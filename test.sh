@@ -22,7 +22,10 @@ check() { # check <name> <condition-description> <actual> <expected>
 }
 
 new_home() { mktemp -d; }
-run() { env HOME="$1" "$REPO_DIR/install.sh" "${@:2}"; }
+# XDG_STATE_HOME is pinned inside the throwaway HOME too: the installer keeps
+# the saved module selection there, and a machine that sets XDG_STATE_HOME
+# would otherwise have its real state written by the test run.
+run() { env HOME="$1" XDG_STATE_HOME="$1/.local/state" "$REPO_DIR/install.sh" "${@:2}"; }
 begins() { grep -cF "BEGIN dotfiles-ai" "$1" 2>/dev/null || true; }
 
 # --- SC-002: any number of runs leaves exactly one managed block -------------
@@ -68,6 +71,56 @@ rm -rf "$h"
 # --- FR-010: unrecognized option exits 2 ------------------------------------
 h="$(new_home)"; run "$h" --nonsense >/dev/null 2>&1
 check "FR-010 unknown option exits 2" "exit status" "$?" "2"
+rm -rf "$h"
+
+# --- FR-014: module selection -----------------------------------------------
+# A subset can be installed, and the choice survives the next unattended run.
+h="$(new_home)"; mkdir -p "$h/.claude"
+run "$h" --only git,testing >/dev/null 2>&1
+body="$h/.claude/CLAUDE.md"
+check "FR-014 --only installs the named modules" "git heading" \
+  "$(grep -c '^# Git$' "$body" || true)" "1"
+check "FR-014 --only omits the rest" "secrets heading" \
+  "$(grep -c '^# Secrets' "$body" || true)" "0"
+
+# The trap this exists to avoid: sync.sh runs install.sh with no arguments.
+run "$h" >/dev/null 2>&1
+check "FR-014 selection survives a bare re-run" "secrets heading" \
+  "$(grep -c '^# Secrets' "$body" || true)" "0"
+
+run "$h" --all-modules >/dev/null 2>&1
+check "FR-014 --all-modules restores every module" "secrets heading" \
+  "$(grep -c '^# Secrets' "$body" || true)" "1"
+
+# --except is the complement, and print modes honor the selection.
+check "FR-014 --except drops only the named module" "git heading in --print" \
+  "$(run "$h" --except git --print 2>/dev/null | grep -c '^# Git$' || true)" "0"
+check "FR-014 --brief honors the selection" "line count" \
+  "$(run "$h" --brief --only git,testing 2>/dev/null | grep -c '^- ' || true)" "2"
+
+# An unknown name must stop the run: quietly installing 12 of the 13 modules
+# someone asked for is the kind of error nobody notices.
+run "$h" --only git,typo >/dev/null 2>&1
+check "FR-014 unknown module exits 3" "exit status" "$?" "3"
+
+# --list is a query — an assistant reads it while building the "which of
+# these?" prompt, before anyone has decided anything.
+rm -rf "$h"; h="$(new_home)"; mkdir -p "$h/.claude"
+run "$h" --only git --list >/dev/null 2>&1
+check "FR-014 --list saves nothing" "state file" \
+  "$([[ -e "$h/.local/state/dotfiles-ai/modules" ]] && echo yes || echo no)" "no"
+check "FR-014 --list marks the selection" "checked lines" \
+  "$(run "$h" --only git --list 2>/dev/null | grep -c '^\[x\]' || true)" "1"
+rm -rf "$h"
+
+# A module can be deleted from the fork after a selection names it. Failing
+# there would break every unattended sync.sh run until someone read the output.
+h="$(new_home)"; mkdir -p "$h/.claude" "$h/.local/state/dotfiles-ai"
+printf 'git\nno-such-module\n' > "$h/.local/state/dotfiles-ai/modules"
+run "$h" >/dev/null 2>&1
+check "FR-015 stale saved name does not fail the run" "exit status" "$?" "0"
+check "FR-015 stale saved name is pruned from the file" "saved names" \
+  "$(tr '\n' ' ' < "$h/.local/state/dotfiles-ai/modules")" "git "
 rm -rf "$h"
 
 # --- the site carries each module's exact text, and it is current -----------
