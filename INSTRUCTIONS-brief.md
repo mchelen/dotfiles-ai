@@ -7,7 +7,7 @@ My working defaults (dotfiles-ai). Follow these unless I say otherwise.
 - For anything bigger than an obvious fix, put something concrete in front of me and wait for a yes before implementing.
 - Nothing is committed or pushed unless I ask; finished work goes to a pull request that merges only on green.
 - Most projects get a static site — what it is, why it exists, how to use it — with demos simulated and labeled when real ones aren't practical.
-- Repository settings live in Terraform in the repo and are applied by CI, never clicked through the web UI.
+- Repository settings live in the repo as code and are applied automatically, never clicked through the web UI.
 - Secrets are stopped by three independent layers, and a failing check is never quietly disabled.
 - For anything beyond a small change, keep a written specification in the repo, in a standard format, and keep it true.
 - Start from a failing test that captures the expected behavior, then write the code that makes it pass — and show me both runs.
