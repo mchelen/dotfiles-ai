@@ -81,6 +81,35 @@ brief() {
   [[ $found -eq 1 ]] || { echo "no modules found in $REPO_DIR/defaults/" >&2; return 1; }
 }
 
+# Remove an existing managed block from $1, writing the remainder to $2, and
+# print one of: replaced | absent | unterminated.
+#
+# Detection and removal deliberately share a single comparison. They used to
+# differ — a substring grep decided whether a block was present, an exact-line
+# awk removed it — so a marker line carrying trailing whitespace was found but
+# not removed: the run reported success, left the stale block in place, and
+# appended a second one. Markers are now compared with surrounding whitespace
+# trimmed, so a hand-touched file still round-trips.
+#
+# A BEGIN with no matching END is reported rather than acted on. The old code
+# skipped to end-of-file in that case, silently deleting everything below the
+# marker.
+strip_block() {
+  awk -v begin="$BEGIN_MARK" -v end="$END_MARK" -v out="$2" '
+    function trim(s) { gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); return s }
+    BEGIN { printf "" > out }
+    { line = trim($0) }
+    !skip && line == begin { skip = 1; found = 1; next }
+    skip  && line == end   { skip = 0; next }
+    !skip { print > out }
+    END {
+      if (skip)       print "unterminated"
+      else if (found) print "replaced"
+      else            print "absent"
+    }
+  ' "$1"
+}
+
 install_all=0
 case "${1:-}" in
   --print) assemble; exit 0 ;;
@@ -103,17 +132,31 @@ for target in "${TARGETS[@]}"; do
   mkdir -p "$dir"
   touch "$target"
 
-  if grep -qF "$BEGIN_MARK" "$target"; then
-    cp "$target" "$target.bak"
-    awk -v begin="$BEGIN_MARK" -v end="$END_MARK" '
-      $0 == begin {skip=1; next}
-      $0 == end   {skip=0; next}
-      !skip {print}
-    ' "$target.bak" > "$target"
-    echo "updated  $target (previous version saved to $target.bak)"
-  else
-    echo "installed $target"
-  fi
+  tmp="$(mktemp)"
+  case "$(strip_block "$target" "$tmp")" in
+    replaced)
+      cp "$target" "$target.bak"
+      cat "$tmp" > "$target"          # write through, keeping mode and symlinks
+      rm -f "$tmp"
+      echo "updated  $target (previous version saved to $target.bak)"
+      ;;
+    absent)
+      rm -f "$tmp"
+      echo "installed $target"
+      ;;
+    unterminated)
+      rm -f "$tmp"
+      echo "$target has a BEGIN marker with no matching END." >&2
+      echo "Refusing to touch it: removing the block would delete everything below" >&2
+      echo "the marker. Fix the file by hand (or restore $target.bak) and re-run." >&2
+      exit 4
+      ;;
+    *)
+      rm -f "$tmp"
+      echo "could not read $target" >&2
+      exit 5
+      ;;
+  esac
 
   # Ensure a blank line before the block, then append it.
   [[ -s "$target" ]] && echo >> "$target"

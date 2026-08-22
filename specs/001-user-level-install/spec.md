@@ -65,6 +65,13 @@ the installer, and diff — only the block's contents may differ.
 4. **Given** a target file that exists with user content but no managed block,
    **When** the installer runs, **Then** the block is appended after a blank line
    and the existing content is preserved.
+5. **Given** a managed block whose `BEGIN` line carries trailing whitespace,
+   **When** the installer runs, **Then** the old block is still replaced: the
+   file ends with exactly one block and none of the previous block's content
+   survives.
+6. **Given** a file containing a `BEGIN` marker with no `END`, **When** the
+   installer runs, **Then** it exits non-zero with a message naming the file,
+   and every line of that file is unchanged.
 
 ---
 
@@ -94,18 +101,23 @@ written to standard output and no target file is created or modified.
   directory rather than writing an empty block over existing files.
 - **Unknown option.** The run stops with a distinct non-zero exit status and
   does not partially install.
-- **A `BEGIN` marker with no matching `END`.** Current behavior drops everything
-  from the marker to the end of the file; the `.bak` copy is the only recovery.
-  [NEEDS CLARIFICATION: should an unterminated block abort the run instead of
-  truncating, given the file may be hand-edited?]
-- **A marker line altered by hand** (trailing whitespace, reflowed) breaks
-  replacement. Detection matches the line loosely while removal requires an
-  exact match, so a `BEGIN` line with a trailing space is *found* but not
-  *removed*: the run reports the target as updated, the stale block survives,
-  and a second block is appended. **This deviates from FR-006 and SC-002** and
-  is a known defect, not intended behavior. [NEEDS CLARIFICATION: make
-  detection and removal use the same comparison, or fail loudly when a marker
-  is found but cannot be matched exactly?]
+- **A `BEGIN` marker with no matching `END`.** *Resolved: the run aborts and
+  the file is left untouched.* Previously it dropped everything from the marker
+  to end-of-file **and exited zero**, so the loss was silent and the `.bak` copy
+  was the only recovery. Refusing is right here: the tool cannot tell an
+  interrupted write from a deliberate edit, and guessing wrong destroys content
+  it did not author.
+- **A marker line altered by hand** (trailing or leading whitespace).
+  *Resolved: markers are compared with surrounding whitespace trimmed, and
+  detection and removal use that one comparison.* Previously detection matched
+  the line loosely while removal required an exact match, so a `BEGIN` line
+  with a trailing space was found but not removed — the run reported success,
+  the stale block survived, and a second block was appended, deviating from
+  FR-006 and SC-002.
+- **Two comparisons that can drift apart.** The defect above existed because
+  "is there a block?" and "which lines are the block?" were answered by
+  different code. They are now one function, so the two answers cannot
+  disagree again.
 - **Target directory exists but the file is read-only or not writable.** Not
   currently distinguished from other failures. [NEEDS CLARIFICATION: should one
   unwritable target abort the whole run or be reported and skipped?]
@@ -144,6 +156,13 @@ written to standard output and no target file is created or modified.
   and MUST exit with a distinct status for an unrecognized option.
 - **FR-011**: The set of target files MUST be a single declared list, so
   supporting a new tool is one entry.
+- **FR-012**: Marker matching MUST ignore leading and trailing whitespace, and
+  the same comparison MUST decide both whether a block is present and which
+  lines constitute it. A single implementation, not two that agree by
+  convention.
+- **FR-013**: A `BEGIN` marker with no matching `END` MUST abort with a
+  distinct non-zero status, naming the file, and MUST leave that file
+  unmodified. Destroying unauthored content is never the fallback.
 
 ### Key Entities
 
@@ -170,6 +189,8 @@ written to standard output and no target file is created or modified.
 - **SC-004**: No file is created for a tool that is not installed on the machine.
 - **SC-005**: Adding a module changes no file other than the new module and the
   generated copies of the block.
+- **SC-007**: Every acceptance scenario above is executable. `./test.sh` runs
+  them against a throwaway `HOME` and fails the build if any regresses.
 - **SC-006**: The condensed form fits the smallest instruction field this
   project documents. It is currently 1,430 characters against a 1,500
   character floor, so roughly one further module exhausts the margin — at
