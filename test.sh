@@ -70,6 +70,13 @@ h="$(new_home)"; run "$h" --nonsense >/dev/null 2>&1
 check "FR-010 unknown option exits 2" "exit status" "$?" "2"
 rm -rf "$h"
 
+# --- the site carries each module's exact text, and it is current -----------
+# build-site.sh injects defaults/*.md into docs/index.html. Nothing stops a
+# module from being edited without the site being rebuilt, so the drift check
+# runs here rather than relying on anyone remembering.
+"$REPO_DIR/build-site.sh" --check >/dev/null 2>&1
+check "site carries current module text" "build-site.sh --check" "$?" "0"
+
 echo
 if [[ $fails -eq 0 ]]; then echo "all checks passed"; else echo "$fails check(s) failed"; fi
 exit $((fails > 0))

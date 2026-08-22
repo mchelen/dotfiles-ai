@@ -51,7 +51,8 @@ flowchart LR
 - **`INSTRUCTIONS.md`** — the assembled block, committed at the repo root as
   a build artifact of `install.sh --print`. Generated, never hand-edited:
   **`.github/workflows/generate-instructions.yml`** regenerates and commits
-  it whenever `defaults/**` (or `install.sh`) changes on `main`. It lives in
+  it — along with `INSTRUCTIONS-brief.md` and the site's module text —
+  whenever `defaults/**`, `install.sh`, or `build-site.sh` changes on `main`. It lives in
   CI rather than in a local pre-commit hook on purpose — modules edited
   through the GitHub web editor have no local hook to run, and the
   no-terminal install path depends on this file being current. Its consumers
@@ -66,7 +67,18 @@ flowchart LR
 - **`docs/`** — the project website (static HTML/CSS, no generator),
   published to GitHub Pages by **`.github/workflows/deploy-pages.yml`**
   (`actions/deploy-pages`) on merges to `main` that touch `docs/`.
-  Terminal output shown there is simulated and labeled as such.
+  Terminal output shown there is simulated and labeled as such. The page is
+  hand-written except for one generated region per module — see
+  `build-site.sh` below — so it is edited directly, then rebuilt.
+- **`build-site.sh`** — the site's only build step. Each module card on the
+  website carries a summary, then the module's **exact text**, then a
+  before/after example; this script fills the middle part, copying every
+  `defaults/*.md` verbatim into its card between per-module
+  `BEGIN`/`END module-text` markers — the same technique `install.sh` uses on
+  instruction files. It exists because the site previously paraphrased each
+  module: a reader could not see what would actually be installed, and the
+  paraphrase drifted the moment the module changed. `--check` exits non-zero
+  when the page is stale, and `test.sh` runs it, so drift fails the build.
 - **`sync.sh`** — propagation. Pulls the latest `main` (fast-forward only)
   and re-runs the installer. In `--auto` mode (meant for shell startup) it
   throttles to one attempt per day via a stamp file in
@@ -131,4 +143,6 @@ The generated block in target files is disposable: the source of truth is
 always `defaults/`. Edits belong in this repo, followed by a re-run of
 `install.sh` — never in the installed files directly. `INSTRUCTIONS.md` is
 the same kind of artifact, one commit deep: it is generated from `defaults/`
-by CI, so editing it directly is always wrong.
+by CI, so editing it directly is always wrong. The module text inside
+`docs/index.html` is the same kind of artifact: written by `build-site.sh`,
+never by hand.
