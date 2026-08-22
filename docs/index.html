@@ -20,6 +20,12 @@
     --term-dim: #8a8a94;
     --caution: #b8860b;
     --caution-bg: #fdf8ec;
+    /* A shade darker than --accent: accent is used for large type and rules,
+       where it has room to be bright; link text is small and needs the
+       contrast. */
+    --link: #9c4522;
+    --link-hover: #7a3419;
+    --on-accent: #ffffff;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -31,9 +37,15 @@
       --border: #32323a;
       --caution: #d8b56a;
       --caution-bg: #24211a;
+      --link: #f0906a;
+      --link-hover: #ffb494;
+      /* The dark-mode accent is a light orange; white on it is 3.0:1. */
+      --on-accent: #1a1206;
     }
   }
   * { box-sizing: border-box; }
+  a { color: var(--link); text-underline-offset: .15em; }
+  a:hover { color: var(--link-hover); }
   body {
     margin: 0;
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -52,7 +64,7 @@
     text-decoration: none; font-weight: 600; font-size: .95rem;
     border: 1px solid var(--border); color: var(--fg); background: var(--card);
   }
-  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
   section { margin-top: 3rem; }
   h2 { font-size: 1.5rem; letter-spacing: -.01em; margin-bottom: .75rem; }
   .num { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; margin-right: .4rem; }
@@ -255,9 +267,6 @@
   .callout ul { margin: .5rem 0 0; padding-left: 1.15rem; }
   .callout li { margin: .3rem 0; }
   .callout.caution { border-left-color: var(--caution); background: var(--caution-bg); }
-  /* The page leaves links at the browser default, which has too little
-     contrast against this box's tint — especially in dark mode. */
-  .callout.caution a { color: var(--accent); }
   .youfork { color: var(--accent); font-weight: 700; }
   /* sticky section nav */
   .sticky-nav {
@@ -412,8 +421,7 @@ copy you just read.</pre>
     </div>
 
     <div class="callout caution">
-      <p><strong>What you're trusting.</strong> This points your assistant at a file in <em>someone else's</em> repo and tells it to follow it. Nothing is executed and nothing is written to disk, but you're trusting whoever controls <code>mchelen/dotfiles-ai</code> — and <code>main</code> can change after you last read it. Read <a href="https://github.com/mchelen/dotfiles-ai/blob/main/INSTRUCTIONS.md">INSTRUCTIONS.md</a> first, or <a href="#modules">every module in full</a>, further down this page.</p>
-      <p>To answer to nobody but yourself, <a href="https://github.com/mchelen/dotfiles-ai/fork">fork first</a>: <a href="#install">Install</a> starts there, and every path after it reads from a repo you own and change on your own schedule. Already forked? Put your repo in <a href="#install">the box in Install</a> and this snippet points at your fork instead.</p>
+      <p><strong>You're trusting this repo's author.</strong> It tells your assistant to follow a file in someone else's repo, and <code>main</code> can change after you read it. To answer to nobody but yourself, <a href="https://github.com/mchelen/dotfiles-ai/fork">fork first</a> — <a href="#install">Install</a> starts there.</p>
     </div>
 
     <div class="quick">
@@ -423,6 +431,7 @@ copy you just read.</pre>
         <li><strong>Then:</strong> it follows the modules you kept and offers to make that permanent, so you don't have to come back and read the install guide. Your choice carries over: <code>./install.sh --only git,testing</code> installs just those and remembers, so the next automatic sync doesn't quietly restore the rest.</li>
         <li><strong>Later:</strong> it knows to send you to <code>defaults/</code> in your own fork when you want to change something — never to the pasted copy, which is disposable by design.</li>
       </ol>
+      <p class="lead">Nothing is executed and nothing is written to disk — the file is text your assistant reads. It is <a href="https://github.com/mchelen/dotfiles-ai/blob/main/INSTRUCTIONS.md">INSTRUCTIONS.md</a>, and <a href="#modules">every module it contains</a> is reproduced in full further down this page, so you can read the whole of what you'd be agreeing to before you paste. Once you've forked, put your repo in <a href="#install">the box in Install</a> and the snippet above points at your fork instead of this one.</p>
       <p class="lead" style="margin-bottom:0">Fetching needs network access. In a <code>claude.ai/code</code> session, <code>raw.githubusercontent.com</code> is on the default <em>Trusted</em> allowlist, so it works as-is. If your tool can't reach the internet, open <a href="https://github.com/mchelen/dotfiles-ai/blob/main/INSTRUCTIONS.md">INSTRUCTIONS.md</a>, click <em>Copy raw file</em>, and paste the block itself instead.</p>
     </div>
 
