@@ -132,6 +132,142 @@ check "SC-006 condensed form fits the documented floor" "$brief_size characters 
   "$([[ $brief_size -le 1500 ]] && echo fits || echo over)" "fits"
 rm -rf "$h"
 
+# =============================================================================
+# sync.sh — specs/002-machine-sync
+#
+# sync.sh had a written spec with ten functional requirements and no tests,
+# while install.sh had twenty-four checks. It is the component that runs
+# unattended, daily, from shell startup on every machine — the one nobody
+# watches run.
+#
+# Each case builds a throwaway "remote": a bare repo, a source tree holding
+# install.sh/sync.sh/defaults, and a clone of it. No network.
+# =============================================================================
+
+git_q() { git -c user.email=t@example.com -c user.name=test -c commit.gpgsign=false "$@"; }
+
+new_fixture() { # prints a root dir containing origin.git/ and clone/
+  local root; root="$(mktemp -d)"
+  # -b main on both: without it the bare repo's HEAD points at master, the
+  # push creates main, and the clone comes up with no working tree at all.
+  git_q init -q -b main --bare "$root/origin.git"
+  git_q init -q -b main "$root/src"
+  cp "$REPO_DIR/install.sh" "$REPO_DIR/sync.sh" "$root/src/"
+  mkdir -p "$root/src/defaults"
+  printf '# One\n\n**First module thesis.**\n' > "$root/src/defaults/one.md"
+  git_q -C "$root/src" add -A
+  git_q -C "$root/src" commit -qm "init"
+  git_q -C "$root/src" push -q "$root/origin.git" main
+  git_q clone -q "$root/origin.git" "$root/clone"
+  echo "$root"
+}
+
+publish() { # publish <root> <module-name>: add a module upstream
+  printf '# %s\n\n**Thesis for %s.**\n' "$2" "$2" > "$1/src/defaults/$2.md"
+  git_q -C "$1/src" add -A
+  git_q -C "$1/src" commit -qm "add $2"
+  git_q -C "$1/src" push -q "$1/origin.git" main
+}
+
+sync_run() { # sync_run <root> <home> [args...]
+  env HOME="$2" XDG_STATE_HOME="$2/.local/state" "$1/clone/sync.sh" "${@:3}"
+}
+
+# --- FR-001/FR-002/SC-001: a published change is pulled and installed --------
+r="$(new_fixture)"; h="$(new_home)"; mkdir -p "$h/.claude"
+publish "$r" two
+out="$(sync_run "$r" "$h" 2>&1)"
+check "FR-002 sync installs what it pulled" "new module in CLAUDE.md" \
+  "$(grep -c '^# two$' "$h/.claude/CLAUDE.md" 2>/dev/null || true)" "1"
+# --- FR-007: the move is reported as a commit range -------------------------
+check "FR-007 sync reports the commit range" "output shape" \
+  "$(echo "$out" | grep -cE 'updated [0-9a-f]{7} -> [0-9a-f]{7}' || true)" "1"
+
+# --- FR-006: the installed commit is recorded -------------------------------
+check "FR-006 installed commit recorded" "matches clone HEAD" \
+  "$(cat "$h/.local/state/dotfiles-ai/installed-commit" 2>/dev/null || true)" \
+  "$(git -C "$r/clone" rev-parse HEAD)"
+
+# --- FR-005/SC-002: nothing to do in auto mode is silent --------------------
+check "FR-005 auto mode is silent when current" "bytes of output" \
+  "$(sync_run "$r" "$h" --auto 2>&1 | wc -c | tr -d ' ')" "0"
+rm -rf "$r" "$h"
+
+# --- FR-003/SC-003: at most one attempt per interval ------------------------
+# The second run must not pull, even though there is something to pull.
+r="$(new_fixture)"; h="$(new_home)"; mkdir -p "$h/.claude"
+sync_run "$r" "$h" --auto >/dev/null 2>&1          # first attempt: stamps
+publish "$r" three
+sync_run "$r" "$h" --auto >/dev/null 2>&1          # throttled: must not pull
+check "FR-003 auto throttles within the interval" "three.md pulled" \
+  "$([[ -e "$r/clone/defaults/three.md" ]] && echo yes || echo no)" "no"
+# …and does pull once the interval is past.
+DOTFILES_AI_SYNC_INTERVAL=0 env HOME="$h" XDG_STATE_HOME="$h/.local/state" \
+  DOTFILES_AI_SYNC_INTERVAL=0 "$r/clone/sync.sh" --auto >/dev/null 2>&1
+check "FR-003 auto syncs once the interval passes" "three.md pulled" \
+  "$([[ -e "$r/clone/defaults/three.md" ]] && echo yes || echo no)" "yes"
+rm -rf "$r" "$h"
+
+# --- FR-004: the window starts at the attempt, not the success --------------
+# A failing sync must still stamp, or an unreachable remote means retrying
+# every single shell start.
+r="$(new_fixture)"; h="$(new_home)"; mkdir -p "$h/.claude"
+git_q -C "$r/clone" remote set-url origin "$r/does-not-exist.git"
+sync_run "$r" "$h" --auto >/dev/null 2>&1
+check "FR-004 a failed attempt still stamps" "stamp file" \
+  "$([[ -e "$h/.local/state/dotfiles-ai/last-sync" ]] && echo yes || echo no)" "yes"
+
+# --- FR-005/SC-004: offline in auto mode is silent and successful -----------
+rm -f "$h/.local/state/dotfiles-ai/last-sync"
+out="$(sync_run "$r" "$h" --auto 2>&1)"; rc=$?
+check "SC-004 offline auto mode stays quiet" "bytes of output" "$(printf '%s' "$out" | wc -c | tr -d ' ')" "0"
+check "SC-004 offline auto mode exits zero" "exit status" "$rc" "0"
+
+# --- FR-008: manual mode says so, on stderr, non-zero -----------------------
+err="$(sync_run "$r" "$h" 2>&1 >/dev/null)"; rc=$?
+check "FR-008 manual mode reports a failed update" "message" \
+  "$(printf '%s' "$err" | grep -c 'git pull failed' || true)" "1"
+check "FR-008 manual mode exits non-zero" "exit status" \
+  "$([[ $rc -ne 0 ]] && echo yes || echo no)" "yes"
+rm -rf "$r" "$h"
+
+# --- SC-005: local commits are never discarded ------------------------------
+# --ff-only is the whole protection here; diverged history must abort, not
+# reset. The clone is someone's machine, and it may hold work.
+r="$(new_fixture)"; h="$(new_home)"; mkdir -p "$h/.claude"
+printf '# Local\n\n**Local only.**\n' > "$r/clone/defaults/local.md"
+git_q -C "$r/clone" add -A
+git_q -C "$r/clone" commit -qm "local work"
+local_sha="$(git -C "$r/clone" rev-parse HEAD)"
+publish "$r" upstream          # diverges: both sides have new commits
+sync_run "$r" "$h" >/dev/null 2>&1
+check "SC-005 diverged history keeps local commits" "clone HEAD unchanged" \
+  "$(git -C "$r/clone" rev-parse HEAD)" "$local_sha"
+check "SC-005 local file survives" "local.md present" \
+  "$([[ -e "$r/clone/defaults/local.md" ]] && echo yes || echo no)" "yes"
+rm -rf "$r" "$h"
+
+# --- FR-010: sync's own pull must not trigger a second sync -----------------
+# The post-merge hook re-runs the installer after a manual pull. Without a
+# guard, sync.sh's own pull fires it too. The hook here records what it saw.
+r="$(new_fixture)"; h="$(new_home)"; mkdir -p "$h/.claude"
+cat > "$r/clone/.git/hooks/post-merge" <<'HOOK'
+#!/usr/bin/env bash
+echo "${DOTFILES_AI_SYNC:-unset}" >> "$(git rev-parse --show-toplevel)/hook-saw"
+HOOK
+chmod +x "$r/clone/.git/hooks/post-merge"
+publish "$r" guarded
+sync_run "$r" "$h" >/dev/null 2>&1
+check "FR-010 sync marks its own pull for the hook" "value the hook saw" \
+  "$(cat "$r/clone/hook-saw" 2>/dev/null || echo "hook did not run")" "1"
+
+# --- FR-009: the superseded core.hooksPath setting is cleared ---------------
+git_q -C "$r/clone" config core.hooksPath .githooks
+sync_run "$r" "$h" >/dev/null 2>&1
+check "FR-009 legacy core.hooksPath is unset" "config value" \
+  "$(git -C "$r/clone" config --get core.hooksPath || echo unset)" "unset"
+rm -rf "$r" "$h"
+
 # --- the committed artifacts match what the installer produces --------------
 # docs/index.html was checked below long before these two were, so a change
 # that regenerated the site but not INSTRUCTIONS.md passed. The no-terminal

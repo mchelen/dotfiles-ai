@@ -85,6 +85,11 @@ installed state, start a shell, and confirm the installer runs.
 
 ### Edge Cases
 
+- **Offline, in automatic mode.** *Resolved: the pull's own output is
+  discarded and only its exit status is used.* `--quiet` suppresses progress,
+  not failures, so an unreachable remote printed five lines of git diagnostics
+  at the prompt on every shell start — silent by intent, noisy in fact. Manual
+  mode still shows them, where they are the useful part of the answer.
 - **Commit hooks unavailable.** When the hook framework is not installed, the
   sync still pulls and installs; hook setup is attempted and its failure ignored.
 - **Legacy hook configuration.** A previously configured custom hooks path is
@@ -142,6 +147,9 @@ installed state, start a shell, and confirm the installer runs.
   shells are opened.
 - **SC-004**: Losing network access never produces an error at the prompt and
   never leaves instruction files half-written.
+- **SC-006**: Every requirement above is executable. `./test.sh` builds a
+  throwaway remote — a bare repo, a source tree, a clone — and asserts each
+  one against it, with no network.
 - **SC-005**: Local commits in the clone are never discarded or rewritten by a
   sync.
 

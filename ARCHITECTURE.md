@@ -68,8 +68,10 @@ flowchart LR
   copy it by hand (web editor, settings fields), so it is a snapshot
   wherever it lands, refreshed by replacing the marker-delimited block.
 - **`test.sh`** — the acceptance scenarios from `specs/001-user-level-install`
-  made executable: each case builds a throwaway `HOME`, runs `install.sh`
-  against it, and asserts the outcome. No framework, no dependencies. Run by
+  and `specs/002-machine-sync` made executable: each case builds a throwaway
+  `HOME` — and, for the sync cases, a throwaway remote (bare repo, source
+  tree, clone) so nothing touches the network — runs the script against it,
+  and asserts the outcome. No framework, no dependencies. Run by
   **`.github/workflows/test.yml`** on every push and pull request, so a
   regression fails the build instead of being discovered in someone's
   instruction file.
