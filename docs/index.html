@@ -422,10 +422,13 @@ default (AskUserQuestion with multiSelect in Claude Code, the equivalent
 picker in any other agent, a numbered list if you have neither). Then follow
 just those for the rest of this session.
 
-Afterwards, offer to make it permanent — fork the repo and run
-./install.sh --only &lt;what I picked&gt;, or commit those modules into this
-project's CLAUDE.md. Later edits go in defaults/ in my fork, never in the
-copy you just read.</pre>
+Afterwards, offer to make it permanent, and ask which I want:
+  - this project, shared with everyone working on it: put the modules I picked
+    into its AGENTS.md, with a CLAUDE.md that imports it, and commit that
+  - every project on this machine: fork the repo, then run
+    ./install.sh --only &lt;what I picked&gt;
+
+Later edits go in defaults/ in my fork, never in the copy you just read.</pre>
     </div>
 
     <div class="callout caution">
@@ -436,14 +439,14 @@ copy you just read.</pre>
       <p><strong>What that does</strong></p>
       <ol>
         <li><strong>Immediately:</strong> the assistant reads <code>INSTRUCTIONS.md</code> — every module, already assembled — and asks which ones you want, as a checklist you can uncheck. Nothing is installed, nothing is committed, and it works in a session that's already running.</li>
-        <li><strong>Then:</strong> it follows the modules you kept and offers to make that permanent, so you don't have to come back and read the install guide. Your choice carries over: <code>./install.sh --only commit-conventions,testing</code> installs just those and remembers, so the next automatic sync doesn't quietly restore the rest.</li>
+        <li><strong>Then:</strong> it follows the modules you kept and offers to make that permanent, at whichever level you want. <strong>This project:</strong> <code>./install.sh --project</code> writes your chosen modules into the repo's <code>AGENTS.md</code> and adds a <code>CLAUDE.md</code> that imports it — shared with everyone who works on it, and a snapshot, since nothing refreshes a file in someone else's repository. <strong>This machine:</strong> <code>./install.sh --only commit-conventions,testing</code> installs just those and remembers, so the next automatic sync doesn't quietly restore the rest.</li>
         <li><strong>Later:</strong> it knows to send you to <code>defaults/</code> in your own fork when you want to change something — never to the pasted copy, which is disposable by design.</li>
       </ol>
       <p class="lead">Nothing is executed and nothing is written to disk — the file is text your assistant reads. It is <a href="https://github.com/mchelen/dotfiles-ai/blob/main/INSTRUCTIONS.md">INSTRUCTIONS.md</a>, and <a href="#modules">every module it contains</a> is reproduced in full further down this page, so you can read the whole of what you'd be agreeing to before you paste. Once you've forked, put your repo in <a href="#install">the box in Install</a> and the snippet above points at your fork instead of this one.</p>
       <p class="lead" style="margin-bottom:0">Fetching needs network access. In a <code>claude.ai/code</code> session, <code>raw.githubusercontent.com</code> is on the default <em>Trusted</em> allowlist, so it works as-is. If your tool can't reach the internet, open <a href="https://github.com/mchelen/dotfiles-ai/blob/main/INSTRUCTIONS.md">INSTRUCTIONS.md</a>, click <em>Copy raw file</em>, and paste the block itself instead.</p>
     </div>
 
-    <p class="lead">This is the zero-commitment version: one session, this repo's opinions, nothing installed.</p>
+    <p class="lead">This is the zero-commitment version: one session, this repo's opinions, nothing installed. Many of these modules — testing, commit conventions, how work reaches <code>main</code> — belong to a <em>project</em> as much as to a person, which is what <code>--project</code> is for.</p>
   </section>
   <section id="what">
     <h2>What it is</h2>

@@ -129,6 +129,37 @@ subset is still what is installed.
 
 ---
 
+### User Story 5 - Put the preferences in a project, not just a person (Priority: P2)
+
+Several of these modules are as much a property of a repository as of a person:
+how work reaches `main`, what a commit looks like, whether tests come first.
+Someone puts the ones they picked into a project's own instruction files, so
+everyone working on that repo gets them.
+
+**Why this priority**: The user-level block reaches one person's tools. A
+project file reaches everyone who works on the repo, including agents run by
+people who have never heard of this project.
+
+**Independent Test**: Run the installer in project mode against a scratch
+repository and confirm the block is in its `AGENTS.md`, with a `CLAUDE.md`
+importing it.
+
+**Acceptance Scenarios**:
+
+1. **Given** a directory, **When** the installer runs in project mode, **Then**
+   the selected modules are written to `AGENTS.md` there and a `CLAUDE.md`
+   containing the import is created.
+2. **Given** a `CLAUDE.md` the project already has, **When** the installer runs
+   in project mode, **Then** that file is left exactly as it is and the run
+   reports that the import is missing.
+3. **Given** a project file containing the block plus the project's own text,
+   **When** the installer runs again, **Then** the block is replaced in place
+   and the project's text is untouched.
+4. **Given** a path that does not exist, **When** the installer runs in project
+   mode, **Then** it exits with a distinct status and creates nothing.
+
+---
+
 ### Edge Cases
 
 - **No modules present.** The run fails with a message naming the empty
@@ -224,6 +255,13 @@ subset is still what is installed.
   stored selection MUST be rewritten without it. Persistence is a requirement rather than a
   convenience: `sync.sh` re-runs the installer unattended, so a selection that
   did not persist would be silently reverted within a day.
+- **FR-017**: The system MUST offer a mode that writes the selected modules
+  into a project's own repository — `AGENTS.md`, plus a `CLAUDE.md` importing
+  it, because Claude Code reads `CLAUDE.md` and not `AGENTS.md`. It MUST NOT
+  overwrite an existing `CLAUDE.md`, MUST NOT alter the machine's saved module
+  selection (a project write says nothing about what this machine wants), and
+  MUST state that the result is a snapshot. Marker handling MUST be the same
+  implementation the user-level path uses, not a second copy of it.
 - **FR-016**: The system MUST offer a listing of the modules — one line each,
   carrying the module's name, its thesis sentence, and whether it is currently
   selected — and that listing MUST NOT change any saved state. It is what an
@@ -258,6 +296,8 @@ subset is still what is installed.
 - **SC-004**: No file is created for a tool that is not installed on the machine.
 - **SC-005**: Adding a module changes no file other than the new module and the
   generated copies of the block.
+- **SC-009**: A project repository can be configured from a single command, and
+  a re-run changes nothing except the block.
 - **SC-008**: A subset chosen once is still the subset in place after an
   unattended `sync.sh` run — no manual step re-asserts it.
 - **SC-007**: Every acceptance scenario above is executable. `./test.sh` runs

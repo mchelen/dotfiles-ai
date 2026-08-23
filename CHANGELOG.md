@@ -10,6 +10,11 @@ edited, so there is nothing to release. Sections are dated instead.
 
 ### Added
 
+- `install.sh --project [DIR]` writes the selected modules into a project
+  repository's `AGENTS.md`, with a `CLAUDE.md` that imports it, so preferences
+  that belong to a repo reach everyone working on it. The quick start offers
+  this alongside the machine-level install, once you have chosen your modules.
+  It is a snapshot — nothing refreshes a file in a repo you share.
 - A `changelog` module: every project keeps a `CHANGELOG.md` written for
   readers rather than generated from the commit log, published on the
   project's website rather than left in the source tree.

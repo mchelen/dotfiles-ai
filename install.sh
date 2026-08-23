@@ -18,6 +18,8 @@
 #   ./install.sh --only a,b       use only these modules (remembered)
 #   ./install.sh --except a,b     use every module but these (remembered)
 #   ./install.sh --all-modules    forget any saved selection and use all modules
+#   ./install.sh --project [DIR]  write the block into a project repo's
+#                                 AGENTS.md (default: the current directory)
 #
 # Not everyone wants every module. A selection made with --only or
 # --except is saved, because sync.sh re-runs this script unattended: a
@@ -241,6 +243,7 @@ strip_block() {
 
 install_all=0
 action="install"
+project_dir=""
 only=""
 except=""
 forget=0
@@ -250,6 +253,12 @@ while [[ $# -gt 0 ]]; do
     --print)       action="print" ;;
     --brief)       action="brief" ;;
     --list)        action="list" ;;
+    --project)
+      action="project"; project_dir="."
+      # The path is optional, so only consume the next argument if it is one.
+      if [[ ${2:-} && ${2:-} != -* ]]; then project_dir="$2"; shift; fi
+      ;;
+    --project=*)   action="project"; project_dir="${1#*=}" ;;
     --all)         install_all=1 ;;
     --all-modules) forget=1 ;;
     --only)        only="${2:-}"; shift ;;
@@ -273,27 +282,32 @@ case "$action" in
   list)  list_modules; exit 0 ;;
 esac
 
-remember_selection "$forget"
+# A project write says nothing about what this machine wants installed, so it
+# leaves the saved selection alone.
+[[ "$action" == "project" ]] || remember_selection "$forget"
 block="$(assemble)"
 
 if [[ ${#SELECTED[@]} -lt $(all_modules | wc -l) ]]; then
-  case "$selection_source" in
-    saved) echo "using your saved selection: $(IFS=,; echo "${SELECTED[*]}")" ;;
-    flag)  echo "installing these modules, and remembering the choice: $(IFS=,; echo "${SELECTED[*]}")" ;;
-  esac
-  echo "(./install.sh --all-modules restores every module)"
+  if [[ "$action" == "project" ]]; then
+    # No "remembering the choice" here: project mode deliberately doesn't.
+    echo "writing these modules: $(IFS=,; echo "${SELECTED[*]}")"
+  else
+    case "$selection_source" in
+      saved) echo "using your saved selection: $(IFS=,; echo "${SELECTED[*]}")" ;;
+      flag)  echo "installing these modules, and remembering the choice: $(IFS=,; echo "${SELECTED[*]}")" ;;
+    esac
+    echo "(./install.sh --all-modules restores every module)"
+  fi
   echo
 fi
 
-for target in "${TARGETS[@]}"; do
-  dir="$(dirname "$target")"
-
-  if [[ ! -d "$dir" && "$install_all" -eq 0 ]]; then
-    echo "skipped  $target (no $dir — tool not detected; use --all to force)"
-    continue
-  fi
-
-  mkdir -p "$dir"
+# Put $block into $1, replacing any existing managed block. Shared by the
+# user-level targets and by --project: the marker handling is the delicate
+# part of this script, and a second copy of it would be a second thing to get
+# wrong.
+write_block() { # write_block <file>
+  local target="$1" tmp
+  mkdir -p "$(dirname "$target")"
   touch "$target"
 
   tmp="$(mktemp)"
@@ -325,11 +339,64 @@ for target in "${TARGETS[@]}"; do
   # Ensure a blank line before the block, then append it.
   [[ -s "$target" ]] && echo >> "$target"
   printf '%s\n' "$block" >> "$target"
+}
+
+# --project: put the selected modules into a project's own repository, where
+# they are shared with whoever else works on it. AGENTS.md is the open
+# convention roughly fifteen tools read; Claude Code reads CLAUDE.md and not
+# AGENTS.md, so a one-line CLAUDE.md importing it covers both without a second
+# copy of the text to keep in step.
+#
+# This is a snapshot on purpose. sync.sh refreshes a machine; nothing refreshes
+# a file committed to someone else's repository, and a bot rewriting a shared
+# instruction file is not a thing to inflict on collaborators. Re-run to update.
+if [[ "$action" == "project" ]]; then
+  if [[ ! -d "$project_dir" ]]; then
+    echo "no such directory: $project_dir" >&2
+    exit 6
+  fi
+  agents="$project_dir/AGENTS.md"
+  claude="$project_dir/CLAUDE.md"
+
+  write_block "$agents"
+
+  if [[ ! -e "$claude" ]]; then
+    printf '@AGENTS.md\n' > "$claude"
+    echo "installed $claude (imports AGENTS.md — Claude Code does not read AGENTS.md itself)"
+  elif ! grep -qF '@AGENTS.md' "$claude"; then
+    echo "note     $claude exists and does not import AGENTS.md."
+    echo "         Add a line reading @AGENTS.md, or Claude Code will not see the block."
+  fi
+
+  if [[ ! -d "$project_dir/.git" ]]; then
+    echo "note     $project_dir is not a git repository — nothing here will be shared"
+    echo "         with collaborators until it is committed somewhere."
+  fi
+
+  cat <<EOF
+
+This is a snapshot, not a subscription: nothing refreshes it when the modules
+change. Re-run this command to update it, and commit the result.
+EOF
+  exit 0
+fi
+
+for target in "${TARGETS[@]}"; do
+  dir="$(dirname "$target")"
+
+  if [[ ! -d "$dir" && "$install_all" -eq 0 ]]; then
+    echo "skipped  $target (no $dir — tool not detected; use --all to force)"
+    continue
+  fi
+
+  write_block "$target"
 done
 
 cat <<'EOF'
 
-Done. For tools that only take rules through their settings UI
+Done. To put these into a project's own repository instead, where they are
+shared with collaborators:                        ./install.sh --project
+For tools that only take rules through their settings UI
 (e.g. Cursor "User Rules"), paste the output of:  ./install.sh --print
 For web chat instruction fields, which are size-capped, use the condensed
 form instead:                                     ./install.sh --brief
