@@ -45,6 +45,7 @@ module only applies to a particular assistant or forge, that's noted in italics.
 | Module | Preference |
 |---|---|
 | [`honest-reporting.md`](defaults/honest-reporting.md) | Answer-first replies, push back on bad ideas, disclose what's unfinished or still failing |
+| [`decision-handoffs.md`](defaults/decision-handoffs.md) | Every reply ends with the decision needed, the options, and a recommendation; with nothing to decide, work continues — speculative work on its own branch |
 | [`propose-before-building.md`](defaults/propose-before-building.md) | New features get a mockup, demo, options, or direction proposal **before** implementation starts |
 | [`tool-fallbacks.md`](defaults/tool-fallbacks.md) | When an interactive tool looks stuck, fall back to plain text instead of retrying it *(any assistant with interactive prompts)* |
 | [`compute-offload.md`](defaults/compute-offload.md) | Let the shell or CI do mechanical work — query instead of reading — but never where judgment or evidence is what's needed *(MCP examples assume MCP)* |
