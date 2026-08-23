@@ -106,6 +106,15 @@ block in the user-level instruction file of each AI CLI it detects on your
 machine (detection = the tool's config directory exists). Use
 `./install.sh --all` to write every target regardless.
 
+**Into a project's own repository.** Many of these modules — testing, commit
+conventions, how work reaches `main` — belong to a project as much as to a
+person. `./install.sh --project [DIR]` writes the selected modules into that
+repo's `AGENTS.md` and adds a `CLAUDE.md` containing `@AGENTS.md`, since
+Claude Code reads `CLAUDE.md` and not `AGENTS.md`. Commit the result and every
+collaborator gets them. It is a snapshot: nothing refreshes a file in a repo
+you share, so re-run it when the modules change. An existing `CLAUDE.md` is
+never overwritten — you are told to add the import instead.
+
 **Installing only some modules.** `./install.sh --list` prints every module
 with its one-line summary; `--only commit-conventions,testing` or
 `--except repo-config`

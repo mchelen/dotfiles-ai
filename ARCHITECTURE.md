@@ -51,7 +51,12 @@ flowchart LR
   Targets are a plain list in the script — adding a tool means adding a
   path there. A target is skipped unless its tool's config directory
   already exists (`--all` overrides), so only tools actually in use get
-  instruction files. Which *modules* go into the block is also selectable
+  instruction files. `--project` points the same marker logic at a repository
+  instead of a home directory, writing `AGENTS.md` and a `CLAUDE.md` that
+  imports it — the modules governing how work reaches `main` belong to a repo
+  as much as to a person. That copy is a snapshot by design: `sync.sh`
+  refreshes a machine, and nothing should rewrite a file shared with a
+  project's collaborators. Which *modules* go into the block is also selectable
   (`--list`, `--only`, `--except`, `--all-modules`): the set is one person's
   opinions and a take-it-whole set is one most people bounce off. A selection
   is saved to `~/.local/state/dotfiles-ai/modules` rather than to the repo,

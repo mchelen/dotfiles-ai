@@ -132,6 +132,42 @@ check "SC-006 condensed form fits the documented floor" "$brief_size characters 
   "$([[ $brief_size -le 1500 ]] && echo fits || echo over)" "fits"
 rm -rf "$h"
 
+# --- FR-017: --project writes into a project repo ---------------------------
+# Many of these modules belong at the project level, where they are shared with
+# whoever else works on the repo. This is a snapshot: nothing syncs it.
+h="$(new_home)"; proj="$(mktemp -d)"; git -C "$proj" init -q
+run "$h" --project "$proj" --only testing,secrets >/dev/null 2>&1
+check "FR-017 --project writes AGENTS.md" "module headings" \
+  "$(grep -c '^# ' "$proj/AGENTS.md" 2>/dev/null || true)" "2"
+check "FR-017 --project adds a CLAUDE.md import" "contents" \
+  "$(cat "$proj/CLAUDE.md" 2>/dev/null || true)" "@AGENTS.md"
+
+# A project write says nothing about what this machine wants installed.
+check "FR-017 --project leaves the machine selection alone" "state file" \
+  "$([[ -e "$h/.local/state/dotfiles-ai/modules" ]] && echo yes || echo no)" "no"
+
+# The shared marker logic must behave the same here as on a user-level file.
+printf '\n# Project notes\n\nkeep me\n' >> "$proj/AGENTS.md"
+run "$h" --project "$proj" >/dev/null 2>&1
+check "FR-017 --project replaces its block in place" "BEGIN count" \
+  "$(begins "$proj/AGENTS.md")" "1"
+check "FR-017 --project preserves the project's own text" "keep me" \
+  "$(grep -c 'keep me' "$proj/AGENTS.md" || true)" "1"
+
+# An existing CLAUDE.md is never overwritten — it belongs to the project.
+printf '# Our conventions\n' > "$proj/CLAUDE.md"
+out="$(run "$h" --project "$proj" 2>&1)"
+check "FR-017 --project does not overwrite an existing CLAUDE.md" "contents" \
+  "$(cat "$proj/CLAUDE.md")" "$(printf '# Our conventions')"
+check "FR-017 --project says the import is missing" "note" \
+  "$(printf '%s' "$out" | grep -c 'does not import AGENTS.md' || true)" "1"
+rm -rf "$h" "$proj"
+
+# A path that does not exist is a typo, not a directory to create.
+h="$(new_home)"; run "$h" --project /no/such/directory >/dev/null 2>&1
+check "FR-017 --project on a missing directory exits 6" "exit status" "$?" "6"
+rm -rf "$h"
+
 # =============================================================================
 # sync.sh — specs/002-machine-sync
 #
