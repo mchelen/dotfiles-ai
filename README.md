@@ -4,6 +4,9 @@ Dotfiles, but for AI coding assistants: a set of reusable, personal defaults
 for how an AI assistant should work with you — carried across projects and
 tools instead of re-explained in every session.
 
+**Changelog:** [`CHANGELOG.md`](CHANGELOG.md), published at
+<https://mchelen.github.io/dotfiles-ai/changelog.html>
+
 **Website:** <https://mchelen.github.io/dotfiles-ai/> — `docs/` published
 by the [`deploy-pages` workflow](.github/workflows/deploy-pages.yml);
 Pages itself configured as code in [`infra/`](infra/)
@@ -72,6 +75,7 @@ module only applies to a particular assistant or forge, that's noted in italics.
 | Module | Preference |
 |---|---|
 | [`architecture-docs.md`](defaults/architecture-docs.md) | Every project keeps an up-to-date `ARCHITECTURE.md` with Mermaid diagrams |
+| [`changelog.md`](defaults/changelog.md) | Keep a `CHANGELOG.md` in Keep a Changelog format, written for readers rather than built from the commit log, and published on the project's site |
 | [`specification.md`](defaults/specification.md) | Intended behavior lives in a checked-in spec (Spec Kit), revised in the same change as the code |
 | [`project-website.md`](defaults/project-website.md) | Most projects get a static site with usage docs and (simulated) screenshots/demos *(any static host; Pages assumed)* |
 

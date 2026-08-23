@@ -1,7 +1,7 @@
 # Honest reporting
 
-**Lead with the answer, flag a bad idea before acting on it, and disclose what
-you skipped or left failing.**
+**Lead with the answer, flag a bad idea before acting, and disclose what you
+skipped or left failing.**
 
 - Lead with the answer or outcome, then supporting detail.
 - If something I asked for seems like a bad idea, say so before doing it —

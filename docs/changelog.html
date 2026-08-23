@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Changelog — dotfiles-ai</title>
+<style>
+  :root {
+    --bg: #fafaf8;
+    --fg: #1c1c1a;
+    --muted: #6b6b66;
+    --accent: #b4552d;
+    --card: #ffffff;
+    --border: #e4e2dc;
+    --term-bg: #1e1e24;
+    --term-fg: #d6d6dc;
+    --term-green: #7ec87e;
+    --term-yellow: #d8b56a;
+    --term-dim: #8a8a94;
+    --caution: #b8860b;
+    --caution-bg: #fdf8ec;
+    /* A shade darker than --accent: accent is used for large type and rules,
+       where it has room to be bright; link text is small and needs the
+       contrast. */
+    --link: #9c4522;
+    --link-hover: #7a3419;
+    --on-accent: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16161a;
+      --fg: #e8e8e4;
+      --muted: #9a9a94;
+      --accent: #e0784a;
+      --card: #1f1f24;
+      --border: #32323a;
+      --caution: #d8b56a;
+      --caution-bg: #24211a;
+      --link: #f0906a;
+      --link-hover: #ffb494;
+      /* The dark-mode accent is a light orange; white on it is 3.0:1. */
+      --on-accent: #1a1206;
+    }
+  }
+  * { box-sizing: border-box; }
+  a { color: var(--link); text-underline-offset: .15em; }
+  a:hover { color: var(--link-hover); }
+  body {
+    margin: 0;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.6;
+  }
+  main { max-width: 860px; margin: 0 auto; padding: 0 1.25rem 4rem; }
+  header { text-align: center; padding: 4rem 1rem 2.5rem; }
+  header h1 { font-size: 2.6rem; margin: 0 0 .5rem; letter-spacing: -.02em; }
+  header h1 .dot { color: var(--accent); }
+  header p.tagline { font-size: 1.25rem; color: var(--muted); margin: 0 auto 1.5rem; max-width: 34em; }
+  .buttons { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: .55rem 1.1rem; border-radius: 8px;
+    text-decoration: none; font-weight: 600; font-size: .95rem;
+    border: 1px solid var(--border); color: var(--fg); background: var(--card);
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  section { margin-top: 3rem; }
+  h2 { font-size: 1.5rem; letter-spacing: -.01em; margin-bottom: .75rem; }
+  .num { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; margin-right: .4rem; }
+  p { margin: .6rem 0; }
+  .lead { color: var(--muted); }
+  code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: .9em; background: var(--card); border: 1px solid var(--border);
+    border-radius: 4px; padding: .1em .35em;
+  }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; margin-top: 1.25rem; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1rem 1.1rem;
+  }
+  .card h3 { margin: 0 0 .4rem; font-size: 1.02rem; }
+  .card p { margin: 0; font-size: .92rem; color: var(--muted); }
+  /* terminal */
+  .term {
+    background: var(--term-bg); color: var(--term-fg);
+    border-radius: 10px; margin-top: 1.25rem; overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  }
+  .term-bar {
+    display: flex; align-items: center; gap: .4rem;
+    padding: .55rem .8rem; background: rgba(255,255,255,.06);
+    font-size: .78rem; color: var(--term-dim);
+  }
+  .term-bar .dots span {
+    display: inline-block; width: 11px; height: 11px; border-radius: 50%;
+    margin-right: 5px; background: #555;
+  }
+  .term-bar .dots span:nth-child(1){ background:#e0604f; }
+  .term-bar .dots span:nth-child(2){ background:#dfb54f; }
+  .term-bar .dots span:nth-child(3){ background:#61b859; }
+  .term-bar .label { margin-left: auto; font-style: italic; }
+  .term pre {
+    margin: 0; padding: 1rem 1.1rem; overflow-x: auto;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: .84rem; line-height: 1.55;
+  }
+  .term .p { color: var(--term-green); }
+  .term .c { color: var(--term-dim); }
+  .term .y { color: var(--term-yellow); }
+  /* module catalog */
+  h3.cat {
+    font-size: 1.15rem; margin: 2.25rem 0 1rem; padding-bottom: .4rem;
+    border-bottom: 2px solid var(--accent); letter-spacing: -.01em;
+  }
+  h3.cat span { font-weight: 400; color: var(--muted); font-size: .92rem; letter-spacing: 0; }
+  .module {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1rem 1.1rem; margin-bottom: 1rem;
+  }
+  .module h4 {
+    margin: 0 0 .4rem; font-size: 1rem; font-family: ui-monospace, Menlo, Consolas, monospace;
+    color: var(--accent);
+  }
+  .module > p { margin: 0 0 .85rem; font-size: .93rem; }
+  .module-summary { margin: 0 0 .6rem; font-size: .95rem; }
+  .module-text { margin: 0 0 .85rem; }
+  .module-text summary {
+    cursor: pointer; font-size: .82rem; color: var(--muted);
+    padding: .3rem .55rem; border: 1px solid var(--border); border-radius: 6px;
+    background: var(--bg); display: inline-block; list-style: none;
+  }
+  .module-text summary::-webkit-details-marker { display: none; }
+  .module-text summary::before { content: "▸ "; }
+  .module-text[open] summary::before { content: "▾ "; }
+  .module-text summary:hover { color: var(--fg); border-color: var(--muted); }
+  .module-text pre {
+    margin: .5rem 0 0; padding: .7rem .85rem; overflow-x: auto;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .78rem;
+    line-height: 1.5; white-space: pre-wrap; color: var(--fg);
+  }
+  .module-scope {
+    font-size: .8rem; color: var(--muted); margin: -.5rem 0 .85rem;
+    padding-left: .6rem; border-left: 2px solid var(--border);
+  }
+  .module-scope::before { content: "Applies to: "; font-weight: 600; }
+  .ba { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .75rem; }
+  .ba-col {
+    border: 1px solid var(--border); border-radius: 8px; padding: .6rem .7rem;
+    background: var(--bg); font-size: .86rem; line-height: 1.5;
+  }
+  .ba-label {
+    display: block; font-size: .66rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .07em; margin-bottom: .35rem;
+  }
+  .ba-label.before { color: #b4552d; }
+  .ba-label.after { color: #3f8b4d; }
+  @media (prefers-color-scheme: dark) {
+    .ba-label.before { color: #e0784a; }
+    .ba-label.after { color: #7ec87e; }
+  }
+  .ba-note { color: var(--muted); font-size: .8rem; font-style: italic; }
+  .ba-scenario {
+    font-size: .9rem; color: var(--fg); background: var(--bg);
+    border-left: 3px solid var(--border); border-radius: 0 6px 6px 0;
+    padding: .45rem .7rem; margin: 0 0 .7rem;
+  }
+  .ba-scenario::before {
+    content: "Scenario"; display: block; font-size: .64rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .07em; color: var(--muted);
+    margin-bottom: .15rem;
+  }
+  .ba-impact {
+    display: block; margin-top: .5rem; padding-top: .45rem;
+    border-top: 1px dashed var(--border); font-size: .82rem; color: var(--muted);
+  }
+  .mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .8rem; }
+  /* install path chooser — one control, doubling as the tab list.
+     (progressive enhancement: without JS every panel just stacks) */
+  .tab-labels {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(228px, 1fr));
+    gap: .6rem; margin: 1rem 0 0; padding: 0;
+  }
+  .tab-labels button {
+    font: inherit; text-align: left; cursor: pointer; display: block;
+    padding: .6rem .75rem; border: 1px solid var(--border); border-radius: 10px;
+    background: var(--card); color: var(--fg);
+  }
+  .tab-labels button strong { display: block; font-size: .93rem; }
+  .tab-labels button span { display: block; font-size: .8rem; color: var(--muted); margin-top: .15rem; }
+  .tab-labels button:hover { border-color: var(--muted); }
+  .tab-labels button[aria-selected="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .tab-labels button[aria-selected="true"] strong { color: var(--accent); }
+  .tab-panel { padding-top: 1.5rem; }
+  .tab-panel h3 { font-size: 1.05rem; margin: 0 0 .3rem; }
+  .tab-panel h3 .step { color: var(--accent); font-variant-numeric: tabular-nums; margin-right: .4rem; }
+  .tab-panel > p:first-child { margin-top: 0; }
+  .js .tab-panel[hidden] { display: none; }
+  /* mock browser window */
+  .browser {
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+    background: var(--card); margin-top: 1.1rem; box-shadow: 0 6px 18px rgba(0,0,0,.10);
+  }
+  .browser-bar {
+    display: flex; align-items: center; gap: .5rem; padding: .5rem .7rem;
+    background: rgba(0,0,0,.04); border-bottom: 1px solid var(--border);
+    font-size: .78rem; color: var(--muted);
+  }
+  @media (prefers-color-scheme: dark) { .browser-bar { background: rgba(255,255,255,.05); } }
+  .browser-bar .dots span {
+    display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; background: #555;
+  }
+  .browser-bar .dots span:nth-child(1){ background:#e0604f; }
+  .browser-bar .dots span:nth-child(2){ background:#dfb54f; }
+  .browser-bar .dots span:nth-child(3){ background:#61b859; }
+  .browser-bar .url {
+    flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 999px;
+    padding: .15rem .65rem; font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: .74rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .browser-bar .label { font-style: italic; }
+  .browser-body { padding: .9rem 1rem; font-size: .89rem; }
+  .browser-body .field {
+    border: 1px solid var(--border); border-radius: 8px; padding: .6rem .75rem;
+    background: var(--bg); font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: .78rem; color: var(--muted); white-space: pre-wrap; margin-top: .4rem;
+  }
+  .browser-body .field strong { color: var(--fg); font-weight: 600; }
+  /* simulated GitHub chrome inside the mock browser */
+  .gh-row { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+  .gh-row + .gh-row { margin-top: .55rem; }
+  .gh-btn {
+    display: inline-block; padding: .28rem .7rem; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--bg);
+    font-size: .78rem; font-weight: 600; white-space: nowrap;
+  }
+  .gh-btn.green { background: #2c7a41; border-color: #2c7a41; color: #fff; }
+  .gh-btn.icon { font-family: ui-monospace, Menlo, Consolas, monospace; padding: .28rem .45rem; }
+  .gh-hl { box-shadow: 0 0 0 2px var(--accent); border-radius: 6px; }
+  .gh-note { font-size: .78rem; color: var(--muted); }
+  .gh-input {
+    border: 1px solid var(--border); border-radius: 6px; padding: .28rem .55rem;
+    background: var(--bg); font-size: .78rem; min-width: 11rem;
+  }
+  .gh-path {
+    font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .8rem; font-weight: 600;
+  }
+  .gh-toolbar {
+    display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
+    border: 1px solid var(--border); border-bottom: none;
+    border-radius: 8px 8px 0 0; padding: .4rem .6rem; background: var(--bg);
+  }
+  .gh-file {
+    border: 1px solid var(--border); border-radius: 0 0 8px 8px; padding: .55rem .6rem;
+    font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .74rem;
+    color: var(--muted); white-space: pre-wrap;
+  }
+  /* callout */
+  .callout {
+    border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: 8px; background: var(--card); padding: .85rem 1rem; margin-top: 1rem;
+  }
+  .callout p:first-child { margin-top: 0; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout ul { margin: .5rem 0 0; padding-left: 1.15rem; }
+  .callout li { margin: .3rem 0; }
+  .callout.caution { border-left-color: var(--caution); background: var(--caution-bg); }
+  .badge {
+    display: inline-block; margin: 0 0 .35rem; padding: .15rem .55rem;
+    border: 1px solid var(--caution); border-radius: 999px; background: var(--caution-bg);
+    color: var(--fg); font-size: .72rem; font-weight: 700; letter-spacing: .04em;
+    text-transform: uppercase; text-decoration: none;
+  }
+  a.badge:hover { border-color: var(--fg); }
+  .youfork { color: var(--accent); font-weight: 700; }
+  /* sticky section nav */
+  .sticky-nav {
+    position: sticky; top: 0; z-index: 20; background: var(--bg);
+    border-bottom: 1px solid var(--border); backdrop-filter: saturate(180%) blur(8px);
+  }
+  .sticky-nav ul {
+    max-width: 860px; margin: 0 auto; padding: .5rem 1.25rem; list-style: none;
+    display: flex; gap: .25rem; flex-wrap: wrap; overflow-x: auto;
+  }
+  .sticky-nav a {
+    display: inline-block; padding: .3rem .6rem; border-radius: 6px; text-decoration: none;
+    color: var(--muted); font-size: .86rem; font-weight: 600; white-space: nowrap;
+  }
+  .sticky-nav a:hover { color: var(--fg); background: var(--card); }
+  section { scroll-margin-top: 3.5rem; }
+  /* quick start */
+  .quick { border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: 10px; background: var(--card); padding: 1.1rem 1.2rem; margin-top: 1.25rem; }
+  .quick ol { margin: .6rem 0 0; padding-left: 1.3rem; }
+  .quick li { margin: .45rem 0; }
+  /* copyable snippet */
+  .snip { position: relative; margin-top: .9rem; }
+  .snip pre {
+    margin: 0; padding: .9rem 1rem; overflow-x: auto; white-space: pre-wrap; word-break: break-word;
+    background: var(--term-bg); color: var(--term-fg); border-radius: 10px;
+    font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .82rem; line-height: 1.55;
+  }
+  .snip .copy {
+    position: absolute; top: .5rem; right: .5rem; font: inherit; font-size: .74rem; font-weight: 700;
+    padding: .25rem .6rem; border-radius: 6px; cursor: pointer;
+    background: rgba(255,255,255,.12); color: #e8e8e4; border: 1px solid rgba(255,255,255,.2);
+  }
+  .snip .copy:hover { background: rgba(255,255,255,.22); }
+  /* repo path input */
+  .repo-box {
+    border: 1px solid var(--border); border-radius: 10px; background: var(--card);
+    padding: .9rem 1rem; margin-top: 1.1rem;
+  }
+  .repo-box label { display: block; font-weight: 600; font-size: .93rem; margin-bottom: .15rem; }
+  .repo-box .hint { color: var(--muted); font-size: .84rem; }
+  .repo-box input {
+    font: inherit; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .86rem;
+    padding: .45rem .6rem; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--bg); color: var(--fg); width: 100%; max-width: 26rem; margin-top: .5rem;
+  }
+  .repo-box .state { font-size: .82rem; color: var(--muted); margin-top: .4rem; min-height: 1.2em; }
+  .repo-box .state b { color: var(--accent); font-family: ui-monospace, Menlo, Consolas, monospace; }
+  /* install path index */
+  kbd {
+    font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .8em;
+    border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 4px;
+    padding: .05em .35em; background: var(--bg);
+  }
+  /* before / after demo */
+  .demo { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; margin-top: 1.25rem; }
+  .chat {
+    border: 1px solid var(--border); border-radius: 10px; background: var(--card);
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+  .chat-head {
+    padding: .6rem .9rem; font-size: .85rem; font-weight: 700;
+    border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: .5rem;
+  }
+  .chat-head .pill {
+    font-size: .68rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    padding: .12rem .5rem; border-radius: 999px;
+  }
+  .chat-head.before .pill { background: rgba(200,90,60,.16); color: #b4552d; }
+  .chat-head.after  .pill { background: rgba(70,150,80,.16); color: #3f8b4d; }
+  @media (prefers-color-scheme: dark) {
+    .chat-head.before .pill { color: #e0784a; }
+    .chat-head.after  .pill { color: #7ec87e; }
+  }
+  .chat-head .note { font-weight: 400; color: var(--muted); font-size: .8rem; }
+  .msg { padding: .75rem .9rem; font-size: .88rem; line-height: 1.55; border-bottom: 1px solid var(--border); }
+  .msg:last-child { border-bottom: none; }
+  .msg.user { background: rgba(0,0,0,.025); }
+  @media (prefers-color-scheme: dark) { .msg.user { background: rgba(255,255,255,.035); } }
+  .msg .who {
+    display: block; font-size: .68rem; text-transform: uppercase; letter-spacing: .07em;
+    color: var(--muted); margin-bottom: .3rem;
+  }
+  .msg ul { margin: .4rem 0 0; padding-left: 1.1rem; }
+  .msg li { margin: .15rem 0; }
+  .msg .ascii {
+    font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .76rem;
+    line-height: 1.35; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: .5rem .6rem; margin: .5rem 0 0; overflow-x: auto;
+    white-space: pre;
+  }
+  table {
+    width: 100%; border-collapse: collapse; margin-top: 1.25rem;
+    font-size: .92rem; background: var(--card);
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  }
+  .table-wrap { overflow-x: auto; }
+  th, td { text-align: left; padding: .55rem .8rem; border-bottom: 1px solid var(--border); }
+  th { background: rgba(0,0,0,.03); font-size: .85rem; }
+  @media (prefers-color-scheme: dark) { th { background: rgba(255,255,255,.04); } }
+  tr:last-child td { border-bottom: none; }
+  .ok { color: var(--accent); font-weight: 600; }
+  footer {
+    text-align: center; color: var(--muted); font-size: .85rem;
+    padding: 2rem 1rem 3rem; border-top: 1px solid var(--border); margin-top: 4rem;
+  }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Changelog<span class="dot">.</span></h1>
+  <p class="tagline">What changed in dotfiles-ai, and when.</p>
+  <div class="buttons"><a class="btn" href="./">Back to the guide</a><a class="btn" href="https://github.com/mchelen/dotfiles-ai/blob/main/CHANGELOG.md">CHANGELOG.md</a></div>
+</header>
+<main>
+<section>
+<p>All notable changes to this project will be documented in this file.</p>
+<p>The format is based on <a href="https://keepachangelog.com">Keep a Changelog</a>. This project is not versioned — the defaults are meant to be forked and edited, so there is nothing to release. Sections are dated instead.</p>
+<h2>Unreleased</h2>
+<h3>Added</h3>
+<ul>
+<li>A <code>changelog</code> module: every project keeps a <code>CHANGELOG.md</code> written for readers rather than generated from the commit log, published on the project's website rather than left in the source tree.</li>
+<li>This file, and its page on the site.</li>
+</ul>
+<h2>2026-08-23</h2>
+<h3>Added</h3>
+<ul>
+<li>Branch protection on <code>main</code>, declared in <code>infra/</code>: pull requests only, the <code>test</code> check required, administrators included, no bypass list.</li>
+<li><code>sync.sh</code> is covered by tests for the first time — fifteen checks against a throwaway git remote, making every requirement in its spec executable.</li>
+<li>The weekly repository-settings check: <code>repo-settings</code> now runs Mondays in check-only mode, reporting drift without applying it.</li>
+<li>A <code>decision-handoffs</code> module: every response ends with the decision you need to make, its options and their costs; where there is nothing to decide, work continues rather than waiting.</li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li><code>sync.sh --auto</code> printed five lines of git diagnostics at the prompt on every shell start while offline. <code>--quiet</code> suppresses progress, not failures. Automatic mode now goes on the exit status alone; manual mode still shows them.</li>
+<li>Generated artifacts could go stale: <code>INSTRUCTIONS.md</code> and <code>INSTRUCTIONS-brief.md</code> were never checked against <code>defaults/</code>, so a change that rebuilt the site but not the block passed. All three are checked now.</li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li>Generated artifacts are regenerated in the change that edits a module and enforced by CI, instead of being repaired afterwards by a workflow pushing to <code>main</code>. <strong>Editing a module entirely in the browser no longer completes on its own</strong> — the change fails its check until someone with a shell or an agent regenerates. Every read path is unaffected.</li>
+<li>The Settings GitHub App is now the default mechanism in the <code>repo-config</code> module, with Terraform the alternative: the app is easier to set up, Terraform reaches settings the app has no keys for (Pages, secret scanning, push protection).</li>
+</ul>
+<h3>Removed</h3>
+<ul>
+<li>The <code>generate-instructions</code> workflow, and with it the last thing that pushed to <code>main</code>.</li>
+</ul>
+<h2>2026-08-22</h2>
+<h3>Added</h3>
+<ul>
+<li>Module selection: <code>install.sh --list</code>, <code>--only</code>, <code>--except</code>, and <code>--all-modules</code>. A chosen subset is remembered, because <code>sync.sh</code> re-runs the installer unattended and a selection that lasted a day would be a trap.</li>
+<li>The quick-start snippet asks which modules you want before applying anything, and says plainly that following it means trusting this repo's author.</li>
+<li>A <code>ci-gated-main</code> module, later merged with the pull-request workflow into one record of how changes reach the default branch.</li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li>Every module card on the website now carries the module's <strong>exact text</strong>, copied verbatim by <code>build-site.sh</code>, instead of a hand-written paraphrase that drifted.</li>
+<li>Modules renamed for what they achieve: <code>communication</code> became <code>honest-reporting</code>, <code>feature-workflow</code> became <code>propose-before-building</code>, and the <code>git</code> module was split into <code>commit-conventions</code>, <code>cheap-git-queries</code>, and the merged <code>ci-gated-main</code>.</li>
+<li>The condensed block was cut from 1,446 to 1,294 characters, and the 1,500-character floor it has to fit is now enforced by <code>install.sh --brief</code> and the test suite rather than remembered.</li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li>The managed block was not replaced when a marker line had been edited by hand: detection matched loosely, removal matched exactly, and a trailing space produced a second block. Writing the reproduction surfaced a worse defect — a <code>BEGIN</code> with no <code>END</code> deleted everything below it and exited zero. Both are fixed, and the run now aborts without touching the file.</li>
+</ul>
+<h2>2026-07-26</h2>
+<h3>Added</h3>
+<ul>
+<li><code>INSTRUCTIONS-brief.md</code>, a condensed one-line-per-module block for web chat instruction fields, which cap out well below the full block.</li>
+<li>Architecture decision records in <code>adr/</code>, starting with why the project is a forkable repo at all.</li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li>Blocks committed into project repositories target <code>AGENTS.md</code>, with a <code>CLAUDE.md</code> that imports it — Claude Code reads <code>CLAUDE.md</code>, not <code>AGENTS.md</code>.</li>
+<li>Commits follow the storytelling convention: atomic units, conventional prefixes, and history reshaped on the branch rather than on <code>main</code>.</li>
+</ul>
+<h2>2026-07-25</h2>
+<h3>Added</h3>
+<ul>
+<li>The fork-first install guide, including a path that needs no terminal at all, and a per-environment walkthrough for Claude Code on the web.</li>
+<li><code>specification</code> and <code>compute-offload</code> modules, and <code>specs/</code> describing this project's own behaviour in Spec Kit format.</li>
+<li><code>tool-fallbacks</code>: when an interactive tool looks stuck, drop to plain text.</li>
+</ul>
+<h2>2026-07-21</h2>
+<h3>Added</h3>
+<ul>
+<li>The project website, published to GitHub Pages.</li>
+<li><code>sync.sh</code>, with shell-startup auto-sync and a post-merge hook.</li>
+<li>Layered secret and PII protection, and the <code>secrets</code> module.</li>
+<li>Repository settings as code, applied from CI.</li>
+<li>Install targets for Copilot CLI, Gemini CLI, Qwen Code, OpenCode, and Goose.</li>
+</ul>
+<h2>2026-07-16</h2>
+<h3>Added</h3>
+<ul>
+<li>The first modules and <code>install.sh</code>.</li>
+</ul>
+</section>
+</main>
+<footer>Generated from <code>CHANGELOG.md</code> by <code>build-site.sh</code>. Edit the markdown, not this page.</footer>
+</body>
+</html>
