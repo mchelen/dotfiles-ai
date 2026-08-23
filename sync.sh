@@ -44,10 +44,16 @@ if command -v pre-commit >/dev/null 2>&1; then
 fi
 
 before=$(git -C "$REPO_DIR" rev-parse HEAD)
-if ! DOTFILES_AI_SYNC=1 git -C "$REPO_DIR" pull --ff-only --quiet origin main; then
-  if [[ $auto -eq 1 ]]; then
-    exit 0  # offline or diverged history; try again next interval
-  fi
+
+# --quiet silences progress, not failures. An unreachable remote still prints
+# five lines of git's own diagnostics, and in --auto that lands at the prompt
+# on every shell start for as long as the laptop is offline — which is the one
+# thing automatic mode must never do. Auto discards it and goes on the exit
+# status; manual mode keeps it, where it is the useful part of the answer.
+pull() { DOTFILES_AI_SYNC=1 git -C "$REPO_DIR" pull --ff-only --quiet origin main; }
+if [[ $auto -eq 1 ]]; then
+  pull >/dev/null 2>&1 || exit 0  # offline or diverged; try again next interval
+elif ! pull; then
   echo "sync: git pull failed (offline, or local history has diverged)" >&2
   exit 1
 fi
