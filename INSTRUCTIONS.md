@@ -273,7 +273,8 @@ Skip this ceremony when:
 **Repository settings live in the repo as code, never clicked through the
 UI.**
 
-*GitHub-specific. The principle — settings as code, applied automatically, never clicked — carries to any forge; both implementations below are GitHub's.*
+*GitHub-specific. The principle — settings as code, applied automatically,
+never clicked — carries to any forge; both implementations below are GitHub's.*
 
 Settings that belong in code: description and homepage, feature toggles, merge
 policy, Pages, vulnerability alerts, secret scanning and push protection, and
@@ -281,10 +282,40 @@ branch protection rules once they exist. When one must change, change the file
 and let it apply — don't flip it in the UI and leave the code lying. If a UI
 change already happened, reconcile the code to match (or revert) promptly.
 
-Two implementations. Ask me which I want the first time a repo needs one,
-rather than assuming:
+Two implementations, and the choice is mostly decided by the list above:
+whether the settings I need are ones the app can reach.
 
-## Terraform (default for repos I own alone)
+## The Settings GitHub App (default)
+
+- [`repository-settings/app`](https://github.com/repository-settings/app),
+  hosted at `github.com/apps/settings`. Config lives in
+  `.github/settings.yml` and syncs when pushed to the default branch.
+- Sections are `repository`, `teams`, `collaborators`, `branches`,
+  `environments`, `labels`, `milestones` — all optional. The `repository`
+  section takes: `name`, `description`, `homepage`, `topics`, `private`,
+  `has_issues`, `has_projects`, `has_wiki`, `has_downloads`,
+  `default_branch`, `allow_squash_merge`, `allow_merge_commit`,
+  `allow_rebase_merge`, `delete_branch_on_merge`,
+  `enable_automated_security_fixes`, `enable_vulnerability_alerts`.
+- No PAT to mint or rotate, no state, no workflow to maintain, and settings
+  changes arrive as reviewable pull requests like any other diff.
+- **Know what it can't reach.** That key list is the whole of it. Pages
+  configuration, secret scanning, and secret scanning push protection have no
+  keys — a repo that needs those managed as code needs Terraform for them,
+  and a repo where they're set by hand has settings-as-documentation for
+  exactly the three that matter most.
+- **Know the trade you're making on access.** The app's own documentation
+  warns that it "inherently escalates anyone with `push` permissions to the
+  **admin** role", because pushing config to the default branch is enough to
+  change settings. Mitigate it the way the docs prescribe: make an admin the
+  `CODEOWNERS` owner of `.github/settings.yml` and require code-owner review.
+  If that mitigation isn't in place, prefer Terraform.
+
+## Terraform (when the app can't reach it)
+
+Reach for this when the repo needs Pages, secret scanning, or push protection
+managed as code, or when the push-to-admin escalation isn't acceptable and
+`CODEOWNERS` isn't enough.
 
 - Official GitHub provider (`integrations/github`) with an `import` block to
   adopt the existing repo. Config lives in `infra/`.
@@ -296,40 +327,25 @@ rather than assuming:
   than failing.
 - Never commit state, `*.tfvars`, or tokens.
 
-## The Settings GitHub App (default when others can push)
-
-- [`repository-settings/app`](https://github.com/repository-settings/app),
-  hosted at `github.com/apps/settings`. Config lives in
-  `.github/settings.yml` and syncs when pushed to the default branch.
-- Sections are `repository`, `teams`, `collaborators`, `branches`,
-  `environments`, `labels`, `milestones` — all optional. The `repository`
-  section takes the familiar keys: `description`, `homepage`, `topics`,
-  `has_issues`, `default_branch`, `allow_squash_merge`, `allow_merge_commit`,
-  `allow_rebase_merge`, `delete_branch_on_merge`, `enable_vulnerability_alerts`.
-- No PAT to mint or rotate, and settings changes arrive as reviewable pull
-  requests like any other diff.
-- **Know the trade before choosing it.** The app's own documentation warns that
-  it "inherently escalates anyone with `push` permissions to the **admin**
-  role", because pushing config to the default branch is enough to change
-  settings. Mitigate it the way the docs prescribe: make an admin the
-  `CODEOWNERS` owner of `.github/settings.yml` and require code-owner review.
-  If that mitigation isn't in place, prefer Terraform.
+Running both on one repo is a mistake unless the key sets are disjoint and the
+split is written down. Two systems reconciling the same setting against
+different sources means the last one to run wins, silently.
 
 ## Setting this up on a repo for the first time
 
-Both options need a one-time human step that an assistant cannot do: creating a
-PAT, or installing a GitHub App. Don't stall silently on it and don't pretend
-it's done — **write out the exact steps and say what you'll do once it's
-finished.**
+Both options need a one-time human step that an assistant cannot do:
+installing a GitHub App, or creating a PAT. Don't stall silently on it and
+don't pretend it's done — **write out the exact steps and say what you'll do
+once it's finished.**
 
-- **Terraform:** create a fine-grained PAT scoped to that repo with
-  Administration read & write, save it as the `REPO_ADMIN_TOKEN` Actions
-  secret, then say which workflow will pick it up. Name any additional
-  permission the config needs — Pages settings need their own.
 - **Settings app:** install `github.com/apps/settings` on the repo or org and
   grant it access to that repo, then say that the next push of
   `.github/settings.yml` to the default branch will apply. Mention the
   CODEOWNERS mitigation in the same breath, not later.
+- **Terraform:** create a fine-grained PAT scoped to that repo with
+  Administration read & write, save it as the `REPO_ADMIN_TOKEN` Actions
+  secret, then say which workflow will pick it up. Name any additional
+  permission the config needs — Pages settings need their own.
 
 Then check it actually worked: read the settings back and compare against the
 file. A workflow that skipped, a token missing a scope, or an app without

@@ -64,7 +64,7 @@ module only applies to a particular assistant or forge, that's noted in italics.
 | [`commit-conventions.md`](defaults/commit-conventions.md) | No commits/pushes unless asked; atomic commits, conventional messages and branch names, no rewriting `main` |
 | [`secrets.md`](defaults/secrets.md) | Layered secret/PII protection: pre-commit scan + CI scanner + GitHub secret scanning; leaked = rotate *(push protection is GitHub's)* |
 | [`ci-gated-main.md`](defaults/ci-gated-main.md) | Work ships as pull requests merged on green, and `main` is protected so nothing else can reach it *(protection half is GitHub-specific)* |
-| [`repo-config.md`](defaults/repo-config.md) | Repo settings as code — Terraform, or the Settings app — never clicked through the UI, with the one-time human setup spelled out *(GitHub-specific)* |
+| [`repo-config.md`](defaults/repo-config.md) | Repo settings as code — the Settings app by default, Terraform where the app has no key (Pages, secret scanning) — never clicked through the UI *(GitHub-specific)* |
 
 **Documentation** — what gets written down
 
