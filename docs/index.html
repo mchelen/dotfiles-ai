@@ -520,8 +520,8 @@ PASS  useAppearance > persists explicit dark</div>
   </section>
   <section id="modules">
     <h2>The modules</h2>
-    <p>Fifteen modules, grouped here by the kind of behavior they govern. Each one is a short markdown file in <code>defaults/</code> — read them, delete the ones you disagree with, add your own.</p>
-    <p class="lead">You don't have to take all fifteen. The <a href="#quick">quick start</a> asks which ones you want before it applies anything, and <code>./install.sh --only commit-conventions,testing</code> installs just those and remembers the choice (<code>--list</code> shows them all, <code>--all-modules</code> forgets).</p>
+    <p>Sixteen modules, grouped here by the kind of behavior they govern. Each one is a short markdown file in <code>defaults/</code> — read them, delete the ones you disagree with, add your own.</p>
+    <p class="lead">You don't have to take all sixteen. The <a href="#quick">quick start</a> asks which ones you want before it applies anything, and <code>./install.sh --only commit-conventions,testing</code> installs just those and remembers the choice (<code>--list</code> shows them all, <code>--all-modules</code> forgets).</p>
 
     <h3 class="cat">Collaboration <span>— how the assistant works with you</span></h3>
 
@@ -533,8 +533,8 @@ PASS  useAppearance > persists explicit dark</div>
         <summary>Exact text — 12 lines, verbatim as installed</summary>
         <pre># Honest reporting
 
-**Lead with the answer, flag a bad idea before acting on it, and disclose what
-you skipped or left failing.**
+**Lead with the answer, flag a bad idea before acting, and disclose what you
+skipped or left failing.**
 
 - Lead with the answer or outcome, then supporting detail.
 - If something I asked for seems like a bad idea, say so before doing it —
@@ -1182,6 +1182,46 @@ rewires a component.**
     </div>
 
     <div class="module">
+      <h4>changelog</h4>
+      <p class="module-summary">Every project keeps a <code>CHANGELOG.md</code> written for the people reading it rather than assembled from the commit log, and publishes it where those people actually are.</p>
+      <!-- BEGIN module-text: changelog -->
+      <details class="module-text">
+        <summary>Exact text — 25 lines, verbatim as installed</summary>
+        <pre># Changelog
+
+**Every project keeps a `CHANGELOG.md`, written for readers rather than
+generated from the log.**
+
+- Follow [Keep a Changelog](https://keepachangelog.com). Newest first, an
+  `## [Unreleased]` section at the top, and released sections headed
+  `## [version] - YYYY-MM-DD`. A project with no versions dates its sections
+  instead — the date is the part readers navigate by.
+- Group entries by kind: **Added**, **Changed**, **Fixed**, **Removed**, plus
+  the format's deprecation and security categories where they apply.
+- **Write it for the reader, not from the history.** A commit log answers
+  "what changed in the code"; a changelog answers "what changed for me". Most
+  commits produce no entry, and one entry often covers several commits.
+- Update it in the same change that earns the entry. Written a month later
+  from the log, it is a reconstruction — and the details worth recording are
+  the ones already forgotten.
+- Skip anything invisible from outside: refactors, test additions, formatting.
+  If it changed nothing for anyone using the project, it belongs in the
+  history and nowhere else.
+- Record removals and breaking changes most carefully of all. Those are the
+  entries people go looking for, usually after something stopped working.
+- **Publish it where the users are**, not only in the repo. If the project has
+  a website, the changelog belongs on it — a file in a source tree is not
+  where someone checks what changed.</pre>
+      </details>
+      <!-- END module-text: changelog -->
+      <p class="ba-scenario">Someone upgrades and something they relied on is gone.</p>
+      <div class="ba">
+        <div class="ba-col"><span class="ba-label before">Before</span>They read 60 commit subjects looking for the one that removed it.<span class="ba-impact">The answer is in the history, phrased for whoever wrote the code rather than whoever hit the change.</span></div>
+        <div class="ba-col"><span class="ba-label after">After</span>A dated <strong>Removed</strong> entry naming what went and what replaces it.<span class="ba-impact">Found in seconds, on the website, without cloning anything.</span></div>
+      </div>
+    </div>
+
+    <div class="module">
       <h4>specification</h4>
       <p class="module-summary">Intended behaviour lives in a checked-in spec, revised in the same change as the code — and code that contradicts it becomes a question rather than a silent edit.</p>
       <p class="module-scope">Agent-agnostic — Spec Kit is a file format plus a CLI, not a feature of one assistant.</p>
@@ -1676,13 +1716,13 @@ When I ask for a new feature or a significant change:
       <p><strong>The catch is size.</strong> These fields are capped, and the full block is nowhere near small enough:</p>
       <div class="table-wrap">
       <table>
-        <tr><th>Field</th><th>Cap</th><th>Full block (<span data-gen="full">27,837</span>)</th><th>Condensed (<span data-gen="brief">1,389</span>)</th></tr>
-        <tr><td>Claude — project instructions</td><td>~8,000</td><td>✗ <span data-gen="over-8000">19,837</span> over</td><td class="ok">✓ fits</td></tr>
-        <tr><td>ChatGPT — custom instructions (paid)</td><td>5,000</td><td>✗ <span data-gen="over-5000">22,837</span> over</td><td class="ok">✓ fits</td></tr>
-        <tr><td>ChatGPT — custom instructions (Free/Go)</td><td>1,500</td><td>✗ <span data-gen="over-1500">26,337</span> over</td><td class="ok">✓ fits</td></tr>
+        <tr><th>Field</th><th>Cap</th><th>Full block (<span data-gen="full">29,296</span>)</th><th>Condensed (<span data-gen="brief">1,479</span>)</th></tr>
+        <tr><td>Claude — project instructions</td><td>~8,000</td><td>✗ <span data-gen="over-8000">21,296</span> over</td><td class="ok">✓ fits</td></tr>
+        <tr><td>ChatGPT — custom instructions (paid)</td><td>5,000</td><td>✗ <span data-gen="over-5000">24,296</span> over</td><td class="ok">✓ fits</td></tr>
+        <tr><td>ChatGPT — custom instructions (Free/Go)</td><td>1,500</td><td>✗ <span data-gen="over-1500">27,796</span> over</td><td class="ok">✓ fits</td></tr>
       </table>
       </div>
-      <p class="lead">So this path uses <code>INSTRUCTIONS-brief.md</code> — one line per module, generated from each module's thesis sentence by the same CI job that builds the full block. At <span data-gen="brief">1,389</span> characters it clears the 1,500 floor with about two modules to spare. That floor is checked, not remembered: <code>install.sh --brief</code> warns when it's exceeded and the test suite fails, so a module that would overflow your settings field is caught before it ships. If you add enough of your own to break it, use <code>--brief --only</code> with the modules that matter to you, or the fetch approach in step 7.</p>
+      <p class="lead">So this path uses <code>INSTRUCTIONS-brief.md</code> — one line per module, generated from each module's thesis sentence by the same CI job that builds the full block. At <span data-gen="brief">1,479</span> characters it clears the 1,500 floor with about two modules to spare. That floor is checked, not remembered: <code>install.sh --brief</code> warns when it's exceeded and the test suite fails, so a module that would overflow your settings field is caught before it ships. If you add enough of your own to break it, use <code>--brief --only</code> with the modules that matter to you, or the fetch approach in step 7.</p>
 
       <h3><span class="step">4.</span>Open <code>INSTRUCTIONS-brief.md</code> in your fork</h3>
       <p><code>github.com/<span class="youfork u">your-username</span>/<span class="r">dotfiles-ai</span>/blob/main/INSTRUCTIONS-brief.md</code></p>
@@ -1924,7 +1964,7 @@ updated  /Users/you/.codex/AGENTS.md <span class="c">(previous version saved to 
 </script>
 
 <footer>
-  <a href="https://github.com/mchelen/dotfiles-ai">mchelen/dotfiles-ai</a> · MIT License · terminal output on this page is simulated for illustration
+  <a href="./changelog.html">Changelog</a> · <a href="https://github.com/mchelen/dotfiles-ai">mchelen/dotfiles-ai</a> · MIT License · terminal output on this page is simulated for illustration
 </footer>
 </body>
 </html>

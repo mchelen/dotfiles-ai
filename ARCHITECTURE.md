@@ -92,7 +92,11 @@ flowchart LR
   wrong within two changes of being written. It exists because the site previously paraphrased each
   module: a reader could not see what would actually be installed, and the
   paraphrase drifted the moment the module changed. `--check` exits non-zero
-  when the page is stale, and `test.sh` runs it, so drift fails the build.
+  when the page is stale, and `test.sh` runs it, so drift fails the build. It
+  also renders `CHANGELOG.md` into `docs/changelog.html`, lifting the `<style>`
+  block out of `index.html` rather than keeping a second copy of it, and
+  refusing any markdown construct outside the subset the changelog uses —
+  publishing raw markdown to a live page is the more expensive mistake.
 - **`sync.sh`** — propagation. Pulls the latest `main` (fast-forward only)
   and re-runs the installer. In `--auto` mode (meant for shell startup) it
   throttles to one attempt per day via a stamp file in
