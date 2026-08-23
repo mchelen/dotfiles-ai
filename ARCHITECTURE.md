@@ -122,7 +122,12 @@ flowchart LR
   applied to this repo — see `specs/README.md`.
 - **`infra/`** — GitHub repository settings as code (Terraform, official
   GitHub provider): description, merge policy, Pages source, vulnerability
-  alerts, secret scanning + push protection. An `import` block adopts the
+  alerts, secret scanning + push protection. The `repo-config` module makes
+  the Settings GitHub App the default and Terraform the exception; this repo
+  is the exception, and for the reason the module names — three of the
+  settings above (Pages `build_type`, secret scanning, push protection) have
+  no key in `.github/settings.yml`, so moving here would hand exactly those
+  back to the web UI. An `import` block adopts the
   existing repo; state stays local and is gitignored. Applied by
   **`.github/workflows/repo-settings.yml`** on merges to `main` touching
   `infra/` (stateless: re-import, reconcile, discard state), using a
