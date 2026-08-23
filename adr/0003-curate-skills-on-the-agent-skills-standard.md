@@ -5,6 +5,12 @@
   [ADR-0002](0002-adopt-storytelling-commit-convention.md) — specifically the
   reasoning in each that rejected skills as single-vendor.
 - **Date:** 2026-07-26
+- **Amended 2026-08-23** — this record flagged four claims as unverified and
+  said they "must be checked before anything depends on them." They have now
+  been checked; see [Verification, 2026-08-23](#verification-2026-08-23). Two
+  are resolved, one corrects an error below, and one could not be checked at
+  all. Nothing about the decision changes; what changes is how much of it
+  rests on a vendor's assertion.
 - **Amended 2026-07-26:** third-party skills are **referenced, never
   vendored**. This closes the copy-vs-pin question the record itself left
   open, before any implementation existed to be superseded.
@@ -55,6 +61,52 @@ standard, where each non-Claude tool looks for skills on disk, and the plugin
 marketplace manifest schema. Those are secondary-source claims and must be
 checked before anything depends on them.
 
+### Verification, 2026-08-23
+
+**Resolved — the marketplace manifest schema.** A marketplace is a
+`.claude-plugin/marketplace.json` in a git-hosted repo. Required: `name`
+(kebab-case, public-facing), `owner` (object, its own `name` required), and
+`plugins` (array). Each plugin entry requires `name` and `source`; `description`,
+`version`, `author`, and a free-form `metadata` are optional. Users run
+`/plugin marketplace add <repo>` then `/plugin install <plugin>@<marketplace>`.
+The one-command bootstrap this record assumed does exist, and is small.
+
+**Correction — the frontmatter field list above is wrong.** The Agent Skills
+spec defines **six** fields: `name`, `description`, `license`, `compatibility`,
+`metadata`, `allowed-tools`. `disable-model-invocation`, listed above as
+though it were standard, is a **Claude Code extension**. The consequence is
+sharper than "not portable": outside Claude Code — claude.ai uploads, the
+Skills API, `package_skill.py` — a non-spec field is a **hard error**, not an
+ignored key:
+
+> `Unexpected key(s) in SKILL.md frontmatter: argument-hint. Allowed
+> properties are: allowed-tools, compatibility, description, license,
+> metadata, name`
+
+So "marked as such rather than silently non-portable" in the Decision below is
+too weak. A skill either restricts itself to the six fields or it fails to
+package at all. That is a better constraint — it is enforced rather than
+remembered — but it means the vendor-neutral core is narrower than this record
+assumed.
+
+**Still unverified — which non-Anthropic tools implement the standard, and
+where they keep skills on disk.** `agentskills.io` is blocked by this
+environment's egress proxy, so the claim of roughly forty supporting tools
+remains unchecked from here. What can be confirmed: Anthropic's own
+documentation states that "Claude Code skills follow the Agent Skills open
+standard, which works across multiple AI tools," and `anthropics/skills`
+names Claude Code, claude.ai on paid plans, and the Claude API. **No
+non-Anthropic implementer has been confirmed first-hand.**
+
+That matters more than it looks. Decision point 4 — bootstrap where a standard
+exists, degrade where it doesn't — assumes other tools to degrade *to*. On the
+evidence actually in hand, this may be an Anthropic-governed format that other
+tools are said to support, which is a different thing from a multi-vendor
+standard. It does not reverse the decision: the format is a plain directory of
+markdown, so a copy step serves any tool regardless. But the portability
+argument should be treated as unconfirmed until someone can reach
+`agentskills.io` or name an implementer.
+
 ### The reframing
 
 The commit convention adopted in ADR-0002 arrived **as a skill, from a
@@ -80,9 +132,10 @@ the authored preference modules.
 
 1. **Content standard: Agent Skills.** Skills are stored as
    `<skill-name>/SKILL.md` directories with standard frontmatter. Skills meant
-   to travel stay within the vendor-neutral core; anything relying on a
-   Claude-specific extension is marked as such rather than silently
-   non-portable.
+   to travel restrict their frontmatter to the spec's six fields — `name`,
+   `description`, `license`, `compatibility`, `metadata`, `allowed-tools` —
+   because anything else is a hard packaging error outside Claude Code, not a
+   silently ignored key. *(Corrected 2026-08-23; see Verification above.)*
 
 2. **Two sources, both curated.**
    - *Authored here*: modules that are procedures rather than facts become
@@ -151,6 +204,9 @@ the authored preference modules.
 ## Revisit when
 
 - The Agent Skills specification changes shape, or its governance moves.
+- `agentskills.io` becomes reachable, or a non-Anthropic implementation is
+  confirmed. Either settles whether the portability premise in this record is
+  real or borrowed.
 - Referenced skills start disappearing or changing under us often enough
   that pinning by reference stops being reliable, or an offline install
   becomes a requirement — either would reopen the vendoring question.
