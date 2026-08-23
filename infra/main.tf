@@ -44,6 +44,12 @@ resource "github_repository" "dotfiles_ai" {
   allow_rebase_merge     = false
   delete_branch_on_merge = true
 
+  # Required by generate-instructions.yml: the artifact-regeneration pull
+  # request merges itself once its checks are green, so the generated files
+  # pass through the same gate as everything else without needing a human to
+  # press a button on a diff nobody reviews.
+  allow_auto_merge = true
+
   vulnerability_alerts = true
 
   # The static site: published by .github/workflows/deploy-pages.yml
