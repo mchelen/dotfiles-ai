@@ -132,7 +132,12 @@ flowchart LR
   **`.github/workflows/repo-settings.yml`** on merges to `main` touching
   `infra/` (stateless: re-import, reconcile, discard state), using a
   fine-grained admin PAT in the `REPO_ADMIN_TOKEN` secret; skips with a
-  notice when the secret is absent.
+  notice when the secret is absent. The same workflow runs weekly in
+  check-only mode: it plans, reports which settings differ, and fails without
+  applying, because applying on change alone leaves the config unverified
+  between edits. The plan covers every declared setting, including the three
+  (Pages `build_type`, secret scanning, push protection) that cannot be read
+  back without an admin token.
 
 ## Propagation paths
 

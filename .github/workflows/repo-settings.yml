@@ -1,8 +1,22 @@
 name: repo-settings
 
-# Applies infra/main.tf whenever it changes on main. Stateless pattern:
-# the import block re-adopts the repo on every run, Terraform reconciles
-# settings, and the runner's local state is discarded — no backend needed.
+# Two modes, one config:
+#
+#   push to infra/** or manual dispatch -> apply. Terraform reconciles the
+#     repository to infra/main.tf.
+#   weekly schedule                     -> check only. Terraform plans and
+#     reports drift without touching anything.
+#
+# The check-only run exists because applying on change alone means the config
+# is only true at the moment it is edited. Settings changed in the web UI in
+# between would sit there indefinitely, which is how a repo ends up with
+# settings-as-documentation. Drift fails the run deliberately: a failing
+# scheduled workflow is the notification, and a green one that quietly found
+# problems is the thing being guarded against.
+#
+# Stateless pattern: the import block re-adopts the repo on every run,
+# Terraform reconciles or compares, and the runner's local state is discarded
+# — no backend needed.
 #
 # Requires a fine-grained PAT with "Administration: read & write" on this
 # repo, stored as the REPO_ADMIN_TOKEN Actions secret (the built-in
@@ -13,13 +27,16 @@ on:
   push:
     branches: [main]
     paths: ['infra/**']
+  schedule:
+    # Mondays 09:17 UTC. Off the hour because that is when everyone else runs.
+    - cron: '17 9 * * 1'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  apply:
+  settings:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,17 +50,45 @@ jobs:
             echo "present=true" >> "$GITHUB_OUTPUT"
           else
             echo "present=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::REPO_ADMIN_TOKEN secret not set — skipping settings apply. Add a fine-grained PAT (Administration: write) as a repo Actions secret to enable."
+            echo "::notice::REPO_ADMIN_TOKEN secret not set — skipping. Add a fine-grained PAT (Administration: write) as a repo Actions secret to enable."
           fi
 
       - uses: hashicorp/setup-terraform@v3
         if: steps.token.outputs.present == 'true'
 
       - name: Apply repo settings
-        if: steps.token.outputs.present == 'true'
+        if: steps.token.outputs.present == 'true' && github.event_name != 'schedule'
         working-directory: infra
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_ADMIN_TOKEN }}
         run: |
           terraform init -input=false
           terraform apply -auto-approve -input=false
+
+      - name: Check for drift
+        if: steps.token.outputs.present == 'true' && github.event_name == 'schedule'
+        working-directory: infra
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_ADMIN_TOKEN }}
+        run: |
+          terraform init -input=false
+          terraform plan -input=false -out=tfplan
+          terraform show -json tfplan > plan.json
+
+          # The import block means every plan contains an import, so a plan
+          # that is non-empty is not the same as drift. An adopted resource
+          # that matches the config plans as "no-op"; anything else is a real
+          # difference. The action strings are printed either way, so a first
+          # run that disagrees with this reasoning says what it actually saw
+          # rather than just failing.
+          echo "planned actions per resource:"
+          jq -r '.resource_changes[]? | "  \(.address): \(.change.actions | join(","))"' plan.json
+
+          drift=$(jq '[.resource_changes[]? | select(.change.actions != ["no-op"])] | length' plan.json)
+          if [ "$drift" -eq 0 ]; then
+            echo "::notice::Repository settings match infra/main.tf."
+          else
+            terraform show -no-color tfplan
+            echo "::error::$drift resource(s) differ from infra/main.tf. Nothing was changed — run this workflow manually to reconcile, or update the config if the change was intended."
+            exit 1
+          fi

@@ -403,6 +403,13 @@ file. A workflow that skipped, a token missing a scope, or an app without
 access all look identical to success from the outside — which is how a repo
 ends up with settings-as-documentation instead of settings-as-code.
 
+Check it again on a schedule, not only when the config changes. Applying on
+change means the config is true at the moment it is edited and unverified
+after that; a weekly run that compares and reports — without applying — is
+what turns "we declared this" into "this is the case". Let drift fail the
+run: a failing scheduled job is the notification, and a green one that found
+problems quietly is the thing being guarded against.
+
 ## Org-owned repos
 
 Prefer the org's existing mechanism if there is one — `safe-settings`, an infra
