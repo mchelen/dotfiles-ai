@@ -121,7 +121,8 @@ flowchart LR
   applied to this repo — see `specs/README.md`.
 - **`infra/`** — GitHub repository settings as code (Terraform, official
   GitHub provider): description, merge policy, Pages source, vulnerability
-  alerts, secret scanning + push protection. The `repo-config` module makes
+  alerts, secret scanning + push protection, and branch protection on `main`
+  (required `test` check, administrators included, branches must be current). The `repo-config` module makes
   the Settings GitHub App the default and Terraform the exception; this repo
   is the exception, and for the reason the module names — three of the
   settings above (Pages `build_type`, secret scanning, push protection) have

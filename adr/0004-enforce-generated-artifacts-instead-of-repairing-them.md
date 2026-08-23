@@ -1,7 +1,7 @@
 # 4. Enforce generated artifacts in CI instead of repairing them with a bot
 
-- **Status:** Proposed — this record exists to support one decision, stated
-  under [Decision](#decision). Branch protection is not yet enabled.
+- **Status:** Accepted — merged as #48. Branch protection followed in a
+  separate change, which is what this decision unblocked.
 - **Date:** 2026-08-23
 
 ## Context
