@@ -13,7 +13,7 @@ exists.*
 | [0001](0001-forkable-repo-for-personal-ai-preferences.md) | Distribute personal AI preferences as a forkable dotfiles repo | Accepted, provisional · superseded in part by 0003 |
 | [0002](0002-adopt-storytelling-commit-convention.md) | Adopt the storytelling commit convention, scoped to two existing rules | Accepted · superseded in part by 0003 |
 | [0003](0003-curate-skills-on-the-agent-skills-standard.md) | Curate skills as a first-class output, on the Agent Skills standard | Accepted |
-| [0004](0004-enforce-generated-artifacts-instead-of-repairing-them.md) | Enforce generated artifacts in CI instead of repairing them with a bot | Proposed |
+| [0004](0004-enforce-generated-artifacts-instead-of-repairing-them.md) | Enforce generated artifacts in CI instead of repairing them with a bot | Accepted |
 
 ## Conventions
 
