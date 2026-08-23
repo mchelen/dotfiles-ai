@@ -976,11 +976,11 @@ quietly disabled.**
 
     <div class="module">
       <h4>repo-config</h4>
-      <p class="module-summary">Repository settings live in the repo as code and apply automatically — the Settings app by default, Terraform for the settings it has no key for.</p>
+      <p class="module-summary">Repository settings live in the repo as code and apply automatically. Terraform is more powerful, the Settings app is easier to set up, so the app goes first.</p>
       <p class="module-scope">GitHub-specific. The principle carries to any forge; both implementations are GitHub's.</p>
       <!-- BEGIN module-text: repo-config -->
       <details class="module-text">
-        <summary>Exact text — 89 lines, verbatim as installed</summary>
+        <summary>Exact text — 92 lines, verbatim as installed</summary>
         <pre># Repo configuration as code
 
 **Repository settings live in the repo as code, never clicked through the
@@ -995,10 +995,12 @@ branch protection rules once they exist. When one must change, change the file
 and let it apply — don't flip it in the UI and leave the code lying. If a UI
 change already happened, reconcile the code to match (or revert) promptly.
 
-Two implementations, and the choice is mostly decided by the list above:
-whether the settings I need are ones the app can reach.
+Two implementations, and the trade between them is simple: **Terraform is more
+powerful, the Settings app is easier to set up.** Start with the app, and move
+to Terraform when you need something it cannot reach — the list below says
+exactly where that line falls.
 
-## The Settings GitHub App (default)
+## The Settings GitHub App (default — least to set up)
 
 - [`repository-settings/app`](https://github.com/repository-settings/app),
   hosted at `github.com/apps/settings`. Config lives in
@@ -1024,11 +1026,12 @@ whether the settings I need are ones the app can reach.
   `CODEOWNERS` owner of `.github/settings.yml` and require code-owner review.
   If that mitigation isn't in place, prefer Terraform.
 
-## Terraform (when the app can't reach it)
+## Terraform (when you need more than the app can reach)
 
-Reach for this when the repo needs Pages, secret scanning, or push protection
-managed as code, or when the push-to-admin escalation isn't acceptable and
-`CODEOWNERS` isn't enough.
+The whole GitHub provider surface, at the cost of a PAT to mint and rotate and
+a workflow to maintain. Reach for it when the repo needs Pages, secret
+scanning, or push protection managed as code, or when the push-to-admin
+escalation isn't acceptable and `CODEOWNERS` isn't enough.
 
 - Official GitHub provider (`integrations/github`) with an `import` block to
   adopt the existing repo. Config lives in `infra/`.
@@ -1604,10 +1607,10 @@ When I ask for a new feature or a significant change:
       <p><strong>The catch is size.</strong> These fields are capped, and the full block is nowhere near small enough:</p>
       <div class="table-wrap">
       <table>
-        <tr><th>Field</th><th>Cap</th><th>Full block (<span data-gen="full">24,731</span>)</th><th>Condensed (<span data-gen="brief">1,294</span>)</th></tr>
-        <tr><td>Claude — project instructions</td><td>~8,000</td><td>✗ <span data-gen="over-8000">16,731</span> over</td><td class="ok">✓ fits</td></tr>
-        <tr><td>ChatGPT — custom instructions (paid)</td><td>5,000</td><td>✗ <span data-gen="over-5000">19,731</span> over</td><td class="ok">✓ fits</td></tr>
-        <tr><td>ChatGPT — custom instructions (Free/Go)</td><td>1,500</td><td>✗ <span data-gen="over-1500">23,231</span> over</td><td class="ok">✓ fits</td></tr>
+        <tr><th>Field</th><th>Cap</th><th>Full block (<span data-gen="full">25,003</span>)</th><th>Condensed (<span data-gen="brief">1,294</span>)</th></tr>
+        <tr><td>Claude — project instructions</td><td>~8,000</td><td>✗ <span data-gen="over-8000">17,003</span> over</td><td class="ok">✓ fits</td></tr>
+        <tr><td>ChatGPT — custom instructions (paid)</td><td>5,000</td><td>✗ <span data-gen="over-5000">20,003</span> over</td><td class="ok">✓ fits</td></tr>
+        <tr><td>ChatGPT — custom instructions (Free/Go)</td><td>1,500</td><td>✗ <span data-gen="over-1500">23,503</span> over</td><td class="ok">✓ fits</td></tr>
       </table>
       </div>
       <p class="lead">So this path uses <code>INSTRUCTIONS-brief.md</code> — one line per module, generated from each module's thesis sentence by the same CI job that builds the full block. At <span data-gen="brief">1,294</span> characters it clears the 1,500 floor with about two modules to spare. That floor is checked, not remembered: <code>install.sh --brief</code> warns when it's exceeded and the test suite fails, so a module that would overflow your settings field is caught before it ships. If you add enough of your own to break it, use <code>--brief --only</code> with the modules that matter to you, or the fetch approach in step 7.</p>

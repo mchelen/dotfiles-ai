@@ -282,10 +282,12 @@ branch protection rules once they exist. When one must change, change the file
 and let it apply — don't flip it in the UI and leave the code lying. If a UI
 change already happened, reconcile the code to match (or revert) promptly.
 
-Two implementations, and the choice is mostly decided by the list above:
-whether the settings I need are ones the app can reach.
+Two implementations, and the trade between them is simple: **Terraform is more
+powerful, the Settings app is easier to set up.** Start with the app, and move
+to Terraform when you need something it cannot reach — the list below says
+exactly where that line falls.
 
-## The Settings GitHub App (default)
+## The Settings GitHub App (default — least to set up)
 
 - [`repository-settings/app`](https://github.com/repository-settings/app),
   hosted at `github.com/apps/settings`. Config lives in
@@ -311,11 +313,12 @@ whether the settings I need are ones the app can reach.
   `CODEOWNERS` owner of `.github/settings.yml` and require code-owner review.
   If that mitigation isn't in place, prefer Terraform.
 
-## Terraform (when the app can't reach it)
+## Terraform (when you need more than the app can reach)
 
-Reach for this when the repo needs Pages, secret scanning, or push protection
-managed as code, or when the push-to-admin escalation isn't acceptable and
-`CODEOWNERS` isn't enough.
+The whole GitHub provider surface, at the cost of a PAT to mint and rotate and
+a workflow to maintain. Reach for it when the repo needs Pages, secret
+scanning, or push protection managed as code, or when the push-to-admin
+escalation isn't acceptable and `CODEOWNERS` isn't enough.
 
 - Official GitHub provider (`integrations/github`) with an `import` block to
   adopt the existing repo. Config lives in `infra/`.
