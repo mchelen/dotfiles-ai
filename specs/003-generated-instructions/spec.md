@@ -1,14 +1,16 @@
 # Feature Specification: Generated INSTRUCTIONS.md
 
 **Feature Branch**: n/a — retroactive spec for behavior already shipped in
-`INSTRUCTIONS.md` and `.github/workflows/generate-instructions.yml`
+`INSTRUCTIONS.md`, `install.sh --print`/`--brief`, and the staleness checks in
+`test.sh`
 
 **Created**: 2026-07-25
 
 **Status**: Active (describes current intended behavior)
 
 **Input**: Make the assembled block available to someone who has only a browser —
-no clone, no shell — and keep that copy current automatically.
+no clone, no shell — and make it impossible for that copy to fall behind the
+modules it is generated from.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -87,16 +89,18 @@ confirm the result is identical to the committed file.
 
 - **Nothing changed.** The regeneration makes no commit at all, rather than an
   empty one.
-- **Regeneration must not trigger itself.** The commit it makes touches only the
-  generated file, which is not among the paths that start the process.
-- **Two changes in quick succession.** Regeneration runs are serialized so the
-  later one is not cancelled and does not race the earlier one's commit.
-- **The file is edited in the same pull request as a module.** The result is the
-  same either way: correct at merge time, and the regeneration finds nothing to
-  do.
-- **A fork with the automation disabled.** The generated file stays at whatever
-  the last regeneration produced. [NEEDS CLARIFICATION: should the install guide
-  tell fork owners to check that the workflow is enabled?]
+- **A module is edited without regenerating.** The change fails its checks and
+  cannot merge, naming the file to regenerate. This is the ordinary case, and
+  it is why the check exists.
+- **A module is edited in the browser, by someone with no terminal.** They
+  cannot complete the change alone: regeneration needs a shell or an agent
+  acting in the fork. *Resolved: the guide says so plainly rather than implying
+  the browser is sufficient for editing.* The browser remains sufficient for
+  every read path, which is what the no-terminal promise actually covers.
+- **Two module changes in flight at once.** Each pull request regenerates from
+  its own base, and whichever merges second fails its check until it is
+  refreshed against the new `main` — the same rebase-and-rerun any conflicting
+  change needs.
 
 ## Requirements *(mandatory)*
 
@@ -109,23 +113,30 @@ confirm the result is identical to the committed file.
   regenerated and committed by the same automation, on the same trigger.
 - **FR-002**: That file MUST be usable by copy and paste with no editing: no
   preamble, no trailing commentary, both markers present.
-- **FR-003**: The file MUST be regenerated whenever the modules or the assembly
-  logic change on the default branch.
-- **FR-004**: Regeneration MUST commit the result only when it differs from what
-  is already committed.
-- **FR-005**: Regeneration MUST run in continuous integration, not as a local
-  pre-commit step, so that changes made without a local checkout are covered.
+- **FR-003**: The file MUST be regenerated in the same change that alters the
+  modules or the assembly logic, so the default branch never carries a
+  mismatched pair.
+- **FR-004**: Regeneration MUST be idempotent: running it when the file is
+  already correct MUST produce no difference, and therefore no commit.
+- **FR-005**: Continuous integration MUST fail when any generated file differs
+  from what the assembly step produces from the current modules, naming the
+  file. Enforcement replaces repair: a check that blocks the change is
+  available to every fork with no credential, whereas automation that pushes
+  the fix needs write access to the default branch and an identity able to
+  hold it.
 - **FR-006**: The file MUST never be authored or corrected by hand; the modules
   are the only input.
-- **FR-007**: Regeneration MUST NOT retrigger itself.
-- **FR-008**: Concurrent regenerations MUST NOT race each other.
+- **FR-007**: The check MUST run on the same events as the rest of the test
+  suite, so a stale artifact is caught before merge rather than corrected
+  after it.
 
 ### Key Entities
 
 - **Generated instructions file**: the repository-root copy of the assembled
   block, the artifact every no-terminal path reads.
-- **Regeneration workflow**: the automation that rebuilds that file from the
-  modules and commits the difference.
+- **Regeneration step**: the command that rebuilds a generated file from the
+  modules — `install.sh --print`, `install.sh --brief`, `build-site.sh` — run
+  by whoever changes a module, in the same change.
 
 ## Success Criteria *(mandatory)*
 
@@ -135,10 +146,12 @@ confirm the result is identical to the committed file.
   open the file, copy raw — with no clone and nothing installed.
 - **SC-002**: For every commit on the default branch, both committed files match
   a fresh assembly of the modules at that commit.
-- **SC-003**: A module edited entirely in the browser is reflected in the
-  generated file without any human action.
-- **SC-004**: A change that leaves the file correct produces no commit and no
-  noise in history.
+- **SC-003**: No commit reaches the default branch carrying a module change
+  without the matching regeneration — enforced, not remembered.
+- **SC-004**: Regeneration on an already-correct tree produces no difference,
+  so re-running it is never a source of noise in history.
+- **SC-005**: The check needs no credential, so it works identically in a fork
+  the moment it is created.
 
 ## Assumptions
 

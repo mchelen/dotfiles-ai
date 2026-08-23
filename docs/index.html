@@ -1532,7 +1532,7 @@ mkdir -p "$HOME/.claude"
 
 - Every project keeps an `ARCHITECTURE.md` at the repo root: a high-level
   description of the code — major components, how they fit together…</div>
-          <div class="gh-note" style="margin-top:.5rem">↑ generated from <code>defaults/</code> by the <code>generate-instructions</code> workflow</div>
+          <div class="gh-note" style="margin-top:.5rem">↑ generated from <code>defaults/</code> by <code>install.sh --print</code>, committed with the change that edits a module</div>
         </div>
       </div>
 
@@ -1602,7 +1602,7 @@ page size. Mockup of the button placement below…</div>
       </div>
 
       <div class="callout">
-        <p><strong>Editing the defaults themselves, also without a terminal:</strong> in your fork, open any file under <code>defaults/</code>, click the pencil, edit, and commit to <code>main</code>. The <code>generate-instructions</code> workflow reassembles <code>INSTRUCTIONS.md</code> within a minute of that commit. To push the change into a project, repeat steps 4–11 and replace the old block (the <code>CLAUDE.md</code> import from step 12 needs no touching — it points at the file you just refreshed).</p>
+        <p><strong>Editing the defaults themselves:</strong> in your fork, open any file under <code>defaults/</code>, click the pencil, and edit. <code>INSTRUCTIONS.md</code> is generated from those files and does <em>not</em> update itself — regenerate it in the same change with <code>./install.sh --print &gt; INSTRUCTIONS.md</code>, or ask a coding agent working in your fork to. The test suite fails if you don't, so nothing lands half-updated, but this one step does need a terminal or an agent. To push the change into a project, repeat steps 4–11 and replace the old block (the <code>CLAUDE.md</code> import from step 12 needs no touching — it points at the file you just refreshed).</p>
       </div>
     </div>
 
