@@ -59,13 +59,12 @@ flowchart LR
   persist would be silently reverted within a day — while the repo-level way
   to curate stays "delete the module from your fork".
 - **`INSTRUCTIONS.md`** — the assembled block, committed at the repo root as
-  a build artifact of `install.sh --print`. Generated, never hand-edited:
-  **`.github/workflows/generate-instructions.yml`** regenerates and commits
-  it — along with `INSTRUCTIONS-brief.md` and the site's module text —
-  whenever `defaults/**`, `install.sh`, or `build-site.sh` changes on `main`. It lives in
-  CI rather than in a local pre-commit hook on purpose — modules edited
-  through the GitHub web editor have no local hook to run, and the
-  no-terminal install path depends on this file being current. Its consumers
+  a build artifact of `install.sh --print`. Generated, never hand-edited, and
+  regenerated in the same change that edits a module — along with
+  `INSTRUCTIONS-brief.md` and the site's module text. **`test.sh`** fails when
+  any of the three differs from what the installer produces, so staleness is
+  caught by the same gate as everything else rather than repaired afterwards
+  by a workflow pushing to `main`. Its consumers
   copy it by hand (web editor, settings fields), so it is a snapshot
   wherever it lands, refreshed by replacing the marker-delimited block.
 - **`test.sh`** — the acceptance scenarios from `specs/001-user-level-install`

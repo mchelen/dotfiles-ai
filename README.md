@@ -196,12 +196,12 @@ remembered: `install.sh --brief` warns on stderr when it's exceeded, and
 before it ships. `--brief --only` is the escape hatch if you add enough of
 your own to break it.
 
-Both are generated — never edit them by hand. The
-[`generate-instructions` workflow](.github/workflows/generate-instructions.yml)
-runs `install.sh --print` and `install.sh --brief` and commits the results
-whenever `defaults/**` changes on `main`. CI rather than a local pre-commit hook is the
-point: a module edited in the browser has no local hook to run, and the
-no-terminal path only works if this file is always current.
+Both are generated — never edit them by hand. Regenerate with
+`./install.sh --print > INSTRUCTIONS.md` and
+`./install.sh --brief > INSTRUCTIONS-brief.md` in the same change that edits a
+module, alongside `./build-site.sh`. `./test.sh` fails if any of the three is
+stale, so a pull request cannot land a module change and leave the copies
+people actually read behind.
 
 ## Keeping copies in sync
 

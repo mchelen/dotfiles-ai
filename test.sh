@@ -132,6 +132,21 @@ check "SC-006 condensed form fits the documented floor" "$brief_size characters 
   "$([[ $brief_size -le 1500 ]] && echo fits || echo over)" "fits"
 rm -rf "$h"
 
+# --- the committed artifacts match what the installer produces --------------
+# docs/index.html was checked below long before these two were, so a change
+# that regenerated the site but not INSTRUCTIONS.md passed. The no-terminal
+# install path reads INSTRUCTIONS.md straight out of the repo, so a stale one
+# is a wrong answer served to whoever copies it.
+h="$(new_home)"
+full="$(mktemp)"; brief="$(mktemp)"
+run "$h" --print > "$full" 2>/dev/null
+run "$h" --brief > "$brief" 2>/dev/null
+check "INSTRUCTIONS.md matches install.sh --print" "regenerate to fix" \
+  "$(diff -q "$REPO_DIR/INSTRUCTIONS.md" "$full" >/dev/null 2>&1 && echo current || echo stale)" "current"
+check "INSTRUCTIONS-brief.md matches install.sh --brief" "regenerate to fix" \
+  "$(diff -q "$REPO_DIR/INSTRUCTIONS-brief.md" "$brief" >/dev/null 2>&1 && echo current || echo stale)" "current"
+rm -f "$full" "$brief"; rm -rf "$h"
+
 # --- the site carries each module's exact text, and it is current -----------
 # build-site.sh injects defaults/*.md into docs/index.html. Nothing stops a
 # module from being edited without the site being rebuilt, so the drift check
