@@ -171,6 +171,14 @@ environment, it lags `defaults/` until the cache rebuilds.
 The last one is deliberately manual: those files are shared with a project's
 collaborators, so no scheduled bot rewrites them.
 
+The copies no mechanism reaches — a block in a settings field, or committed to
+a project — carry the refresh instruction inside themselves: the block ends
+with the URL it was assembled from and asks whatever reads it to compare, report
+and offer. It is the weakest of the mechanisms here, because an assistant has
+no scheduler, but it is the only one available to a copy that nothing owns.
+`sync.sh` additionally reports when a fork has fallen behind an `upstream`
+remote, without merging it.
+
 ## Key invariant
 
 The generated block in target files is disposable: the source of truth is

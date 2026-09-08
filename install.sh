@@ -51,6 +51,23 @@ TARGETS=(
   "$HOME/.config/goose/.goosehints"         # Goose
 )
 
+# Where this copy came from, so an installed block can be checked against its
+# source later. Derived from the clone's own remote, normalised so an SSH and
+# an HTTPS clone of the same repo produce the same string — a fork's blocks
+# should point at the fork, not at wherever it was forked from.
+source_url() {
+  local url
+  url="$(git -C "$REPO_DIR" remote get-url origin 2>/dev/null || true)"
+  if [[ -z "$url" ]]; then
+    echo "https://github.com/mchelen/dotfiles-ai"   # no clone: name the origin
+    return
+  fi
+  url="${url%.git}"; url="${url%/}"
+  url="${url/#git@github.com:/https://github.com/}"
+  url="${url/#ssh:\/\/git@github.com\//https://github.com/}"
+  echo "$url"
+}
+
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-ai"
 SELECTION_FILE="$STATE_DIR/modules"
 
@@ -147,12 +164,36 @@ selected_files() { local m; for m in "${SELECTED[@]}"; do echo "$REPO_DIR/defaul
 # Modules are flat files in defaults/; categories are a documentation
 # concept (see the README), not a directory layout.
 assemble() {
-  local f
+  local f src raw
+  src="$(source_url)"
+  raw="${src/#https:\/\/github.com\//https://raw.githubusercontent.com/}/main/INSTRUCTIONS.md"
   echo "$BEGIN_MARK"
   while read -r f; do
     cat "$f"
     echo
   done < <(selected_files)
+
+  # A staying-current note travels inside the block, because the copies that
+  # need it most are the ones nothing else can reach: a block pasted into a
+  # settings field, or committed to a project repo. Deliberately carries no
+  # date or commit — the block is regenerated and diffed by CI, and anything
+  # that changes on its own would make that check fail every day.
+  cat <<EOF
+# Keeping these current
+
+**These defaults came from $src and do not update themselves.**
+
+- When I ask whether they are current, or when we start something substantial
+  and fetching a URL is cheap, read $raw
+  and compare it with the block between these markers.
+- Tell me what changed, in a sentence or two. Then offer to replace the block.
+  Never rewrite it without asking — it may sit in a file I share with other
+  people.
+- On a machine with the repository cloned, \`sync.sh\` already does this on a
+  schedule and this note is redundant. It is here for the copies nothing
+  refreshes: pasted into a settings field, or committed to a project.
+EOF
+  echo
   echo "$END_MARK"
 }
 

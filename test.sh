@@ -137,8 +137,10 @@ rm -rf "$h"
 # whoever else works on the repo. This is a snapshot: nothing syncs it.
 h="$(new_home)"; proj="$(mktemp -d)"; git -C "$proj" init -q
 run "$h" --project "$proj" --only testing,secrets >/dev/null 2>&1
-check "FR-017 --project writes AGENTS.md" "module headings" \
-  "$(grep -c '^# ' "$proj/AGENTS.md" 2>/dev/null || true)" "2"
+check "FR-017 --project writes AGENTS.md" "the two selected modules" \
+  "$(grep -cE '^# (Testing|Secrets and sensitive data)$' "$proj/AGENTS.md" 2>/dev/null || true)" "2"
+check "FR-017 --project writes only what was selected" "an unselected module" \
+  "$(grep -c '^# Changelog$' "$proj/AGENTS.md" 2>/dev/null || true)" "0"
 check "FR-017 --project adds a CLAUDE.md import" "contents" \
   "$(cat "$proj/CLAUDE.md" 2>/dev/null || true)" "@AGENTS.md"
 
@@ -193,7 +195,7 @@ new_fixture() { # prints a root dir containing origin.git/ and clone/
   printf '# One\n\n**First module thesis.**\n' > "$root/src/defaults/one.md"
   git_q -C "$root/src" add -A
   git_q -C "$root/src" commit -qm "init"
-  git_q -C "$root/src" push -q "$root/origin.git" main
+  git_q -C "$root/src" push -q "$root/origin.git" main 2>/dev/null
   git_q clone -q "$root/origin.git" "$root/clone"
   echo "$root"
 }
@@ -202,7 +204,7 @@ publish() { # publish <root> <module-name>: add a module upstream
   printf '# %s\n\n**Thesis for %s.**\n' "$2" "$2" > "$1/src/defaults/$2.md"
   git_q -C "$1/src" add -A
   git_q -C "$1/src" commit -qm "add $2"
-  git_q -C "$1/src" push -q "$1/origin.git" main
+  git_q -C "$1/src" push -q "$1/origin.git" main 2>/dev/null
 }
 
 sync_run() { # sync_run <root> <home> [args...]
@@ -302,6 +304,47 @@ git_q -C "$r/clone" config core.hooksPath .githooks
 sync_run "$r" "$h" >/dev/null 2>&1
 check "FR-009 legacy core.hooksPath is unset" "config value" \
   "$(git -C "$r/clone" config --get core.hooksPath || echo unset)" "unset"
+rm -rf "$r" "$h"
+
+# --- the block tells a pasted copy how to check itself ----------------------
+# A block pasted into a settings field or committed to a project has nothing
+# watching it. The only thing that can notice it has gone stale is whatever
+# reads it, so the block says where it came from.
+h="$(new_home)"
+printed="$(run "$h" --print 2>/dev/null)"
+check "block names its source repository" "raw URL present" \
+  "$(printf '%s' "$printed" | grep -c 'raw.githubusercontent.com/.*/INSTRUCTIONS.md' || true)" "1"
+check "the note is inside the markers" "note before END" \
+  "$(printf '%s' "$printed" | awk '/BEGIN dotfiles-ai/{i=1} /Keeping these current/{if(i)n=1} /END dotfiles-ai/{print (n?"inside":"outside"); exit}')" "inside"
+# Nothing dated or commit-pinned: the artifact check regenerates and diffs, so
+# anything that moved on its own would fail the build every day.
+check "the note carries nothing that changes on its own" "dates or shas" \
+  "$(printf '%s' "$printed" | grep -cE '[0-9]{4}-[0-9]{2}-[0-9]{2}|\b[0-9a-f]{7,40}\b' || true)" "0"
+rm -rf "$h"
+
+# --- sync.sh reports when the fork is behind upstream -----------------------
+# The fork is the user's, so merging upstream stays their click. Saying that
+# it is waiting is not.
+r="$(new_fixture)"; h="$(new_home)"; mkdir -p "$h/.claude"
+git_q init -q -b main --bare "$r/upstream.git"
+git_q -C "$r/src" push -q "$r/upstream.git" main 2>/dev/null
+git_q -C "$r/clone" remote add upstream "$r/upstream.git"
+sync_run "$r" "$h" >/dev/null 2>&1                     # settle: nothing behind
+check "upstream level produces no notice" "output" \
+  "$(sync_run "$r" "$h" 2>&1 | grep -c 'behind upstream' || true)" "0"
+
+printf '# Up\n\n**Upstream only.**\n' > "$r/src/defaults/up.md"
+git_q -C "$r/src" add -A; git_q -C "$r/src" commit -qm "upstream moves"
+git_q -C "$r/src" push -q "$r/upstream.git" main 2>/dev/null
+check "upstream ahead is reported" "notice" \
+  "$(sync_run "$r" "$h" 2>&1 | grep -c 'behind upstream' || true)" "1"
+# …and reported on an idle machine, where nothing else has moved. That is the
+# case the notice exists for, and it sits before the early exit for it.
+rm -f "$h/.local/state/dotfiles-ai/last-sync"   # past the throttle window
+check "upstream notice survives an idle auto run" "notice" \
+  "$(sync_run "$r" "$h" --auto 2>&1 | grep -c 'behind upstream' || true)" "1"
+check "the fork is not merged for you" "up.md pulled" \
+  "$([[ -e "$r/clone/defaults/up.md" ]] && echo yes || echo no)" "no"
 rm -rf "$r" "$h"
 
 # --- the committed artifacts match what the installer produces --------------

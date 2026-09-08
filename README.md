@@ -218,6 +218,20 @@ people actually read behind.
 
 ## Keeping copies in sync
 
+Every assembled block ends with the URL it was built from and asks whoever
+reads it to compare the two when asked — and to report what changed and offer
+to update, never to rewrite it unprompted. That is the only mechanism
+available to a block pasted into a settings field or committed to a project,
+where nothing is watching. On a machine with the repo cloned, `sync.sh` makes
+it redundant.
+
+If you add an `upstream` remote to your clone
+(`git remote add upstream https://github.com/mchelen/dotfiles-ai`), `sync.sh`
+also says when your fork has fallen behind it. Merging that stays your click —
+via GitHub's *Sync fork* — because the point of the fork is that nothing
+changes under you.
+
+
 The copies of the defaults can drift apart, each refreshed differently:
 
 | Direction | How | Effort |
