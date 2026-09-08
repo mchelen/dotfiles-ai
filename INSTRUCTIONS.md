@@ -554,4 +554,18 @@ retrying it.**
 - When a tool failure may have destroyed something I typed, say so explicitly
   instead of quietly proceeding on a guess.
 
+# Keeping these current
+
+**These defaults came from https://github.com/mchelen/dotfiles-ai and do not update themselves.**
+
+- When I ask whether they are current, or when we start something substantial
+  and fetching a URL is cheap, read https://raw.githubusercontent.com/mchelen/dotfiles-ai/main/INSTRUCTIONS.md
+  and compare it with the block between these markers.
+- Tell me what changed, in a sentence or two. Then offer to replace the block.
+  Never rewrite it without asking — it may sit in a file I share with other
+  people.
+- On a machine with the repository cloned, `sync.sh` already does this on a
+  schedule and this note is redundant. It is here for the copies nothing
+  refreshes: pasted into a settings field, or committed to a project.
+
 <!-- END dotfiles-ai -->

@@ -395,6 +395,8 @@
 <h2>Unreleased</h2>
 <h3>Added</h3>
 <ul>
+<li>Every assembled block now ends with the URL it came from and asks whoever reads it to check against that source, report what changed, and offer to update — never to rewrite it unprompted. It is the only refresh mechanism available to a block pasted into a settings field or committed to a project.</li>
+<li><code>sync.sh</code> reports when your fork has fallen behind an <code>upstream</code> remote, if you have configured one. It does not merge it: the fork is yours.</li>
 <li><code>install.sh --project [DIR]</code> writes the selected modules into a project repository's <code>AGENTS.md</code>, with a <code>CLAUDE.md</code> that imports it, so preferences that belong to a repo reach everyone working on it. The quick start offers this alongside the machine-level install, once you have chosen your modules. It is a snapshot — nothing refreshes a file in a repo you share.</li>
 <li>A <code>changelog</code> module: every project keeps a <code>CHANGELOG.md</code> written for readers rather than generated from the commit log, published on the project's website rather than left in the source tree.</li>
 <li>This file, and its page on the site.</li>

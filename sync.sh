@@ -9,6 +9,10 @@
 # Usage:
 #   ./sync.sh          sync now
 #   ./sync.sh --auto   for shell startup: at most one attempt per day
+#
+# If a remote named `upstream` exists, it also reports when your fork has
+# fallen behind it. Merging that is your call, not this script's:
+#   git remote add upstream https://github.com/mchelen/dotfiles-ai
 #                      (override with DOTFILES_AI_SYNC_INTERVAL, seconds),
 #                      silent when offline or already up to date
 
@@ -58,6 +62,25 @@ elif ! pull; then
   exit 1
 fi
 after=$(git -C "$REPO_DIR" rev-parse HEAD)
+
+# Fork <- upstream stays a deliberate manual step: the fork is yours, and
+# upstream changing underneath you is the thing forking avoids. But nobody
+# clicks a button they don't know is waiting. If an `upstream` remote exists,
+# say when it has moved ahead, and leave the decision alone.
+#
+# This runs before the "nothing to install" early exit below, because an idle
+# machine — the fork unchanged, everything installed — is exactly the case
+# where upstream is the only thing that has moved.
+if git -C "$REPO_DIR" remote get-url upstream >/dev/null 2>&1 &&
+   git -C "$REPO_DIR" fetch --quiet upstream main >/dev/null 2>&1; then
+  behind=$(git -C "$REPO_DIR" rev-list --count HEAD..upstream/main 2>/dev/null || echo 0)
+  if [[ "$behind" -gt 0 ]]; then
+    echo "dotfiles-ai: your fork is $behind commit(s) behind upstream."
+    echo "             Review and merge them with GitHub's 'Sync fork' button,"
+    echo "             then this will pick them up on its next run."
+  fi
+fi
+
 installed=$(cat "$STATE_DIR/installed-commit" 2>/dev/null || true)
 
 if [[ $auto -eq 1 && "$after" == "$installed" ]]; then

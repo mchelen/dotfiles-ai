@@ -10,6 +10,12 @@ edited, so there is nothing to release. Sections are dated instead.
 
 ### Added
 
+- Every assembled block now ends with the URL it came from and asks whoever
+  reads it to check against that source, report what changed, and offer to
+  update — never to rewrite it unprompted. It is the only refresh mechanism
+  available to a block pasted into a settings field or committed to a project.
+- `sync.sh` reports when your fork has fallen behind an `upstream` remote, if
+  you have configured one. It does not merge it: the fork is yours.
 - `install.sh --project [DIR]` writes the selected modules into a project
   repository's `AGENTS.md`, with a `CLAUDE.md` that imports it, so preferences
   that belong to a repo reach everyone working on it. The quick start offers
